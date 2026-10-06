@@ -1,3 +1,7 @@
+html, body {
+    overscroll-behavior-y: contain;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
