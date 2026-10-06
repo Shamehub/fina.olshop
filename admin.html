@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FINA OLSHOP</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 800: '#92400e', 900: '#78350f' },
+                        rose: { 600: '#e11d48' }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fef3c7; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
+        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes modalFadeIn {
+            0% { opacity: 0; transform: scale(0.98) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal-pop { will-change: transform, opacity; animation: modalFadeIn 0.18s cubic-bezier(0, 0, 0.2, 1) forwards; }
+    </style>
+</head>
+<body class="bg-amber-50/50 text-amber-900 font-sans min-h-screen flex flex-col justify-between custom-scrollbar">
+
+    <!-- OVERLAY AUTENTIKASI ADMIN -->
+    <div id="adminAuthOverlay" class="fixed inset-0 z-50 bg-amber-900/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-800 mx-auto flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h2 class="font-serif font-bold text-xl text-amber-900 mb-1">Akses Admin FINA OLSHOP</h2>
+            <p class="text-xs text-amber-800/80 mb-6">Masukkan kata sandi yang terdaftar pada sheet Settings untuk melanjutkan.</p>
+            
+            <form onsubmit="verifyAdminAccess(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminAuthInput" required placeholder="Kata Sandi Admin..." 
+                        class="w-full p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm text-center font-bold tracking-widest outline-none focus:ring-2 focus:ring-amber-500 transition">
+                </div>
+                <div class="flex flex-col gap-2 pt-1">
+                    <button type="submit" id="btnAdminAuthSubmit" class="w-full bg-amber-800 hover:bg-amber-900 text-white py-3 rounded-2xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-key"></i>
+                        <span>Masuk Dashboard</span>
+                    </button>
+                    <a href="index.html" class="text-xs font-bold text-amber-800/80 hover:text-amber-900 py-1 transition">
+                        &larr; Kembali ke Halaman Toko
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div id="adminDashboardContent" class="hidden flex-1 flex flex-col justify-between">
+        <header class="bg-amber-900 text-white py-4 px-4 sm:px-6 shadow-lg sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="bg-amber-800 p-2.5 rounded-2xl border border-amber-700/50 shadow-inner">
+                        <i class="fa-solid fa-user-shield text-xl text-amber-400"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-lg sm:text-xl tracking-tight">Admin Management</h1>
+                        <p class="text-xs text-amber-200/80 font-medium">FINA OLSHOP</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-store text-amber-600 text-base"></i>
+                        <span class="font-bold text-xs text-amber-900">Status Toko:</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="setAdminStoreStatus('BUKA')" id="btnAdminBuka" class="px-3 py-1 rounded-xl font-bold text-xs bg-emerald-600 text-white shadow-sm">
+                            <i class="fa-solid fa-circle text-[8px] mr-1"></i> Buka
+                        </button>
+                        <button onclick="setAdminStoreStatus('LIBUR')" id="btnAdminLibur" class="px-3 py-1 rounded-xl font-bold text-xs bg-rose-600 text-white shadow-sm">
+                            <i class="fa-solid fa-circle text-[8px] mr-1"></i> Libur
+                        </button>
+                        <button onclick="setAdminStoreStatus('TUTUP')" id="btnAdminTutup" class="px-3 py-1 rounded-xl font-bold text-xs bg-gray-900 text-white shadow-sm">
+                            <i class="fa-solid fa-circle text-[8px] mr-1"></i> Tutup
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="loadAdminOrders(); loadAdminProducts();" class="text-xs bg-amber-800 hover:bg-amber-700 text-amber-100 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-amber-700">
+                        <i class="fa-solid fa-rotate text-amber-400"></i>
+                        <span>Refresh Data</span>
+                    </button>
+                    <a href="index.html" class="text-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-white px-3.5 py-2 rounded-xl font-bold transition shadow-md flex items-center gap-1.5">
+                        <i class="fa-solid fa-store"></i>
+                        <span>Halaman Toko</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+            <!-- SUMMARY CARDS -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-800/70 uppercase tracking-wider block">Total Pesanan</span>
+                        <span id="statTotalOrders" class="font-serif font-extrabold text-xl sm:text-2xl text-amber-900">0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-rose-600/80 uppercase tracking-wider block">Pending</span>
+                        <span id="statPendingOrders" class="font-serif font-extrabold text-xl sm:text-2xl text-rose-600">0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">Diproses</span>
+                        <span id="statProcessingOrders" class="font-serif font-extrabold text-xl sm:text-2xl text-amber-600">0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-fire-burner"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Selesai</span>
+                        <span id="statCompletedOrders" class="font-serif font-extrabold text-xl sm:text-2xl text-emerald-600">0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABS SWITCHER -->
+            <div class="flex items-center gap-2 border-b border-amber-200/80 pt-2 font-bold text-xs sm:text-sm">
+                <button onclick="switchTab('orders')" id="tabBtnOrders" class="pb-3 px-3 border-b-2 border-amber-800 text-amber-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Kelola Pesanan Masuk</span>
+                </button>
+                <button onclick="switchTab('products')" id="tabBtnProducts" class="pb-3 px-3 text-amber-800/60 hover:text-amber-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-cake-candles"></i>
+                    <span>Kelola Katalog Kue</span>
+                </button>
+                <button onclick="switchTab('settings')" id="tabBtnSettings" class="pb-3 px-3 text-amber-800/60 hover:text-amber-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Pengaturan Sistem</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: KELOLA PESANAN MASUK -->
+            <section id="tabOrders" class="space-y-4">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-amber-100 shadow-sm">
+                    <div class="relative flex-1">
+                        <input type="text" id="orderSearchInput" oninput="filterAdminOrders()" placeholder="Cari Order ID, Nama, No WA..." 
+                            class="w-full pl-9 pr-4 py-2 bg-amber-50/50 border border-amber-200 rounded-xl text-xs text-amber-900 outline-none">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-amber-800/50 text-xs"></i>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="font-bold text-amber-900 text-[11px]">Filter Status:</span>
+                        <select id="orderStatusFilter" onchange="filterAdminOrders()" class="bg-amber-50/50 border border-amber-200 rounded-xl p-2 font-semibold text-amber-900 outline-none">
+                            <option value="ALL">Semua Status</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="DIPROSES">DIPROSES</option>
+                            <option value="SEDANG DIKEMAS">SEDANG DIKEMAS</option>
+                            <option value="SIAP DIAMBIL">SIAP DIAMBIL</option>
+                            <option value="SEGEA DIKIRIM">SEGERA DIKIRIM</option>
+                            <option value="DALAM PENGIRIMAN">DALAM PENGIRIMAN</option>
+                            <option value="DIKIRIM">DIKIRIM</option>
+                            <option value="SELESAI">SELESAI</option>
+                            <option value="CANCEL">CANCEL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-amber-100/70 text-amber-900 uppercase font-bold border-b border-amber-200/80 text-[11px] tracking-wider">
+                                    <th class="p-3.5">Order ID</th>
+                                    <th class="p-3.5">Pelanggan</th>
+                                    <th class="p-3.5">Pengiriman</th>
+                                    <th class="p-3.5">Waktu Ambil / Pengiriman</th>
+                                    <th class="p-3.5">Detail Items</th>
+                                    <th class="p-3.5">Total Harga</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminOrdersTable" class="divide-y divide-amber-100/80">
+                                <tr>
+                                    <td colspan="8" class="p-8 text-center text-amber-800">
+                                        <i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i>
+                                        <span>Memuat data pesanan...</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: KELOLA KATALOG KUE -->
+            <section id="tabProducts" class="hidden space-y-4">
+                <div class="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-amber-100 shadow-sm">
+                    <div>
+                        <h2 class="font-serif font-bold text-base text-amber-900">Katalog FINA OLSHOP</h2>
+                        <p class="text-xs text-amber-800/80">Tambah, edit, upload hingga 5 foto kue, serta kelola varian & stok.</p>
+                    </div>
+                    <button onclick="openAddProductWithSlug()" class="bg-amber-800 hover:bg-amber-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>+ Kue Baru</span>
+                    </button>
+                </div>
+
+                <div id="adminProductsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <!-- TAB 3: PENGATURAN SISTEM & SETTINGS -->
+            <section id="tabSettings" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-3xl border border-amber-100 shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 border-b border-amber-100 pb-2">
+                            <i class="fa-solid fa-image text-amber-600"></i>
+                            <h3 class="font-serif font-bold text-base text-amber-900">Pengaturan Logo Toko</h3>
+                        </div>
+                        <p class="text-xs text-amber-800/80">Ubah URL logo toko yang tersimpan di sheet Settings.</p>
+                        
+                        <div>
+                            <label class="block font-bold text-amber-900 text-xs mb-1">URL Logo Baru *</label>
+                            <input type="url" id="settingLogoUrl" placeholder="https://..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs outline-none">
+                        </div>
+
+                        <button onclick="saveLogoSettings()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow-sm">
+                            Simpan Logo
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-amber-100 shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 border-b border-amber-100 pb-2">
+                            <i class="fa-solid fa-qrcode text-amber-600"></i>
+                            <h3 class="font-serif font-bold text-base text-amber-900">QRIS & Rekening Pembayaran</h3>
+                        </div>
+                        <p class="text-xs text-amber-800/80">Pengaturan QRIS & nomor rekening bank untuk checkout pelanggan.</p>
+                        
+                        <div>
+                            <label class="block font-bold text-amber-900 text-xs mb-1">URL Gambar QRIS Barcode *</label>
+                            <input type="url" id="settingQrisUrl" placeholder="https://..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-amber-900 text-xs mb-1">Informasi Rekening Bank / E-Wallet *</label>
+                            <input type="text" id="settingBankInfo" placeholder="BCA: 1234567890 a.n FINA OLSHOP" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs outline-none">
+                        </div>
+
+                        <button onclick="saveQrisSettings()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow-sm">
+                            Simpan Pembayaran
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-amber-100 shadow-sm space-y-3 md:col-span-2">
+                        <div class="flex items-center gap-2 border-b border-amber-100 pb-2">
+                            <i class="fa-solid fa-key text-amber-600"></i>
+                            <h3 class="font-serif font-bold text-base text-amber-900">Kata Sandi Admin</h3>
+                        </div>
+                        <p class="text-xs text-amber-800/80">Perbarui kata sandi untuk mengakses dashboard admin.</p>
+                        
+                        <div>
+                            <label class="block font-bold text-amber-900 text-xs mb-1">Kata Sandi Baru *</label>
+                            <input type="password" id="settingNewPwd" placeholder="Masukkan kata sandi baru..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl text-xs outline-none">
+                        </div>
+
+                        <button onclick="savePasswordSettings()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow-sm">
+                            Simpan Kata Sandi
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL ALERT CUSTOM PREMIUM -->
+    <div id="premiumAlertModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div id="alertIconBox" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 shadow-inner"></div>
+            <h3 id="alertTitle" class="font-serif font-bold text-lg text-amber-900 mb-1">Notifikasi</h3>
+            <p id="alertMessage" class="text-xs text-amber-800/90 leading-relaxed mb-6">Pesan notifikasi...</p>
+            <div id="alertActions" class="flex justify-center gap-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM CRUD PRODUK FULLSCREEN -->
+    <div id="productCrudModal" class="fixed inset-0 z-50 hidden bg-white flex flex-col justify-between animate-modal-pop">
+        <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
+            <h3 id="crudModalTitle" class="font-serif font-bold text-lg text-amber-900">Tambah Kue Baru</h3>
+            <div class="flex items-center gap-2">
+                <button onclick="shareCurrentPage()" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-share-nodes mr-1"></i>Bagikan</button>
+                <button onclick="closeModalWithSlug()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar max-w-2xl mx-auto w-full">
+            <form id="crudForm" onsubmit="saveProductSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="crudRowIndex">
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Nama Kue *</label>
+                    <input type="text" id="crudName" required placeholder="mis: Risol Crispy / Bolu Gulung" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Kategori *</label>
+                        <input type="text" id="crudCategory" required placeholder="mis: Kue Basah, Bolu, Snack" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Harga Dasar (Rp) *</label>
+                        <input type="number" id="crudPrice" required placeholder="2000" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/80 p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <label class="block font-bold text-amber-900">Opsi Pilihan Produk *</label>
+                    <select id="crudVariantType" onchange="toggleVariantInputs(this.value)" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none font-medium">
+                        <option value="SINGLE">Satuan Saja (Standar)</option>
+                        <option value="PAKET">Paket Saja</option>
+                        <option value="BOTH">Pilihan Satuan & Paket (Pelanggan Bisa Memilih)</option>
+                    </select>
+
+                    <div id="variantPriceInputs" class="hidden space-y-2 pt-1 border-t border-amber-200">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-amber-800 text-[11px]">Harga Satuan (Rp)</label>
+                                <input type="number" id="crudPriceSatuan" placeholder="15000" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-amber-800 text-[11px]">Harga Paket (Rp)</label>
+                                <input type="number" id="crudPricePaket" placeholder="135000" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Ukuran / Porsi *</label>
+                        <input type="text" id="crudSize" required placeholder="Pcs / Loyang 20cm" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Sistem Stok *</label>
+                        <select id="crudIsPo" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                            <option value="false">Ready Stock</option>
+                            <option value="true">Pre-Order (PO)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Lama PO (Hari)</label>
+                    <input type="number" id="crudPoDays" value="0" min="0" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                </div>
+
+                <div class="bg-amber-50/80 p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block font-bold text-amber-900">Galeri Foto Kue (Maks. 5 Foto) *</label>
+                        <span id="photoCountBadge" class="text-[10px] font-bold text-amber-800 bg-amber-200 px-2 py-0.5 rounded-full">0/5 Foto</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="crudFileInput" accept="image/*" multiple onchange="handleMultiImageUpload(event)" class="hidden">
+                        <button type="button" onclick="document.getElementById('crudFileInput').click()" class="bg-amber-800 hover:bg-amber-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Gambar
+                        </button>
+                        <span id="uploadProgressText" class="text-[11px] font-semibold text-amber-800"></span>
+                    </div>
+
+                    <div id="multiImagePreviewContainer" class="grid grid-cols-5 gap-2 pt-2"></div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Deskripsi Kue *</label>
+                    <textarea id="crudDesc" required rows="2" placeholder="Jelaskan rasa & tekstur kue..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Bahan Utama (Pisahkan dengan koma)</label>
+                    <input type="text" id="crudIngredients" placeholder="Tepung Terigu, Garam, Air, Telur" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Masa Simpan</label>
+                    <input type="text" id="crudShelfLife" placeholder="3 Hari Suhu Ruang" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-amber-100">
+                    <button type="button" onclick="closeModalWithSlug()" class="px-4 py-2 rounded-xl font-bold text-amber-800 hover:bg-amber-100">Batal</button>
+                    <button type="submit" id="btnSaveCrud" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-md transition">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // GANTI DENGAN URL APPS SCRIPT WEB APP ANDA YANG SUDAH DIDEPLOY
+        var API_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID_HERE/exec";
+
+        var rawOrdersData = [];
+        var rawProductsData = [];
+        var uploadedImages = [];
+
+        function apiCall(action, payload, callback, errCallback) {
+            if (payload) {
+                payload.action = action;
+                fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+                .then(res => res.json())
+                .then(res => { if (callback) callback(res.data || res); })
+                .catch(err => { if (errCallback) errCallback(err); else showPremiumAlert("Error", err.message, "error"); });
+            } else {
+                fetch(API_URL + "?action=" + action)
+                .then(res => res.json())
+                .then(res => { if (callback) callback(res.data); })
+                .catch(err => { if (errCallback) errCallback(err); else showPremiumAlert("Error", err.message, "error"); });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputEl = document.getElementById('adminAuthInput');
+            if (inputEl) inputEl.focus();
+            window.addEventListener('hashchange', handleHashRouting);
+        });
+
+        function handleHashRouting() {
+            var hash = window.location.hash;
+            closeAllModals();
+
+            if (hash === '#/kue/tambah') {
+                openAddProductModal();
+            } else if (hash.startsWith('#/kue/edit/')) {
+                var rowIdx = hash.replace('#/kue/edit/', '');
+                openEditProductModal(rowIdx);
+            }
+        }
+
+        function closeAllModals() {
+            var modal = document.getElementById('productCrudModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function closeModalWithSlug() {
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+            closeAllModals();
+        }
+
+        function shareCurrentPage() {
+            if (navigator.share) {
+                navigator.share({ title: 'Admin - FINA OLSHOP', url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showPremiumAlert("Disalin", "Tautan telah disalin!", "success");
+            }
+        }
+
+        function verifyAdminAccess(e) {
+            e.preventDefault();
+            var inputPwd = document.getElementById('adminAuthInput').value.trim();
+            var btn = document.getElementById('btnAdminAuthSubmit');
+
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memeriksa...';
+            btn.disabled = true;
+
+            apiCall('verifyAdminPassword', { password: inputPwd }, function(res) {
+                btn.innerHTML = '<i class="fa-solid fa-key"></i> Masuk Dashboard';
+                btn.disabled = false;
+
+                if (res && res.success) {
+                    document.getElementById('adminAuthOverlay').classList.add('hidden');
+                    document.getElementById('adminDashboardContent').classList.remove('hidden');
+
+                    loadAdminOrders();
+                    loadAdminProducts();
+                    loadAdminSettings();
+                } else {
+                    showPremiumAlert("Akses Ditolak", "Kata sandi yang Anda masukkan salah!", "error");
+                }
+            });
+        }
+
+        function showPremiumAlert(title, message, type, confirmCallback) {
+            var modal = document.getElementById('premiumAlertModal');
+            var iconBox = document.getElementById('alertIconBox');
+            var titleEl = document.getElementById('alertTitle');
+            var msgEl = document.getElementById('alertMessage');
+            var actionsEl = document.getElementById('alertActions');
+
+            titleEl.innerText = title;
+            msgEl.innerText = message;
+
+            if (type === 'success') {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-emerald-100 text-emerald-600 border border-emerald-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else if (type === 'error') {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-rose-100 text-rose-600 border border-rose-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+            } else if (type === 'confirm') {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-amber-100 text-amber-600 border border-amber-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
+            } else {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-blue-100 text-blue-600 border border-blue-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+
+            if (type === 'confirm') {
+                actionsEl.innerHTML = 
+                    '<button onclick="closePremiumAlert()" class="px-4 py-2 rounded-xl font-bold text-xs text-amber-800 hover:bg-amber-100 transition">Batal</button>' +
+                    '<button id="btnConfirmOk" class="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-xl font-bold text-xs transition shadow-md">Ya, Lanjutkan</button>';
+                document.getElementById('btnConfirmOk').onclick = function() {
+                    closePremiumAlert();
+                    if (confirmCallback) confirmCallback();
+                };
+            } else {
+                actionsEl.innerHTML = '<button onclick="closePremiumAlert()" class="bg-amber-800 hover:bg-amber-900 text-white px-6 py-2 rounded-xl font-bold text-xs transition shadow-md">Mengerti</button>';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePremiumAlert() { document.getElementById('premiumAlertModal').classList.add('hidden'); }
+
+        function switchTab(tab) {
+            var tabOrders = document.getElementById('tabOrders');
+            var tabProducts = document.getElementById('tabProducts');
+            var tabSettings = document.getElementById('tabSettings');
+            var btnOrders = document.getElementById('tabBtnOrders');
+            var btnProducts = document.getElementById('tabBtnProducts');
+            var btnSettings = document.getElementById('tabBtnSettings');
+
+            tabOrders.classList.add('hidden');
+            tabProducts.classList.add('hidden');
+            tabSettings.classList.add('hidden');
+            
+            btnOrders.className = "pb-3 px-3 text-amber-800/60 hover:text-amber-900 font-bold transition flex items-center gap-2";
+            btnProducts.className = "pb-3 px-3 text-amber-800/60 hover:text-amber-900 font-bold transition flex items-center gap-2";
+            btnSettings.className = "pb-3 px-3 text-amber-800/60 hover:text-amber-900 font-bold transition flex items-center gap-2";
+
+            if (tab === 'orders') {
+                tabOrders.classList.remove('hidden');
+                btnOrders.className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2";
+            } else if (tab === 'products') {
+                tabProducts.classList.remove('hidden');
+                btnProducts.className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2";
+            } else if (tab === 'settings') {
+                tabSettings.classList.remove('hidden');
+                btnSettings.className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2";
+            }
+        }
+
+        function loadAdminOrders() {
+            var tbody = document.getElementById('adminOrdersTable');
+            tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-amber-800"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i><span>Memuat data pesanan...</span></td></tr>';
+
+            apiCall('getOrders', null, function(orders) {
+                rawOrdersData = Array.isArray(orders) ? orders : [];
+                updateOrderStatistics(rawOrdersData);
+                renderAdminOrdersTable(rawOrdersData);
+            });
+        }
+
+        function updateOrderStatistics(orders) {
+            var total = orders.length;
+            var pending = orders.filter(function(o) { return String(o.status).trim().toUpperCase() === 'PENDING'; }).length;
+            var processing = orders.filter(function(o) { 
+                var st = String(o.status).trim().toUpperCase();
+                return st === 'DIPROSES' || st === 'SEDANG DIKEMAS' || st === 'SIAP DIAMBIL'; 
+            }).length;
+            var completed = orders.filter(function(o) { return String(o.status).trim().toUpperCase() === 'SELESAI'; }).length;
+
+            document.getElementById('statTotalOrders').innerText = total;
+            document.getElementById('statPendingOrders').innerText = pending;
+            document.getElementById('statProcessingOrders').innerText = processing;
+            document.getElementById('statCompletedOrders').innerText = completed;
+        }
+
+        function filterAdminOrders() {
+            var searchQuery = document.getElementById('orderSearchInput').value.toLowerCase().trim();
+            var statusFilter = document.getElementById('orderStatusFilter').value.toUpperCase();
+
+            var filtered = rawOrdersData.filter(function(o) {
+                var matchSearch = (o.orderId && o.orderId.toLowerCase().indexOf(searchQuery) !== -1) ||
+                                    (o.customerName && o.customerName.toLowerCase().indexOf(searchQuery) !== -1) ||
+                                    (o.phone && o.phone.toLowerCase().indexOf(searchQuery) !== -1);
+                var currentStatus = o.status ? String(o.status).trim().toUpperCase() : 'PENDING';
+                var matchStatus = (statusFilter === 'ALL') || (currentStatus === statusFilter);
+                return matchSearch && matchStatus;
+            });
+
+            renderAdminOrdersTable(filtered);
+        }
+
+        function renderAdminOrdersTable(orders) {
+            var tbody = document.getElementById('adminOrdersTable');
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-amber-800 font-semibold">Tidak ada data pesanan.</td></tr>';
+                return;
+            }
+
+            var statusList = ["PENDING", "DIPROSES", "SEDANG DIKEMAS", "SIAP DIAMBIL", "SEGERA DIKIRIM", "DALAM PENGIRIMAN", "DIKIRIM", "SELESAI", "CANCEL"];
+
+            tbody.innerHTML = orders.map(function(o) {
+                var price = (o.totalPrice && !isNaN(o.totalPrice)) ? Number(o.totalPrice) : 0;
+                var statusVal = o.status ? String(o.status).trim().toUpperCase() : 'PENDING';
+                var cleanPhone = o.phone ? String(o.phone).replace(/[^0-9]/g, '') : '';
+                var waLink = cleanPhone ? 'https://wa.me/' + (cleanPhone.indexOf('0') === 0 ? '62' + cleanPhone.slice(1) : cleanPhone) : '#';
+
+                var optionsHtml = statusList.map(function(st) {
+                    var selected = (statusVal === st) ? 'selected' : '';
+                    return '<option value="' + st + '" ' + selected + '>' + st + '</option>';
+                }).join('');
+
+                return '<tr class="hover:bg-amber-50/80 transition text-xs">' +
+                    '<td class="p-3.5 font-bold text-amber-900 border-b border-amber-100">' + (o.orderId || '-') + '</td>' +
+                    '<td class="p-3.5 border-b border-amber-100">' +
+                        '<div class="font-bold text-amber-900">' + (o.customerName || '-') + '</div>' +
+                        '<a href="' + waLink + '" target="_blank" class="text-[11px] text-emerald-600 hover:underline inline-flex items-center gap-1 font-semibold mt-0.5">' +
+                            '<i class="fa-brands fa-whatsapp"></i> ' + (o.phone || '-') +
+                        '</a>' +
+                    '</td>' +
+                    '<td class="p-3.5 border-b border-amber-100">' +
+                        '<span class="font-semibold text-amber-900">' + (o.shippingMethod || '-') + '</span>' +
+                        (o.address && o.address !== '-' ? '<p class="text-[10px] text-amber-800/80 truncate max-w-[150px] mt-0.5" title="' + o.address + '">' + o.address + '</p>' : '') +
+                    '</td>' +
+                    '<td class="p-3.5 font-medium text-amber-900 border-b border-amber-100">' + (o.deliveryDateTime || '-') + '</td>' +
+                    '<td class="p-3.5 border-b border-amber-100">' +
+                        '<div class="whitespace-pre-line leading-relaxed text-amber-900">' + (o.itemsDetail || '-') + '</div>' +
+                    '</td>' +
+                    '<td class="p-3.5 font-extrabold text-rose-600 border-b border-amber-100 whitespace-nowrap">Rp ' + price.toLocaleString('id-ID') + '</td>' +
+                    '<td class="p-3.5 border-b border-amber-100">' +
+                        '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-block ' + getStatusBadgeClass(statusVal) + '">' + statusVal + '</span>' +
+                    '</td>' +
+                    '<td class="p-3.5 border-b border-amber-100">' +
+                        '<select onchange="changeStatus(' + o.rowIndex + ', this.value)" class="text-[11px] p-1.5 border border-amber-200 rounded-lg bg-white font-semibold text-amber-900 outline-none cursor-pointer hover:border-amber-400 transition">' +
+                            optionsHtml +
+                        '</select>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        function getStatusBadgeClass(status) {
+            if (status === 'SELESAI') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+            if (status === 'DIPROSES' || status === 'SEDANG DIKEMAS') return 'bg-amber-100 text-amber-800 border border-amber-200';
+            if (status === 'SIAP DIAMBIL') return 'bg-purple-100 text-purple-800 border border-purple-200';
+            if (status === 'SEGERA DIKIRIM' || status === 'DALAM PENGIRIMAN' || status === 'DIKIRIM') return 'bg-blue-100 text-blue-800 border border-blue-200';
+            if (status === 'CANCEL') return 'bg-gray-200 text-gray-800 border border-gray-300';
+            return 'bg-rose-100 text-rose-800 border border-rose-200';
+        }
+
+        function changeStatus(rowIndex, status) {
+            apiCall('updateOrderStatus', { rowIndex: rowIndex, status: status }, function() {
+                showPremiumAlert("Status Diperbarui", "Status pesanan berhasil diubah!", "success");
+                loadAdminOrders();
+            });
+        }
+        
+        function setAdminStoreStatus(status) {
+            apiCall('setStoreStatus', { status: status }, function() {
+                showPremiumAlert("Status Toko", "Status toko diubah menjadi: " + status, "success");
+            });
+        }
+
+        function toggleVariantInputs(val) {
+            var box = document.getElementById('variantPriceInputs');
+            if (val === 'BOTH') box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        }
+
+        function handleMultiImageUpload(e) {
+            var files = e.target.files;
+            if (!files || files.length === 0) return;
+            if (uploadedImages.length + files.length > 5) {
+                return showPremiumAlert("Batas Maksimal", "Maksimal hanya 5 foto per kue!", "error");
+            }
+
+            var txt = document.getElementById('uploadProgressText');
+            txt.innerText = "Mengunggah...";
+
+            var uploadPromises = Array.from(files).map(function(file) {
+                return new Promise(function(resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function(evt) {
+                        var img = new Image();
+                        img.src = evt.target.result;
+                        img.onload = function() {
+                            var canvas = document.createElement('canvas');
+                            var MAX_WIDTH = 800, MAX_HEIGHT = 800;
+                            var width = img.width, height = img.height;
+
+                            if (width > height) {
+                                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                            } else {
+                                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                            }
+
+                            canvas.width = width; canvas.height = height;
+                            var ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            var compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+
+                            apiCall('uploadImageToDrive', { base64Data: compressedBase64, fileName: "Kue_" + new Date().getTime() + ".jpg" }, function(res) {
+                                resolve(res.url);
+                            }, reject);
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(uploadPromises)
+                .then(function(urls) {
+                    uploadedImages = uploadedImages.concat(urls);
+                    txt.innerText = "Berhasil diunggah!";
+                    renderMultiImagePreviews();
+                })
+                .catch(function(err) {
+                    txt.innerText = "Gagal!";
+                    showPremiumAlert("Upload Gagal", err.message, "error");
+                });
+        }
+
+        function renderMultiImagePreviews() {
+            var container = document.getElementById('multiImagePreviewContainer');
+            document.getElementById('photoCountBadge').innerText = uploadedImages.length + "/5 Foto";
+
+            if (uploadedImages.length === 0) {
+                container.innerHTML = '<span class="col-span-5 text-[10px] text-amber-800/60 italic">Belum ada foto.</span>';
+                return;
+            }
+
+            container.innerHTML = uploadedImages.map(function(url, idx) {
+                return '<div class="relative group rounded-xl overflow-hidden border border-amber-200 h-16 bg-amber-100">' +
+                    '<img src="' + url + '" class="w-full h-full object-cover">' +
+                    '<button type="button" onclick="removeUploadedImage(' + idx + ')" class="absolute top-1 right-1 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md hover:bg-rose-700 transition">' +
+                        '<i class="fa-solid fa-xmark"></i>' +
+                    '</button>' +
+                '</div>';
+            }).join('');
+        }
+
+        function removeUploadedImage(idx) {
+            uploadedImages.splice(idx, 1);
+            renderMultiImagePreviews();
+        }
+
+        function loadAdminProducts() {
+            var grid = document.getElementById('adminProductsGrid');
+            grid.innerHTML = '<div class="col-span-full text-center py-12 text-amber-800"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i><span>Memuat katalog kue...</span></div>';
+
+            apiCall('getProducts', null, function(prods) {
+                rawProductsData = Array.isArray(prods) ? prods : [];
+                if (rawProductsData.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-8 text-amber-800 font-semibold">Tidak ada kue di katalog.</div>';
+                    return;
+                }
+
+                grid.innerHTML = rawProductsData.map(function(p) {
+                    var mainImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
+                    var totalPhotos = (p.images && p.images.length > 0) ? p.images.length : 1;
+
+                    return '<div class="bg-white p-4 rounded-3xl border border-amber-100 shadow-sm flex flex-col justify-between gap-3 hover:shadow-md transition">' +
+                        '<div class="flex items-center gap-3">' +
+                            '<div class="relative w-16 h-16 flex-shrink-0">' +
+                                '<img src="' + mainImg + '" alt="' + p.name + '" class="w-16 h-16 object-cover rounded-2xl border border-amber-100">' +
+                                '<span class="absolute -bottom-1 -right-1 bg-amber-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><i class="fa-solid fa-images mr-0.5"></i>' + totalPhotos + '</span>' +
+                            '</div>' +
+                            '<div class="flex-1 min-w-0">' +
+                                '<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">' + p.category + '</span>' +
+                                '<h4 class="font-serif font-bold text-xs truncate text-amber-900 mt-1">' + p.name + '</h4>' +
+                                '<p class="text-[11px] font-bold text-amber-900 mt-0.5">Rp ' + Number(p.price).toLocaleString('id-ID') + ' / ' + p.size + '</p>' +
+                                '<span class="text-[10px] font-bold ' + (p.isAvailable ? 'text-emerald-600' : 'text-rose-600') + ' block mt-0.5">' +
+                                    (p.isAvailable ? '• Status: Tersedia' : '• Status: Habis') +
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+
+                        '<div class="flex items-center justify-between pt-2 border-t border-amber-100 text-xs">' +
+                            '<button onclick="toggleStock(' + p.rowIndex + ', ' + p.isAvailable + ')" class="px-2.5 py-1 rounded-lg font-bold text-[11px] ' + (p.isAvailable ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-800') + '">' +
+                                (p.isAvailable ? 'Set Habis' : 'Set Ada') +
+                            '</button>' +
+                            '<div class="flex gap-2">' +
+                                '<button onclick="openEditProductWithSlug(' + p.rowIndex + ')" class="bg-blue-50 text-blue-600 p-1.5 rounded-lg hover:bg-blue-100 font-bold"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
+                                '<button onclick="confirmDeleteProduct(' + p.rowIndex + ', \'' + p.name + '\')" class="bg-rose-50 text-rose-600 p-1.5 rounded-lg hover:bg-rose-100 font-bold"><i class="fa-solid fa-trash-can"></i> Hapus</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            });
+        }
+
+        function toggleStock(rowIndex, currentStatus) {
+            apiCall('toggleProductAvailability', { rowIndex: rowIndex, currentStatus: currentStatus }, function() {
+                loadAdminProducts();
+            });
+        }
+
+        function openAddProductWithSlug() { window.location.hash = '#/kue/tambah'; }
+        function openAddProductModal() {
+            document.getElementById('crudModalTitle').innerText = "Tambah Kue Baru";
+            document.getElementById('crudForm').reset();
+            document.getElementById('crudRowIndex').value = "";
+            document.getElementById('uploadProgressText').innerText = "";
+            uploadedImages = [];
+            renderMultiImagePreviews();
+            toggleVariantInputs("SINGLE");
+            document.getElementById('productCrudModal').classList.remove('hidden');
+        }
+
+        function openEditProductWithSlug(rowIndex) { window.location.hash = '#/kue/edit/' + rowIndex; }
+        function openEditProductModal(rowIndex) {
+            var p = rawProductsData.find(function(item) { return item.rowIndex == rowIndex; });
+            if (!p) return;
+
+            document.getElementById('crudModalTitle').innerText = "Edit Data Kue";
+            document.getElementById('crudRowIndex').value = p.rowIndex;
+            document.getElementById('crudName').value = p.name;
+            document.getElementById('crudCategory').value = p.category;
+            document.getElementById('crudPrice').value = p.price;
+            document.getElementById('crudSize').value = p.size;
+            document.getElementById('crudIsPo').value = String(p.isPo);
+            document.getElementById('crudPoDays').value = p.poDays || 0;
+            document.getElementById('crudDesc').value = p.description;
+            document.getElementById('crudIngredients').value = p.ingredients ? p.ingredients.join(', ') : '';
+            document.getElementById('crudShelfLife').value = p.shelfLife || '3 Hari Suhu Ruang';
+
+            uploadedImages = (p.images && p.images.length > 0) ? p.images : (p.image ? [p.image] : []);
+            renderMultiImagePreviews();
+
+            var vType = p.variantType || "SINGLE";
+            document.getElementById('crudVariantType').value = vType;
+            toggleVariantInputs(vType);
+
+            if (vType === 'BOTH' && p.variants && p.variants.length >= 2) {
+                document.getElementById('crudPriceSatuan').value = p.variants[0].price || p.price;
+                document.getElementById('crudPricePaket').value = p.variants[1].price || (p.price * 10);
+            }
+
+            document.getElementById('productCrudModal').classList.remove('hidden');
+        }
+
+        function saveProductSubmit(e) {
+            e.preventDefault();
+            if (uploadedImages.length === 0) {
+                return showPremiumAlert("Peringatan", "Wajib mengunggah minimal 1 foto kue!", "error");
+            }
+
+            var btn = document.getElementById('btnSaveCrud');
+            btn.innerText = "Menyimpan...";
+            btn.disabled = true;
+
+            var rowIndex = document.getElementById('crudRowIndex').value;
+            var vType = document.getElementById('crudVariantType').value;
+            
+            var variantsArr = [];
+            if (vType === 'BOTH') {
+                var priceSat = Number(document.getElementById('crudPriceSatuan').value) || Number(document.getElementById('crudPrice').value);
+                var pricePak = Number(document.getElementById('crudPricePaket').value) || (priceSat * 10);
+                variantsArr = [{ name: "Satuan", price: priceSat }, { name: "Paket", price: pricePak }];
+            } else if (vType === 'PAKET') {
+                variantsArr = [{ name: "Paket", price: Number(document.getElementById('crudPrice').value) }];
+            } else {
+                variantsArr = [{ name: "Satuan", price: Number(document.getElementById('crudPrice').value) }];
+            }
+
+            var productPayload = {
+                rowIndex: rowIndex ? Number(rowIndex) : null,
+                name: document.getElementById('crudName').value.trim(),
+                category: document.getElementById('crudCategory').value,
+                price: Number(document.getElementById('crudPrice').value),
+                size: document.getElementById('crudSize').value.trim(),
+                isPo: document.getElementById('crudIsPo').value === 'true',
+                poDays: Number(document.getElementById('crudPoDays').value) || 0,
+                image: uploadedImages[0],
+                images: uploadedImages,
+                description: document.getElementById('crudDesc').value.trim(),
+                ingredients: document.getElementById('crudIngredients').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+                shelfLife: document.getElementById('crudShelfLife').value.trim(),
+                variantType: vType,
+                variants: variantsArr
+            };
+
+            var actionName = rowIndex ? 'updateProduct' : 'addProduct';
+            apiCall(actionName, { product: productPayload }, function() {
+                showPremiumAlert("Berhasil", "Data kue berhasil disimpan!", "success");
+                btn.innerText = "Simpan Data"; btn.disabled = false;
+                closeModalWithSlug();
+                loadAdminProducts();
+            });
+        }
+
+        function confirmDeleteProduct(rowIndex, productName) {
+            showPremiumAlert("Hapus Kue", "Apakah Anda yakin ingin menghapus kue '" + productName + "'?", "confirm", function() {
+                apiCall('deleteProduct', { rowIndex: rowIndex }, function() {
+                    showPremiumAlert("Terhapus", "Data kue berhasil dihapus!", "success");
+                    loadAdminProducts();
+                });
+            });
+        }
+
+        function loadAdminSettings() {
+            apiCall('getAppSettings', null, function(s) {
+                if (s) {
+                    if (s.logoUrl) document.getElementById('settingLogoUrl').value = s.logoUrl;
+                    if (s.qrisUrl) document.getElementById('settingQrisUrl').value = s.qrisUrl;
+                    if (s.bankInfo) document.getElementById('settingBankInfo').value = s.bankInfo;
+                }
+            });
+        }
+
+        function saveLogoSettings() {
+            var url = document.getElementById('settingLogoUrl').value.trim();
+            if (!url) return showPremiumAlert("Peringatan", "URL Logo tidak boleh kosong", "error");
+            apiCall('updateLogoUrl', { url: url }, function() {
+                showPremiumAlert("Berhasil", "URL Logo berhasil disimpan!", "success");
+            });
+        }
+
+        function saveQrisSettings() {
+            var qris = document.getElementById('settingQrisUrl').value.trim();
+            var bank = document.getElementById('settingBankInfo').value.trim();
+            if (!qris || !bank) return showPremiumAlert("Peringatan", "URL QRIS & Rekening tidak boleh kosong", "error");
+
+            apiCall('updateQrisSettings', { qrisUrl: qris, bankInfo: bank }, function() {
+                showPremiumAlert("Berhasil", "Pengaturan QRIS & Rekening berhasil disimpan!", "success");
+            });
+        }
+
+        function savePasswordSettings() {
+            var pwd = document.getElementById('settingNewPwd').value.trim();
+            if (!pwd) return showPremiumAlert("Peringatan", "Kata sandi tidak boleh kosong", "error");
+
+            apiCall('updateAdminPassword', { password: pwd }, function() {
+                showPremiumAlert("Berhasil", "Kata sandi admin berhasil diperbarui!", "success");
+                document.getElementById('settingNewPwd').value = "";
+            });
+        }
+    </script>
+</body>
+</html>
