@@ -3,107 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delight Bakery & Pastry - Ema Ende</title>
+    <title>FINA OLSHOP - Premium Bakery & Cake Store</title>
     
-    <!-- CDN & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        amber: {
-                            50: '#fffbeb',
-                            100: '#fef3c7',
-                            500: '#f59e0b',
-                            800: '#92400e',
-                            900: '#78350f',
-                        },
-                        rose: {
-                            600: '#e11d48',
-                        }
+                        amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 800: '#92400e', 900: '#78350f' },
+                        rose: { 600: '#e11d48' }
                     },
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fef3c7; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
+        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes modalFadeIn {
+            0% { opacity: 0; transform: scale(0.98) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #fef3c7;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #f59e0b;
-            border-radius: 4px;
-        }
+        .animate-modal-pop { will-change: transform, opacity; animation: modalFadeIn 0.18s cubic-bezier(0, 0, 0.2, 1) forwards; }
     </style>
 </head>
 <body class="bg-amber-50/60 text-amber-900 font-sans min-h-screen flex flex-col justify-between custom-scrollbar">
 
-    <!-- NAVBAR -->
+    <!-- NAVBAR PELANGGAN -->
     <header class="sticky top-0 z-30 bg-amber-50/90 backdrop-blur-md border-b border-amber-200/80 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div class="flex items-center justify-between gap-4">
                 
-                <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <div class="bg-gradient-to-tr from-amber-600 to-amber-500 text-white p-2.5 rounded-2xl shadow-md">
-                        <i class="fa-solid me-0.5 fa-cake-candles text-xl sm:text-2xl"></i>
-                    </div>
+                    <img id="appLogo" src="https://cdn-icons-png.flaticon.com/512/3081/3081986.png" alt="FINA OLSHOP Logo" class="w-10 h-10 object-contain rounded-2xl bg-amber-100 p-1 border border-amber-200 shadow-sm">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 class="font-serif font-bold text-lg sm:text-2xl text-amber-900 tracking-tight leading-none">Delight Bakery</h1>
-                            <span class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">Ema Ende</span>
+                            <h1 class="font-serif font-bold text-lg sm:text-2xl text-amber-900 tracking-tight leading-none">FINA OLSHOP</h1>                            
                         </div>
-                        <p class="text-xs text-amber-800 font-medium hidden sm:block mt-0.5">Kue Basah, Pastry & Premium Tart</p>
+                        <p class="text-xs text-amber-800 font-medium hidden sm:block mt-0.5">Menyediakan berbagai jenis makanan ringan & kue</p>
                     </div>
                 </div>
 
-                <!-- Live Search Bar -->
                 <div class="flex-1 max-w-md hidden md:block">
                     <div class="relative">
-                        <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Cari kue, bolu, atau bahan (mis: Wijsman)..." 
+                        <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Cari kue..." 
                             class="w-full pl-10 pr-4 py-2 bg-white border border-amber-200 rounded-full text-sm text-amber-900 placeholder-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-800/60 text-sm"></i>
                     </div>
                 </div>
 
-                <!-- Right Actions & Connection Status -->
                 <div class="flex items-center gap-2 sm:gap-3">
+                    <div id="storeStatusBadge" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-emerald-600 text-white">
+                      <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                      <span id="storeStatusText">Toko Buka</span>
+                    </div>
                     
-                    <!-- Connection Badge -->
-                    <button onclick="openApiModal()" id="statusBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition">
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="statusDot"></span>
-                        <span id="statusText">Lokal Dummy</span>
-                    </button>
-
-                    <!-- Tambah Kue Admin -->
-                    <button onclick="promptAdminAdd()" class="hidden sm:flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-full text-xs font-bold transition">
-                        <i class="fa-solid fa-plus text-amber-800"></i>
-                        <span>Kue Baru</span>
-                    </button>
-
-                    <!-- Floating Cart Button -->
-                    <button onclick="toggleCartDrawer(true)" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-full shadow-md flex items-center gap-2 transition transform active:scale-95">
+                    <button onclick="openCartWithSlug()" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-full shadow-md flex items-center gap-2 transition transform active:scale-95">
                         <i class="fa-solid fa-basket-shopping text-base"></i>
                         <span class="text-xs font-bold hidden sm:inline">Keranjang</span>
                         <span id="cartCount" class="bg-rose-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-amber-50">0</span>
                     </button>
+                    <a href="admin.html" class="bg-amber-800 hover:bg-amber-900 text-white px-3 py-2 rounded-full text-xs font-bold shadow-md transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span class="hidden sm:inline">Admin</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- Mobile Search Bar -->
             <div class="mt-2.5 md:hidden">
                 <div class="relative">
                     <input type="text" oninput="handleSearch(this.value)" placeholder="Cari kue basah, pastry..." 
@@ -112,184 +94,271 @@
                 </div>
             </div>
 
-            <!-- Quick Categories -->
-            <div class="flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
+            <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
                 <button onclick="filterCategory('All')" class="cat-btn active px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-amber-900 text-white border-amber-900">Semua Menu</button>
-                <button onclick="filterCategory('Kue Basah')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Kue Basah</button>
-                <button onclick="filterCategory('Cookies')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Cookies</button>
-                <button onclick="filterCategory('Bolu')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Bolu</button>
-                <button onclick="filterCategory('Tart')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Tart</button>
-                <button onclick="filterCategory('Pastry')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Pastry</button>
-                <button onclick="filterCategory('Dessert')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Dessert</button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
-        
-        <!-- Filter Bar & Toggle Stock -->
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-amber-100/60 p-3 rounded-2xl border border-amber-200">
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> Filter Status:</span>
-                <button onclick="togglePoFilter('all')" id="btnPoAll" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white">Semua</button>
-                <button onclick="togglePoFilter('ready')" id="btnPoReady" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Ready Stock</button>
-                <button onclick="togglePoFilter('po')" id="btnPoOnly" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Pre-Order (PO)</button>
+    <!-- KATALOG UTAMA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-10">
+        <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-amber-100/60 p-3 rounded-2xl border border-amber-200">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> Filter Status:</span>
+                    <button onclick="togglePoFilter('all')" id="btnPoAll" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white">Semua</button>
+                    <button onclick="togglePoFilter('ready')" id="btnPoReady" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Ready Stock</button>
+                    <button onclick="togglePoFilter('po')" id="btnPoOnly" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Pre-Order (PO)</button>
+                </div>
+                <div class="text-xs text-amber-800 font-medium">
+                    Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+                </div>
             </div>
-            <div class="text-xs text-amber-800 font-medium">
-                Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div class="col-span-full text-center py-20">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-amber-600 mb-3"></i>
+                    <p class="text-sm font-bold text-amber-900">Memuat Katalog FINA OLSHOP Realtime...</p>
+                </div>
+            </div>
+
+            <div id="emptyState" class="hidden text-center py-16">
+                <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-amber-900 mb-1">Kue Tidak Ditemukan</h3>
+                <p class="text-sm text-amber-800">Coba ganti kata kunci pencarian Anda.</p>
             </div>
         </div>
 
-        <!-- Product Grid -->
-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Render via JS -->
-        </div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-16">
-            <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                <i class="fa-solid fa-cookie-bite"></i>
+        <!-- RIWAYAT ORDERAN -->
+        <section class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-amber-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-amber-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-serif font-bold text-base sm:text-lg text-amber-900">Riwayat Pesanan Terbaru</h2>
+                        <p class="text-xs text-amber-800/80">Pantau status pesanan yang telah diproses &amp; selesai.</p>
+                    </div>
+                </div>
+                <button onclick="fetchPublicOrders()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1 border border-amber-200">
+                    <i class="fa-solid fa-rotate text-amber-600"></i> Refresh Status
+                </button>
             </div>
-            <h3 class="font-serif text-xl font-bold text-amber-900 mb-1">Kue Tidak Ditemukan</h3>
-            <p class="text-sm text-amber-800">Coba ganti kata kunci pencarian atau ubah filter kategori Anda.</p>
-        </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-amber-100/60 text-amber-900 uppercase font-bold border-b border-amber-200/80 text-[11px]">
+                            <th class="p-3 rounded-l-xl">Order ID</th>
+                            <th class="p-3">Pelanggan</th>
+                            <th class="p-3">Detail Item</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 rounded-r-xl">Waktu Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publicOrdersTable" class="divide-y divide-amber-100/80">
+                        <tr>
+                            <td colspan="5" class="p-6 text-center text-amber-800">
+                                <i class="fa-solid fa-spinner fa-spin text-xl text-amber-600 mb-1 block"></i>
+                                <span>Memuat riwayat pesanan...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-amber-900 text-amber-100 mt-12 border-t border-amber-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="text-center md:text-left">
-                    <h2 class="font-serif font-bold text-lg text-white">Delight Bakery & Pastry</h2>
-                    <p class="text-xs text-amber-200/80 mt-0.5">Dibuat secara segar dengan bahan olahan kualitas terbaik di Ende.</p>
-                </div>
-                <div class="flex items-center gap-4 text-xs">
-                    <button onclick="openApiModal()" class="hover:underline text-amber-200"><i class="fa-solid fa-gear mr-1"></i>Pengaturan API GAS</button>
-                    <span>•</span>
-                    <a href="https://wa.me/6281574268876" target="_blank" class="hover:underline text-amber-200"><i class="fa-brands fa-whatsapp mr-1"></i>Hubungi Admin</a>
-                </div>
-            </div>
+    <footer class="bg-amber-900 text-amber-100 mt-12 border-t border-amber-800 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="font-serif font-bold text-lg text-white">FINA OLSHOP</h2>
+            <p class="text-xs text-amber-200/80 mt-1">Sajian Kue Premium &amp; Olshop Terpercaya dengan Bahan Berkualitas Terbaik.</p>
         </div>
     </footer>
 
-    <!-- MODAL DETAIL KUE -->
-    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-amber-100 transform transition-all">
-            <div class="relative">
-                <img id="modalImage" src="" alt="" class="w-full h-64 sm:h-80 object-cover rounded-t-3xl">
-                <button onclick="closeDetailModal()" class="absolute top-4 right-4 bg-white/80 hover:bg-white text-amber-900 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-                <div id="modalBadgePo" class="absolute bottom-4 left-4"></div>
-            </div>
+    <!-- MODAL ALERT CUSTOM PREMIUM -->
+    <div id="premiumAlertModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div id="alertIconBox" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 shadow-inner"></div>
+            <h3 id="alertTitle" class="font-serif font-bold text-lg text-amber-900 mb-1">Notifikasi</h3>
+            <p id="alertMessage" class="text-xs text-amber-800/90 leading-relaxed mb-6">Pesan notifikasi...</p>
+            <div id="alertActions" class="flex justify-center gap-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL KUE FULLSCREEN -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-0 transition-opacity duration-200">
+        <div class="bg-white w-full h-full shadow-2xl flex flex-col overflow-hidden animate-modal-pop">
             
-            <div class="p-6">
-                <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
-                    <div>
-                        <span id="modalCategory" class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">Category</span>
-                        <h2 id="modalTitle" class="font-serif text-2xl font-bold text-amber-900 mt-2">Nama Kue</h2>
-                    </div>
-                    <div class="text-right">
-                        <div id="modalPrice" class="text-2xl font-extrabold text-amber-900">Rp 0</div>
-                        <span id="modalSize" class="text-xs text-amber-800 font-medium">Loyang</span>
-                    </div>
+            <div class="bg-amber-50 border-b border-amber-200/80 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <img id="modalAppLogo" src="https://cdn-icons-png.flaticon.com/512/3081/3081986.png" class="w-7 h-7 object-contain">
+                    <span class="font-serif font-bold text-amber-900 text-sm sm:text-base">Detail Produk &amp; Varian - FINA OLSHOP</span>
                 </div>
-
-                <div class="flex items-center gap-4 text-xs text-amber-800 mb-4 pb-4 border-b border-amber-100">
-                    <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="modalRating">4.9</span></div>
-                    <div>•</div>
-                    <div><i class="fa-solid fa-fire text-rose-500 mr-1"></i><span id="modalSold">100+</span> Terjual</div>
-                    <div>•</div>
-                    <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i>Simpan: <span id="modalShelfLife" class="font-semibold text-amber-900">-</span></div>
-                </div>
-
-                <div class="mb-4">
-                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">Deskripsi Kue</h3>
-                    <p id="modalDescription" class="text-sm text-amber-800/90 leading-relaxed">Deskripsi produk...</p>
-                </div>
-
-                <!-- Ingredients list -->
-                <div class="mb-6">
-                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Bahan-Bahan Utama</h3>
-                    <div id="modalIngredients" class="flex flex-wrap gap-1.5"></div>
-                </div>
-
-                <!-- Custom Notes Field -->
-                <div class="mb-6 bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
-                    <label class="block text-xs font-bold text-amber-900 mb-1">
-                        <i class="fa-solid fa-pen-to-square mr-1 text-amber-600"></i> Catatan Khusus untuk Item Ini (Opsional)
-                    </label>
-                    <input type="text" id="modalCustomNote" placeholder="Contoh: Tulis ucapan 'Happy Birthday Mom', potong 16 bagian..." 
-                        class="w-full text-xs p-2.5 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <button onclick="closeDetailModal()" class="px-5 py-2.5 rounded-full text-xs font-bold text-amber-800 hover:bg-amber-100 transition">Batal</button>
-                    <button id="modalAddBtn" onclick="" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-md transition flex items-center gap-2">
-                        <i class="fa-solid fa-cart-plus"></i> Tambahkan ke Keranjang
+                <div class="flex items-center gap-2">
+                    <button onclick="shareCurrentPage()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span class="hidden sm:inline">Bagikan</span>
+                    </button>
+                    <button onclick="closeModalWithSlug()" class="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center justify-center transition font-bold">
+                        <i class="fa-solid fa-xmark text-base"></i>
                     </button>
                 </div>
             </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col lg:flex-row">
+                <div class="flex-1 p-5 sm:p-7 space-y-5 lg:border-r border-amber-100">
+                    <div class="space-y-2">
+                        <div class="relative overflow-hidden rounded-2xl border border-amber-100 bg-amber-50/30 flex items-center justify-center h-[260px] sm:h-[360px] group">
+                            <img id="modalMainImage" src="" class="w-full h-full object-cover transition-all duration-300">
+                            
+                            <div class="absolute top-3 left-3">
+                                <span id="modalCategory" class="text-xs font-bold uppercase text-rose-600 bg-white/95 px-3 py-1 rounded-full border border-rose-200 shadow-sm">Category</span>
+                            </div>
+
+                            <button onclick="prevGalleryImage()" id="btnPrevImage" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-amber-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center transition opacity-0 group-hover:opacity-100">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <button onclick="nextGalleryImage()" id="btnNextImage" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-amber-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center transition opacity-0 group-hover:opacity-100">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="modalGalleryThumbnails" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap items-start justify-between gap-3 mb-2">
+                            <div>
+                                <h2 id="modalTitle" class="font-poppins font-semibold text-2xl sm:text-3xl text-amber-900">Nama Kue</h2>
+                                <p class="text-xs text-amber-800/80 mt-0.5">Sajian kue lezat buatan FINA OLSHOP dengan resep spesial.</p>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <div id="modalPrice" class="text-2xl sm:text-3xl font-extrabold text-amber-900">Rp 0</div>
+                                <span id="modalSize" class="text-xs text-amber-800 font-semibold bg-amber-100/80 px-2.5 py-1 rounded-lg inline-block mt-1">Loyang</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-xs text-amber-800 py-2.5 my-2 border-y border-amber-100">
+                            <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="modalRating" class="font-bold text-amber-900">4.9</span></div>
+                            <div>•</div>
+                            <div><i class="fa-solid fa-fire text-rose-500 mr-1"></i><span id="modalSold" class="font-bold text-amber-900">100+</span> Terjual</div>
+                            <div>•</div>
+                            <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i>Simpan: <span id="modalShelfLife" class="font-semibold text-amber-900">-</span></div>
+                        </div>
+                    </div>
+
+                    <div id="modalVariantSection" class="bg-amber-100/50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                        <span class="block text-xs font-bold text-amber-900 uppercase tracking-wider">
+                            <i class="fa-solid fa-boxes-packing mr-1 text-amber-600"></i> Pilih Varian / Opsi Produk:
+                        </span>
+                        <div id="modalVariantOptions" class="grid grid-cols-2 gap-2"></div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-align-left text-amber-600"></i> Deskripsi Kue
+                        </h3>
+                        <p id="modalDescription" class="text-xs sm:text-sm text-amber-800/90 leading-relaxed bg-amber-50/40 p-3.5 rounded-2xl border border-amber-100/80">Deskripsi produk...</p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-wheat-awn text-amber-600"></i> Bahan-Bahan Utama
+                        </h3>
+                        <div id="modalIngredients" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200">
+                        <label class="block text-xs font-bold text-amber-900 mb-1">
+                            <i class="fa-solid fa-pen-to-square mr-1 text-amber-600"></i> Catatan Khusus untuk Item Ini (Opsional)
+                        </label>
+                        <input type="text" id="modalCustomNote" placeholder="Contoh: Tulis ucapan 'Happy Birthday Mom'..." 
+                            class="w-full text-xs p-2.5 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <div class="pt-1 flex items-center justify-end gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+                        <button onclick="closeModalWithSlug()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-amber-800 hover:bg-amber-100 transition">Batal</button>
+                        <button onclick="askProductViaWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>Tanya Kue</span>
+                        </button>
+                        <button id="modalAddBtn" class="bg-amber-800 hover:bg-amber-900 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus text-sm"></i> 
+                            <span>Tambahkan ke Keranjang</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-80 bg-amber-50/30 p-5 space-y-3 shrink-0 border-t lg:border-t-0 border-amber-100">
+                    <div class="pb-2 border-b border-amber-200/80">
+                        <h3 class="font-serif font-bold text-base text-amber-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Produk Lainnya
+                        </h3>
+                        <p class="text-[11px] text-amber-800/80">Rekomendasi pilihan untuk Anda</p>
+                    </div>
+
+                    <div id="modalRelatedProductsList" class="space-y-2.5 max-h-[420px] lg:max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pr-1"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- CART DRAWER SLIDE-IN -->
-    <div id="cartDrawer" class="fixed inset-0 z-50 hidden">
-        <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"></div>
-        
-        <div class="absolute right-0 top-0 bottom-0 max-w-md w-full bg-white shadow-2xl flex flex-col justify-between transform transition-transform custom-scrollbar">
-            
-            <!-- Cart Header -->
-            <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-basket-shopping text-amber-600 text-lg"></i>
-                    <h2 class="font-serif font-bold text-lg text-amber-900">Keranjang Belanja</h2>
-                </div>
-                <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center justify-center">
+    <!-- CART FULLSCREEN MODAL -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 hidden bg-white flex flex-col justify-between animate-modal-pop">
+        <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-basket-shopping text-amber-600 text-lg"></i>
+                <h2 class="font-serif font-bold text-lg text-amber-900">Keranjang Belanja FINA OLSHOP</h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="shareCurrentPage()" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-share-nodes mr-1"></i>Bagikan</button>
+                <button onclick="closeModalWithSlug()" class="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center justify-center font-bold">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
+        </div>
 
-            <!-- Cart Items List -->
-            <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                <!-- Rendered dynamically -->
-            </div>
+        <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 custom-scrollbar max-w-4xl mx-auto w-full"></div>
 
-            <!-- Cart Summary & Checkout Trigger -->
-            <div class="p-4 border-t border-amber-100 bg-amber-50/50 space-y-3">
-                <div class="space-y-1.5 text-xs text-amber-800">
-                    <div class="flex justify-between">
-                        <span>Subtotal Item</span>
-                        <span id="cartSubtotal" class="font-bold text-amber-900">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Estimasi Pengiriman</span>
-                        <span id="cartShippingFee" class="font-bold text-amber-900">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-extrabold text-amber-900 pt-2 border-t border-amber-200">
-                        <span>Total Keseluruhan</span>
-                        <span id="cartGrandTotal" class="text-rose-600">Rp 0</span>
-                    </div>
+        <div class="p-4 border-t border-amber-100 bg-amber-50 space-y-3 max-w-4xl mx-auto w-full">
+            <div class="space-y-1.5 text-xs text-amber-800">
+                <div class="flex justify-between">
+                    <span>Subtotal Item</span>
+                    <span id="cartSubtotal" class="font-bold text-amber-900">Rp 0</span>
                 </div>
-
-                <button onclick="openCheckoutModal()" id="btnCheckout" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50">
-                    <span>Lanjut ke Pembayaran</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                <div class="flex justify-between">
+                    <span>Estimasi Pengiriman</span>
+                    <span id="cartShippingFee" class="font-bold text-amber-900">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm font-extrabold text-amber-900 pt-2 border-t border-amber-200">
+                    <span>Total Keseluruhan</span>
+                    <span id="cartGrandTotal" class="text-rose-600">Rp 0</span>
+                </div>
             </div>
+
+            <button onclick="openCheckoutWithSlug()" id="btnCheckout" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-white py-3 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50">
+                <span>Lanjut ke Pembayaran</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
     </div>
 
-    <!-- MODAL FORM CHECKOUT -->
-    <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl p-6 border border-amber-100">
-            
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-amber-100">
-                <h2 class="font-serif font-bold text-xl text-amber-900"><i class="fa-solid fa-clipboard-check text-amber-600 mr-2"></i>Form Pemesanan</h2>
-                <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    <!-- FORM CHECKOUT FULLSCREEN MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-white flex flex-col justify-between animate-modal-pop">
+        <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
+            <h2 class="font-serif font-bold text-xl text-amber-900"><i class="fa-solid fa-clipboard-check text-amber-600 mr-2"></i>Form Pemesanan FINA OLSHOP</h2>
+            <div class="flex items-center gap-2">
+                <button onclick="shareCurrentPage()" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-share-nodes mr-1"></i>Bagikan</button>
+                <button onclick="closeModalWithSlug()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold"><i class="fa-solid fa-xmark"></i></button>
             </div>
+        </div>
 
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar max-w-2xl mx-auto w-full">
             <form id="checkoutForm" onsubmit="processCheckout(event)" class="space-y-4 text-xs">
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">Nama Lengkap *</label>
@@ -298,38 +367,43 @@
 
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">Nomor WhatsApp *</label>
-                    <input type="tel" id="custPhone" required placeholder="081234567890" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    <input type="tel" id="custPhone" required placeholder="08123456789" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
 
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">Metode Pengiriman *</label>
                     <select id="shipMethod" onchange="handleShippingChange(this.value)" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                        <option value="pickup">Ambil Sendiri di Toko (Gratis / Rp 0)</option>
-                        <option value="delivery">Kurir Toko (Kota Ende - Rp 10.000)</option>
+                        <option value="pickup">Ambil Sendiri di Rumah/Toko (Gratis / Rp 0)</option>
+                        <option value="delivery">Jasa Kirim (Khusus Area Ds. Kresek - Biaya Rp 5.000)</option>
                     </select>
                 </div>
 
                 <div id="addressContainer" class="hidden">
                     <label class="block font-bold text-amber-900 mb-1">Alamat Lengkap Pengiriman *</label>
-                    <textarea id="custAddress" rows="2" placeholder="Jl. Soekarno Hatta No. 12, Kel. Mautapaga, Ende..." class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                    <textarea id="custAddress" rows="2" placeholder="Masukkan alamat pengiriman..." class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-amber-900 mb-1">Tanggal Pengambilan *</label>
+                        <label id="lblDeliveryDate" class="block font-bold text-amber-900 mb-1">Tanggal Pengambilan *</label>
                         <input type="date" id="deliveryDate" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
                     </div>
                     <div>
-                        <label class="block font-bold text-amber-900 mb-1">Estimasi Jam *</label>
-                        <input type="time" id="deliveryTime" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                        <label id="lblDeliveryTime" class="block font-bold text-amber-900 mb-1">Jam Pengambilan (24 Jam) *</label>
+                        <select id="deliveryTime" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-medium">
+                            <option value="08:00">08:00 WIB</option><option value="09:00">09:00 WIB</option><option value="10:00">10:00 WIB</option>
+                            <option value="11:00">11:00 WIB</option><option value="12:00">12:00 WIB</option><option value="13:00">13:00 WIB</option>
+                            <option value="14:00" selected>14:00 WIB</option><option value="15:00">15:00 WIB</option><option value="16:00">16:00 WIB</option>
+                            <option value="17:00">17:00 WIB</option><option value="18:00">18:00 WIB</option><option value="19:00">19:00 WIB</option><option value="20:00">20:00 WIB</option>
+                        </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-bold text-amber-900 mb-1">Metode Pembayaran *</label>
-                    <select id="paymentMethod" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    <select id="paymentMethod" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-semibold">
+                        <option value="QRIS All Payment">QRIS All Payment (Gopay/OVO/Dana/BCA/dll)</option>
                         <option value="Transfer Bank (BCA/Mandiri)">Transfer Bank (BCA / Mandiri)</option>
-                        <option value="QRIS All Payment">QRIS All Payment</option>
                         <option value="COD / Bayar di Toko">COD / Bayar di Toko</option>
                     </select>
                 </div>
@@ -339,313 +413,303 @@
                         <span class="text-amber-800">Total Pembayaran:</span>
                         <div id="checkoutTotal" class="text-lg font-extrabold text-rose-600">Rp 0</div>
                     </div>
-                    <button type="submit" id="btnSubmitOrder" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white px-6 py-3 rounded-2xl font-bold shadow-md transition flex items-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                        <span>Kirim via WhatsApp</span>
+                    <button type="submit" id="btnSubmitOrder" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 text-white px-6 py-3 rounded-2xl font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right text-base"></i>
+                        <span>Lanjutkan Pembayaran</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL SETUP API GAS -->
-    <div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 border border-amber-100 text-xs">
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
-                <h2 class="font-serif font-bold text-lg text-amber-900"><i class="fa-solid fa-cloud-bolt text-amber-600 mr-2"></i>Setup API Google Apps Script</h2>
-                <button onclick="closeApiModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL PEMBAYARAN BARCODE QRIS FULLSCREEN -->
+    <div id="qrisPaymentModal" class="fixed inset-0 z-50 hidden bg-white flex flex-col justify-between animate-modal-pop">
+        <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-amber-600 text-lg"></i>
+                <h3 class="font-serif font-bold text-base text-amber-900">Scan QRIS Pembayaran</h3>
             </div>
+            <div class="flex items-center gap-2">
+                <button onclick="shareCurrentPage()" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-share-nodes mr-1"></i>Bagikan</button>
+                <button onclick="closeModalWithSlug()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
 
-            <p class="text-amber-800 mb-3">Masukkan URL Web App Deployment Google Apps Script untuk sinkronisasi katalog realtime & pencatatan pesanan otomatis.</p>
-
-            <div class="space-y-3 mb-4">
-                <div>
-                    <label class="block font-bold text-amber-900 mb-1">Web App URL</label>
-                    <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzFgN8Inyc3M0UIJ4Se2lYkEW4Jh33RodFbu7pU5ugJDH0YKVt7riKfTHsW8gWgFiKy/exec" class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar max-w-md mx-auto w-full text-center space-y-4">
+            <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 space-y-3">
+                <img id="qrisImageModal" src="" class="w-52 h-52 object-contain mx-auto rounded-xl border border-white shadow-md">
+                
+                <div class="text-left space-y-1 text-xs">
+                    <div id="bankInfoDisplay" class="font-bold text-amber-900 text-center bg-white p-2 rounded-xl border border-amber-200">
+                        BCA: 1234567890 a.n FINA OLSHOP
+                    </div>
+                    <p class="text-[11px] text-amber-800 text-center">Silakan scan QRIS di atas atau transfer ke rekening tertera sejumlah:</p>
+                    <div id="qrisAmountDisplay" class="text-xl font-extrabold text-rose-600 text-center">Rp 0</div>
                 </div>
-
-                <div class="flex items-center gap-2">
-                    <button onclick="saveApiUrl()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold transition">Simpan API</button>
-                    <button onclick="testApiConnection()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-4 py-2 rounded-xl font-bold transition">Tes Koneksi</button>
-                    <button onclick="clearApiUrl()" class="text-rose-600 hover:underline px-2 font-semibold">Gunakan Dummy</button>
-                </div>
             </div>
 
-            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-                <h4 class="font-bold text-amber-900 mb-1">Langkah Deployment Singkat:</h4>
-                <ol class="list-decimal pl-4 space-y-1 text-amber-800">
-                    <li>Buka Google Sheets & Klik <code class="bg-amber-200/60 px-1 rounded">Extensions > Apps Script</code>.</li>
-                    <li>Salin kode <code class="bg-amber-200/60 px-1 rounded">Code.gs</code> yang disediakan ke editor.</li>
-                    <li>Klik <code class="bg-amber-200/60 px-1 rounded">Deploy > New Deployment</code>.</li>
-                    <li>Pilih type <code class="bg-amber-200/60 px-1 rounded">Web App</code>, set Access ke <code class="bg-amber-200/60 px-1 rounded">Anyone</code>.</li>
-                    <li>Salin URL hasil deploy dan tempel di atas.</li>
-                </ol>
-            </div>
+            <button onclick="openWaConfirmModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-circle text-base"></i>
+                <span>Saya Sudah Bayar (Konfirmasi WA)</span>
+            </button>
         </div>
     </div>
 
-    <!-- MODAL QUICK ADMIN ADD PRODUCT -->
-    <div id="adminModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 border border-amber-100 text-xs">
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
-                <h2 class="font-serif font-bold text-lg text-amber-900"><i class="fa-solid fa-plus-circle text-amber-600 mr-2"></i>Tambah Varian Kue Baru</h2>
-                <button onclick="closeAdminModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL KONFIRMASI WHATSAPP -->
+    <div id="waConfirmModal" class="fixed inset-0 z-50 hidden bg-white flex flex-col justify-center items-center p-6 text-center animate-modal-pop">
+        <div class="max-w-sm w-full space-y-4">
+            <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200 mx-auto flex items-center justify-center text-4xl shadow-inner">
+                <i class="fa-brands fa-whatsapp"></i>
             </div>
+            <h3 class="font-serif font-bold text-xl text-amber-900">Konfirmasi Pesanan WA</h3>
+            <p class="text-xs text-amber-800/90 leading-relaxed">
+                Pesanan Anda telah disimpan! Klik tombol di bawah untuk meneruskan rincian pesanan &amp; bukti transfer langsung ke WhatsApp FINA OLSHOP.
+            </p>
 
-            <form id="adminForm" onsubmit="submitNewProduct(event)" class="space-y-3">
-                <div>
-                    <label class="block font-bold text-amber-900 mb-0.5">Nama Kue *</label>
-                    <input type="text" id="admName" required placeholder="mis: Bolu Gulung Keju" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-bold text-amber-900 mb-0.5">Kategori *</label>
-                        <select id="admCategory" required class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                            <option value="Kue Basah">Kue Basah</option>
-                            <option value="Cookies">Cookies</option>
-                            <option value="Bolu">Bolu</option>
-                            <option value="Tart">Tart</option>
-                            <option value="Pastry">Pastry</option>
-                            <option value="Dessert">Dessert</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-amber-900 mb-0.5">Harga (Rp) *</label>
-                        <input type="number" id="admPrice" required placeholder="85000" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-bold text-amber-900 mb-0.5">Ukuran / Porsi *</label>
-                        <input type="text" id="admSize" required placeholder="Loyang 20cm / Toples" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-amber-900 mb-0.5">Sistem Stok *</label>
-                        <select id="admIsPo" onchange="document.getElementById('admPoDaysBox').classList.toggle('hidden', this.value === 'false')" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                            <option value="false">Ready Stock</option>
-                            <option value="true">Pre-Order (PO)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="admPoDaysBox" class="hidden">
-                    <label class="block font-bold text-amber-900 mb-0.5">Lama Waktu PO (Hari)</label>
-                    <input type="number" id="admPoDays" value="1" min="1" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-amber-900 mb-0.5">URL Gambar (Unsplash/Direct) *</label>
-                    <input type="url" id="admImage" required placeholder="https://images.unsplash.com/photo-..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-amber-900 mb-0.5">Deskripsi *</label>
-                    <textarea id="admDesc" required rows="2" placeholder="Jelaskan kelezatan kue..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-amber-900 mb-0.5">Bahan Utama (Pisahkan dengan koma)</label>
-                    <input type="text" id="admIngredients" placeholder="Wijsman, Keju, Keju Edam" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-amber-900 mb-0.5">Masa Simpan</label>
-                    <input type="text" id="admShelfLife" placeholder="3 Hari Suhu Ruang" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                </div>
-
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeAdminModal()" class="px-4 py-2 rounded-xl font-bold text-amber-800 hover:bg-amber-100">Batal</button>
-                    <button type="submit" id="btnSaveProduct" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-md transition">Simpan Kue</button>
-                </div>
-            </form>
+            <button onclick="executeSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-2xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Kirim Pesanan via WhatsApp</span>
+            </button>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // TAHAP 2: DUMMY DATA FALLBACK
-        const dummyProducts = [
-            {
-                id: 1,
-                name: "Nastar Premium Wijsman",
-                category: "Cookies",
-                price: 175000,
-                size: "Toples 500g",
-                isPo: false,
-                poDays: 0,
-                rating: 4.9,
-                sold: 340,
-                image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=600&q=80",
-                description: "Nastar lembut dengan mentega Wijsman pilihan dan isian selai nanas asli buatan rumah yang pas manis dan asamnya.",
-                ingredients: ["Mentega Wijsman", "Keju Edam", "Nanas Palembang"],
-                shelfLife: "1 Bulan Suhu Ruang"
-            },
-            {
-                id: 2,
-                name: "Lapis Legit Original",
-                category: "Bolu",
-                price: 350000,
-                size: "Loyang 20x20cm",
-                isPo: true,
-                poDays: 2,
-                rating: 5.0,
-                sold: 120,
-                image: "https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80",
-                description: "Lapis legit tradisional beraroma rempah bumbu spekkoek yang kaya rasa, lembut, dan berlapis rapi.",
-                ingredients: ["Kuning Telur", "Mentega Wijsman", "Bumbu Spekkoek"],
-                shelfLife: "7 Hari Suhu Ruang"
-            },
-            {
-                id: 3,
-                name: "Fudgy Brownies Shiny Crust",
-                category: "Dessert",
-                price: 85000,
-                size: "Loyang 20x10cm",
-                isPo: false,
-                poDays: 0,
-                rating: 4.8,
-                sold: 510,
-                image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
-                description: "Brownies cokelat lumer dengan lapisan atas shiny crust renyah dan potongan cokelat melimpah di setiap gigitan.",
-                ingredients: ["Dark Chocolate 70%", "Butter", "Belgian Cocoa"],
-                shelfLife: "5 Hari Suhu Ruang"
-            },
-            {
-                id: 4,
-                name: "Strawberry Shortcake",
-                category: "Tart",
-                price: 275000,
-                size: "Diameter 18cm",
-                isPo: true,
-                poDays: 1,
-                rating: 4.9,
-                sold: 85,
-                image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80",
-                description: "Sponge cake vanila yang sangat lembut berlapis fresh cream whipped dan potongan buah stroberi segar pilihan.",
-                ingredients: ["Stroberi Fresh", "Whipping Cream", "Vanilla Bean"],
-                shelfLife: "2 Hari di Kulkas"
-            },
-            {
-                id: 5,
-                name: "Croissant Butter French",
-                category: "Pastry",
-                price: 28000,
-                size: "Pcs (Large)",
-                isPo: false,
-                poDays: 0,
-                rating: 4.7,
-                sold: 420,
-                image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80",
-                description: "Croissant khas Prancis yang renyah di luar dan bertumpuk berongga lembut beraroma butter kaya di dalam.",
-                ingredients: ["French Butter", "Flour", "Yeast"],
-                shelfLife: "2 Hari Suhu Ruang"
-            },
-            {
-                id: 6,
-                name: "Klepon Cake Lumer",
-                category: "Kue Basah",
-                price: 220000,
-                size: "Diameter 16cm",
-                isPo: true,
-                poDays: 1,
-                rating: 4.9,
-                sold: 190,
-                image: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=600&q=80",
-                description: "Perpaduan rasa kue tradisional klepon dengan pandan asli, unti kelapa gula merah lumer, dan cream lembut.",
-                ingredients: ["Pandan Asli", "Gula Aren Organik", "Kelapa Parut"],
-                shelfLife: "2 Hari Suhu Ruang"
+        // GANTI DENGAN URL APPS SCRIPT WEB APP ANDA YANG SUDAH DIDEPLOY
+        var API_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID_HERE/exec";
+
+        var products = [];
+        var cart = [];
+        var currentCategory = 'All';
+        var currentSearchQuery = '';
+        var currentPoFilter = 'all';
+
+        var currentGalleryImages = [];
+        var currentImageIndex = 0;
+        var currentSelectedProduct = null;
+        var currentSelectedVariant = null;
+
+        var appQrisUrl = '';
+        var appBankInfo = '';
+        var pendingOrderData = null;
+
+        // FETCH API WRAPPER
+        function apiCall(action, payload, callback, errCallback) {
+            if (payload) {
+                payload.action = action;
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(res => { if (callback) callback(res.data || res); })
+                .catch(err => { if (errCallback) errCallback(err); else showPremiumAlert("Error API", err.message, "error"); });
+            } else {
+                fetch(API_URL + "?action=" + action)
+                .then(res => res.json())
+                .then(res => { if (callback) callback(res.data); })
+                .catch(err => { if (errCallback) errCallback(err); else showPremiumAlert("Error API", err.message, "error"); });
             }
-        ];
+        }
 
-        // GLOBAL APP STATE
-        let products = [];
-        let cart = [];
-        let currentCategory = 'All';
-        let currentSearchQuery = '';
-        let currentPoFilter = 'all'; // 'all', 'ready', 'po'
-        let apiUrl = localStorage.getItem('delight_bakery_api') || '';
-        let isOnline = false;
-
-        // INITIALIZATION
-        document.addEventListener('DOMContentLoaded', () => {
-            initApp();
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchProductsFromBackend();
+            fetchStoreSettings();
+            fetchPublicOrders();
             
-            // Set default date picker to tomorrow
-            const tomorrow = new Date();
+            var tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('deliveryDate').value = tomorrow.toISOString().split('T')[0];
-            document.getElementById('deliveryTime').value = "10:00";
+            var dateEl = document.getElementById('deliveryDate');
+            if (dateEl) dateEl.value = tomorrow.toISOString().split('T')[0];
+            
+            var timeEl = document.getElementById('deliveryTime');
+            if (timeEl) timeEl.value = "10:00";
+
+            window.addEventListener('hashchange', handleHashRouting);
         });
 
-        async function initApp() {
-            if (apiUrl) {
-                document.getElementById('apiUrlInput').value = apiUrl;
-                await fetchProductsFromApi();
-            } else {
-                loadLocalDummy();
+        function handleHashRouting() {
+            var hash = window.location.hash;
+            closeAllModals();
+
+            if (hash.startsWith('#/produk/')) {
+                var prodId = hash.replace('#/produk/', '');
+                openDetailModal(prodId, false);
+            } else if (hash === '#/keranjang') {
+                toggleCartDrawer(true, false);
+            } else if (hash === '#/checkout') {
+                openCheckoutModal(false);
+            } else if (hash === '#/qris') {
+                document.getElementById('qrisPaymentModal').classList.remove('hidden');
             }
-            renderProducts();
-            updateCartUI();
         }
 
-        function loadLocalDummy() {
-            products = [...dummyProducts];
-            isOnline = false;
-            updateConnectionBadge(false, "Data Lokal Dummy");
+        function closeAllModals() {
+            ['detailModal', 'cartDrawer', 'checkoutModal', 'qrisPaymentModal', 'waConfirmModal'].forEach(id => {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
         }
 
-        async function fetchProductsFromApi() {
-            updateConnectionBadge(false, "Memuat Data...");
-            try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    products = data;
-                    isOnline = true;
-                    updateConnectionBadge(true, "Online Realtime");
-                } else {
-                    throw new Error("Format data tidak valid");
+        function closeModalWithSlug() {
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+            closeAllModals();
+        }
+
+        function shareCurrentPage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'FINA OLSHOP',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showPremiumAlert("Tautan Disalin", "Tautan halaman ini telah disalin ke clipboard!", "success");
+            }
+        }
+
+        function showPremiumAlert(title, message, type, confirmCallback) {
+            var modal = document.getElementById('premiumAlertModal');
+            var iconBox = document.getElementById('alertIconBox');
+            var titleEl = document.getElementById('alertTitle');
+            var msgEl = document.getElementById('alertMessage');
+            var actionsEl = document.getElementById('alertActions');
+
+            titleEl.innerText = title;
+            msgEl.innerText = message;
+
+            if (type === 'success') {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-emerald-100 text-emerald-600 border border-emerald-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else if (type === 'error') {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-rose-100 text-rose-600 border border-rose-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+            } else {
+                iconBox.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 bg-amber-100 text-amber-600 border border-amber-200";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+
+            actionsEl.innerHTML = '<button onclick="closePremiumAlert()" class="bg-amber-800 hover:bg-amber-900 text-white px-6 py-2 rounded-xl font-bold text-xs transition shadow-md">Mengerti</button>';
+            modal.classList.remove('hidden');
+        }
+
+        function closePremiumAlert() { document.getElementById('premiumAlertModal').classList.add('hidden'); }
+
+        function fetchProductsFromBackend() {
+            apiCall('getProducts', null, function(data) {
+                products = Array.isArray(data) ? data : [];
+                renderCategoryButtons();
+                renderProducts();
+                updateCartUI();
+                handleHashRouting();
+            });
+        }
+
+        function fetchStoreSettings() {
+            apiCall('getAppSettings', null, function(settings) {
+                if (settings) {
+                    updateStoreStatusUI(settings.storeStatus);
+                    if (settings.logoUrl) {
+                        var logo = document.getElementById('appLogo');
+                        if (logo) logo.src = settings.logoUrl;
+                    }
+                    if (settings.qrisUrl) appQrisUrl = settings.qrisUrl;
+                    if (settings.bankInfo) appBankInfo = settings.bankInfo;
                 }
-            } catch (err) {
-                console.warn("Gagal terhubung ke API, menggunakan data dummy:", err);
-                loadLocalDummy();
+            });
+        }
+
+        function fetchPublicOrders() {
+            var tbody = document.getElementById('publicOrdersTable');
+            if (!tbody) return;
+
+            apiCall('getOrders', null, function(orders) {
+                if (!orders || orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-amber-800 font-semibold">Belum ada riwayat pesanan.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = orders.slice(0, 10).map(function(o) {
+                    var statusVal = o.status ? String(o.status).trim().toUpperCase() : 'PENDING';
+                    var updateTime = o.statusUpdatedAt || o.timestamp || '-';
+
+                    return '<tr class="hover:bg-amber-50/80 transition text-xs">' +
+                        '<td class="p-3 font-bold text-amber-900 border-b border-amber-100">' + o.orderId + '</td>' +
+                        '<td class="p-3 font-medium text-amber-900 border-b border-amber-100">' + o.customerName + '</td>' +
+                        '<td class="p-3 border-b border-amber-100"><div class="line-clamp-2 leading-relaxed text-amber-900">' + o.itemsDetail + '</div></td>' +
+                        '<td class="p-3 border-b border-amber-100">' +
+                            '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-block ' + getStatusBadgeClass(statusVal) + '">' + statusVal + '</span>' +
+                        '</td>' +
+                        '<td class="p-3 border-b border-amber-100 font-semibold text-amber-800 whitespace-nowrap"><i class="fa-regular fa-clock mr-1 text-amber-600"></i>' + updateTime + '</td>' +
+                    '</tr>';
+                }).join('');
+            });
+        }
+
+        function getStatusBadgeClass(status) {
+            if (status === 'SELESAI') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+            if (status === 'DIPROSES' || status === 'SEDANG DIKEMAS') return 'bg-amber-100 text-amber-800 border border-amber-200';
+            if (status === 'SIAP DIAMBIL') return 'bg-purple-100 text-purple-800 border border-purple-200';
+            if (status === 'SEGERA DIKIRIM' || status === 'DALAM PENGIRIMAN' || status === 'DIKIRIM') return 'bg-blue-100 text-blue-800 border border-blue-200';
+            if (status === 'CANCEL') return 'bg-gray-200 text-gray-800 border border-gray-300';
+            return 'bg-rose-100 text-rose-800 border border-rose-200';
+        }
+
+        function updateStoreStatusUI(status) {
+            var badge = document.getElementById('storeStatusBadge');
+            var textEl = document.getElementById('storeStatusText');
+            if (!badge || !textEl) return;
+
+            var statusClean = status ? status.toUpperCase().trim() : 'BUKA';
+
+            if (statusClean === 'BUKA') {
+                badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-emerald-600 text-white";
+                textEl.innerText = "Toko Buka";
+            } else if (statusClean === 'LIBUR') {
+                badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-rose-600 text-white";
+                textEl.innerText = "Toko Libur";
+            } else if (statusClean === 'TUTUP') {
+                badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-gray-900 text-white";
+                textEl.innerText = "Toko Tutup";
             }
         }
 
-        function updateConnectionBadge(online, text) {
-            const badge = document.getElementById('statusBadge');
-            const dot = document.getElementById('statusDot');
-            const txt = document.getElementById('statusText');
+        function renderCategoryButtons() {
+            var container = document.getElementById('categoryContainer');
+            if (!container) return;
 
-            txt.innerText = text;
-            if (online) {
-                badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition";
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-            } else {
-                badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition";
-                dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+            var categoriesSet = new Set();
+            products.forEach(function(p) { if (p.category) categoriesSet.add(String(p.category).trim()); });
+
+            var categories = Array.from(categoriesSet);
+            var html = '<button onclick="filterCategory(\'All\')" id="catBtn-All" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap ' + 
+                (currentCategory === 'All' ? 'bg-amber-900 text-white border-amber-900' : 'bg-white text-amber-800 border-amber-200 hover:border-amber-400') + 
+                '">Semua Menu</button>';
+
+            if (categories.length > 0) {
+                html += categories.map(function(cat) {
+                    var isActive = currentCategory.toLowerCase() === cat.toLowerCase();
+                    var activeClass = isActive ? 'bg-amber-900 text-white border-amber-900' : 'bg-white text-amber-800 border-amber-200 hover:border-amber-400';
+                    var safeCat = cat.replace(/'/g, "\\'");
+                    return '<button onclick="filterCategory(\'' + safeCat + '\')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap ' + activeClass + '">' + cat + '</button>';
+                }).join('');
             }
+            container.innerHTML = html;
         }
 
-        // RENDER PRODUCTS & FILTERS
+        function filterCategory(cat) { currentCategory = cat; renderCategoryButtons(); renderProducts(); }
+
         function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            const empty = document.getElementById('emptyState');
+            var grid = document.getElementById('productGrid');
+            var empty = document.getElementById('emptyState');
+            if (!grid) return;
             
-            let filtered = products.filter(p => {
-                const matchCat = (currentCategory === 'All') || (p.category.toLowerCase() === currentCategory.toLowerCase());
-                
-                const q = currentSearchQuery.toLowerCase();
-                const matchSearch = p.name.toLowerCase().includes(q) || 
-                                    p.description.toLowerCase().includes(q) ||
-                                    (p.ingredients && p.ingredients.some(ing => ing.toLowerCase().includes(q)));
-                
-                let matchPo = true;
+            var filtered = products.filter(function(p) {
+                var matchCat = (currentCategory === 'All') || (p.category.toLowerCase() === currentCategory.toLowerCase());
+                var q = currentSearchQuery.toLowerCase().trim();
+                var matchSearch = p.name.toLowerCase().indexOf(q) !== -1 || p.description.toLowerCase().indexOf(q) !== -1;
+                var matchPo = true;
                 if (currentPoFilter === 'ready') matchPo = !p.isPo;
                 if (currentPoFilter === 'po') matchPo = p.isPo;
-
                 return matchCat && matchSearch && matchPo;
             });
 
@@ -653,103 +717,74 @@
 
             if (filtered.length === 0) {
                 grid.innerHTML = '';
-                empty.classList.remove('hidden');
+                if (empty) empty.classList.remove('hidden');
                 return;
             }
 
-            empty.classList.add('hidden');
-            grid.innerHTML = filtered.map(p => `
-                <div class="bg-white rounded-3xl overflow-hidden border border-amber-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-                    <div>
-                        <!-- Product Image & Badges -->
-                        <div class="relative overflow-hidden h-48">
-                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            
-                            <!-- PO / Ready Badge -->
-                            <div class="absolute top-3 left-3">
-                                ${p.isPo 
-                                    ? `<span class="bg-rose-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-hourglass-start mr-1"></i>PO H-${p.poDays}</span>`
-                                    : `<span class="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-bolt mr-1"></i>Ready Stock</span>`
-                                }
-                            </div>
+            if (empty) empty.classList.add('hidden');
 
-                            <button onclick="openDetailModal(${p.id})" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-amber-900 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition">
-                                <i class="fa-solid fa-eye text-xs"></i>
-                            </button>
-                        </div>
+            grid.innerHTML = filtered.map(function(p) {
+                var mainImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
 
-                        <!-- Product Info -->
-                        <div class="p-4">
-                            <div class="flex items-center justify-between text-[11px] text-amber-800 mb-1">
-                                <span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">${p.category}</span>
-                                <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span class="font-bold text-amber-900">${p.rating || '5.0'}</span></div>
-                            </div>
+                return '<div class="bg-white rounded-3xl overflow-hidden border border-amber-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group ' + (!p.isAvailable ? 'opacity-60' : '') + '">' +
+                    '<div>' +
+                        '<div onclick="openDetailModalWithSlug(' + p.id + ')" class="relative overflow-hidden h-48 cursor-pointer">' +
+                            '<img src="' + mainImg + '" alt="' + p.name + '" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">' +
+                            '<div class="absolute top-3 left-3 flex flex-col gap-1 items-start">' +
+                                (p.isPo 
+                                    ? '<span class="bg-rose-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-hourglass-start mr-1"></i>PO H-' + p.poDays + '</span>'
+                                    : '<span class="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-bolt mr-1"></i>Ready Stock</span>'
+                                ) +
+                                (!p.isAvailable ? '<span class="bg-gray-800 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Stok Habis</span>' : '') +
+                            '</div>' +
+                            (p.images && p.images.length > 1 ? '<span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fa-solid fa-images mr-1"></i>' + p.images.length + ' Foto</span>' : '') +
+                        '</div>' +
 
-                            <h3 onclick="openDetailModal(${p.id})" class="font-serif font-bold text-base text-amber-900 cursor-pointer hover:text-amber-600 transition line-clamp-1">${p.name}</h3>
-                            <p class="text-xs text-amber-800/80 line-clamp-2 mt-1 mb-3">${p.description}</p>
-                            
-                            <div class="text-[11px] text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 inline-block">
-                                <i class="fa-solid fa-box mr-1 text-amber-600"></i>${p.size}
-                            </div>
-                        </div>
-                    </div>
+                        '<div class="p-4">' +
+                            '<div class="flex items-center justify-between text-[11px] text-amber-800 mb-1">' +
+                                '<span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">' + p.category + '</span>' +
+                                '<div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span class="font-bold text-amber-900">' + (p.rating || '5.0') + '</span></div>' +
+                            '</div>' +
+                            '<h3 onclick="openDetailModalWithSlug(' + p.id + ')" class="font-poppins font-semibold text-base text-amber-900 cursor-pointer hover:text-amber-600 transition line-clamp-1 mt-1">' + p.name + '</h3>' +
+                            '<p class="text-xs text-amber-800/80 line-clamp-2 mt-1 mb-3">' + p.description + '</p>' +
+                            '<div class="text-[11px] text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 inline-block"><i class="fa-solid fa-box mr-1 text-amber-600"></i>' + p.size + '</div>' +
+                        '</div>' +
+                    '</div>' +
 
-                    <!-- Bottom Price & Add Action -->
-                    <div class="p-4 pt-0 flex items-center justify-between gap-2 border-t border-amber-50 mt-2">
-                        <div>
-                            <span class="text-[10px] text-amber-800 block">Harga</span>
-                            <span class="font-extrabold text-amber-900 text-base">Rp ${p.price.toLocaleString('id-ID')}</span>
-                        </div>
-                        <button onclick="quickAddToCart(${p.id})" class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2.5 rounded-2xl transition font-bold text-xs flex items-center gap-1">
-                            <i class="fa-solid fa-cart-plus text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                    '<div class="p-4 pt-0 flex items-center justify-between gap-2 border-t border-amber-50 mt-2">' +
+                        '<div>' +
+                            '<span class="text-[10px] text-amber-800 block">Harga</span>' +
+                            '<span class="font-extrabold text-amber-900 text-base">Rp ' + p.price.toLocaleString('id-ID') + '</span>' +
+                        '</div>' +
+                        '<button onclick="quickAddToCart(' + p.id + ')" ' + (!p.isAvailable ? 'disabled' : '') + ' class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2.5 rounded-2xl transition font-bold text-xs flex items-center gap-1 disabled:opacity-40">' +
+                            '<i class="fa-solid fa-cart-plus text-sm"></i>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
         }
 
-        // FILTER HANDLERS
-        function handleSearch(val) {
-            currentSearchQuery = val;
-            renderProducts();
+        function handleSearch(val) { currentSearchQuery = val; renderProducts(); }
+        function togglePoFilter(type) { currentPoFilter = type; renderProducts(); }
+
+        function openDetailModalWithSlug(id) {
+            window.location.hash = '#/produk/' + id;
         }
 
-        function filterCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                if (btn.innerText.trim().toLowerCase() === cat.toLowerCase() || (cat === 'All' && btn.innerText.includes('Semua'))) {
-                    btn.className = "cat-btn active px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-amber-900 text-white border-amber-900";
-                } else {
-                    btn.className = "cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400";
-                }
-            });
-            renderProducts();
-        }
-
-        function togglePoFilter(type) {
-            currentPoFilter = type;
-            const btnAll = document.getElementById('btnPoAll');
-            const btnReady = document.getElementById('btnPoReady');
-            const btnPo = document.getElementById('btnPoOnly');
-
-            [btnAll, btnReady, btnPo].forEach(btn => btn.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300");
-
-            if (type === 'all') btnAll.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
-            if (type === 'ready') btnReady.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
-            if (type === 'po') btnPo.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
-
-            renderProducts();
-        }
-
-        // TAHAP 4.B: MODAL DETAIL KUE
-        function openDetailModal(id) {
-            const p = products.find(prod => prod.id == id);
+        function openDetailModal(id, updateHash = true) {
+            var p = products.find(function(prod) { return prod.id == id; });
             if (!p) return;
 
-            document.getElementById('modalImage').src = p.image;
+            if (updateHash) window.location.hash = '#/produk/' + id;
+
+            currentSelectedProduct = p;
+            currentGalleryImages = (p.images && p.images.length > 0) ? p.images : [p.image];
+            currentImageIndex = 0;
+
+            updateGalleryUI();
+
             document.getElementById('modalTitle').innerText = p.name;
             document.getElementById('modalCategory').innerText = p.category;
-            document.getElementById('modalPrice').innerText = `Rp ${p.price.toLocaleString('id-ID')}`;
             document.getElementById('modalSize').innerText = p.size;
             document.getElementById('modalRating').innerText = p.rating || '5.0';
             document.getElementById('modalSold').innerText = (p.sold || 50) + '+';
@@ -757,367 +792,374 @@
             document.getElementById('modalDescription').innerText = p.description;
             document.getElementById('modalCustomNote').value = '';
 
-            // Ingredients
-            const ingBox = document.getElementById('modalIngredients');
+            renderVariantSelection(p);
+
+            var ingBox = document.getElementById('modalIngredients');
             if (p.ingredients && p.ingredients.length > 0) {
-                ingBox.innerHTML = p.ingredients.map(ing => `
-                    <span class="bg-amber-100 text-amber-900 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-amber-200">
-                        <i class="fa-solid fa-wheat-awn mr-1 text-amber-600"></i>${ing}
-                    </span>
-                `).join('');
+                ingBox.innerHTML = p.ingredients.map(function(ing) {
+                    return '<span class="bg-amber-100 text-amber-900 text-[11px] font-semibold px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-wheat-awn mr-1 text-amber-600"></i>' + ing + '</span>';
+                }).join('');
             } else {
-                ingBox.innerHTML = '<span class="text-xs text-amber-800">Resep rahasia bakery</span>';
+                ingBox.innerHTML = '<span class="text-xs text-amber-800">Resep rahasia FINA OLSHOP</span>';
             }
 
-            // PO Badge
-            const badgeBox = document.getElementById('modalBadgePo');
-            if (p.isPo) {
-                badgeBox.innerHTML = `<span class="bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"><i class="fa-solid fa-hourglass-start mr-1"></i>Pre-Order H-${p.poDays}</span>`;
+            var addBtn = document.getElementById('modalAddBtn');
+            if (p.isAvailable) {
+                addBtn.disabled = false;
+                addBtn.onclick = function() {
+                    var finalPrice = currentSelectedVariant ? currentSelectedVariant.price : p.price;
+                    var finalVariantName = currentSelectedVariant ? currentSelectedVariant.name : p.size;
+
+                    addToCart({
+                        id: p.id,
+                        name: p.name + (currentSelectedVariant ? ' (' + currentSelectedVariant.name + ')' : ''),
+                        price: finalPrice,
+                        size: finalVariantName,
+                        image: currentGalleryImages[0]
+                    }, document.getElementById('modalCustomNote').value.trim());
+
+                    closeModalWithSlug();
+                };
             } else {
-                badgeBox.innerHTML = `<span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"><i class="fa-solid fa-bolt mr-1"></i>Ready Stock</span>`;
+                addBtn.disabled = true;
+                addBtn.onclick = null;
             }
 
-            // Set Action Button
-            document.getElementById('modalAddBtn').onclick = () => {
-                const customNote = document.getElementById('modalCustomNote').value.trim();
-                addToCart(p, customNote);
-                closeDetailModal();
-            };
-
+            renderRelatedProducts(p.id);
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        function closeDetailModal() {
-            document.getElementById('detailModal').classList.add('hidden');
+        function askProductViaWA() {
+            if (!currentSelectedProduct) return;
+            var storePhone = "6281574268876";
+            var prodName = currentSelectedProduct.name;
+            var prodCategory = currentSelectedProduct.category;
+            var selectedPrice = currentSelectedVariant ? currentSelectedVariant.price : currentSelectedProduct.price;
+            var selectedVariantName = currentSelectedVariant ? currentSelectedVariant.name : currentSelectedProduct.size;
+            var note = document.getElementById('modalCustomNote').value.trim();
+
+            var message = "*HALO FINA OLSHOP* 🍰✨\n" +
+                "Saya mau bertanya tentang produk kue ini:\n\n" +
+                "🍰 *Nama Kue:* " + prodName + "\n" +
+                "📂 *Kategori:* " + prodCategory + "\n" +
+                "📦 *Varian/Ukuran:* " + selectedVariantName + "\n" +
+                "💰 *Harga:* Rp " + selectedPrice.toLocaleString('id-ID') + "\n" +
+                (note ? "📝 *Catatan Khusus:* " + note + "\n" : "") + "\n" +
+                "Apakah produk ini ready / bisa dipesan? Terima kasih!";
+
+            window.open("https://wa.me/" + storePhone + "?text=" + encodeURIComponent(message), '_blank');
         }
 
-        // TAHAP 4.C: KERANJANG BELANJA (CART SYSTEM)
+        function updateGalleryUI() {
+            var mainImg = document.getElementById('modalMainImage');
+            var thumbsContainer = document.getElementById('modalGalleryThumbnails');
+            mainImg.src = currentGalleryImages[currentImageIndex];
+
+            if (currentGalleryImages.length <= 1) {
+                thumbsContainer.innerHTML = '';
+                document.getElementById('btnPrevImage').classList.add('hidden');
+                document.getElementById('btnNextImage').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('btnPrevImage').classList.remove('hidden');
+            document.getElementById('btnNextImage').classList.remove('hidden');
+
+            thumbsContainer.innerHTML = currentGalleryImages.map(function(img, idx) {
+                var activeBorder = (idx === currentImageIndex) ? 'border-amber-800 ring-2 ring-amber-500' : 'border-amber-200 opacity-60';
+                return '<img src="' + img + '" onclick="selectGalleryImage(' + idx + ')" class="w-14 h-14 object-cover rounded-xl border-2 cursor-pointer transition ' + activeBorder + '">';
+            }).join('');
+        }
+
+        function selectGalleryImage(idx) { currentImageIndex = idx; updateGalleryUI(); }
+        function prevGalleryImage() { currentImageIndex = (currentImageIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length; updateGalleryUI(); }
+        function nextGalleryImage() { currentImageIndex = (currentImageIndex + 1) % currentGalleryImages.length; updateGalleryUI(); }
+
+        function renderVariantSelection(p) {
+            var box = document.getElementById('modalVariantSection');
+            var container = document.getElementById('modalVariantOptions');
+
+            if (p.variantType === 'BOTH' && p.variants && p.variants.length > 0) {
+                box.classList.remove('hidden');
+                currentSelectedVariant = p.variants[0];
+
+                container.innerHTML = p.variants.map(function(v, idx) {
+                    var isSel = (idx === 0);
+                    return '<button type="button" onclick="selectVariantOption(' + idx + ')" id="variantBtn-' + idx + '" class="p-2.5 rounded-xl text-left border transition font-bold text-xs flex flex-col justify-between ' +
+                        (isSel ? 'bg-amber-800 text-white border-amber-800 shadow-sm' : 'bg-white text-amber-900 border-amber-200 hover:border-amber-400') + '">' +
+                        '<span>' + v.name + '</span>' +
+                        '<span class="text-sm font-extrabold mt-1">Rp ' + v.price.toLocaleString('id-ID') + '</span>' +
+                    '</button>';
+                }).join('');
+
+                updateModalPriceDisplay(p.variants[0].price);
+            } else {
+                box.classList.add('hidden');
+                currentSelectedVariant = null;
+                updateModalPriceDisplay(p.price);
+            }
+        }
+
+        function selectVariantOption(idx) {
+            if (!currentSelectedProduct || !currentSelectedProduct.variants) return;
+            currentSelectedVariant = currentSelectedProduct.variants[idx];
+
+            currentSelectedProduct.variants.forEach(function(v, i) {
+                var btn = document.getElementById('variantBtn-' + i);
+                if (btn) {
+                    btn.className = (i === idx)
+                        ? 'p-2.5 rounded-xl text-left border transition font-bold text-xs flex flex-col justify-between bg-amber-800 text-white border-amber-800 shadow-sm'
+                        : 'p-2.5 rounded-xl text-left border transition font-bold text-xs flex flex-col justify-between bg-white text-amber-900 border-amber-200 hover:border-amber-400';
+                }
+            });
+
+            updateModalPriceDisplay(currentSelectedVariant.price);
+        }
+
+        function updateModalPriceDisplay(price) {
+            document.getElementById('modalPrice').innerText = "Rp " + Number(price).toLocaleString('id-ID');
+        }
+
+        function renderRelatedProducts(currentId) {
+            var sidebarList = document.getElementById('modalRelatedProductsList');
+            if (!sidebarList) return;
+
+            var related = products.filter(function(prod) { return prod.id != currentId; }).slice(0, 6);
+
+            if (related.length === 0) {
+                sidebarList.innerHTML = '<div class="text-center py-6 text-xs text-amber-800">Tidak ada produk lainnya.</div>';
+                return;
+            }
+
+            sidebarList.innerHTML = related.map(function(rp) {
+                var mainImg = (rp.images && rp.images.length > 0) ? rp.images[0] : rp.image;
+
+                return '<div onclick="openDetailModalWithSlug(' + rp.id + ')" class="bg-white p-2.5 rounded-2xl border border-amber-100/80 hover:border-amber-300 shadow-sm transition cursor-pointer flex gap-3 items-center group">' +
+                    '<img src="' + mainImg + '" alt="' + rp.name + '" class="w-14 h-14 object-cover rounded-xl border border-amber-100 flex-shrink-0">' +
+                    '<div class="flex-1 min-w-0">' +
+                        '<span class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">' + rp.category + '</span>' +
+                        '<h4 class="font-serif font-bold text-xs text-amber-900 truncate mt-0.5 group-hover:text-amber-600 transition">' + rp.name + '</h4>' +
+                        '<p class="text-[11px] font-extrabold text-amber-900 mt-0.5">Rp ' + Number(rp.price).toLocaleString('id-ID') + '</p>' +
+                    '</div>' +
+                    '<button onclick="event.stopPropagation(); quickAddToCart(' + rp.id + ')" ' + (!rp.isAvailable ? 'disabled' : '') + ' class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2 rounded-xl transition font-bold text-xs shrink-0 disabled:opacity-40" title="Tambah Keranjang">' +
+                        '<i class="fa-solid fa-cart-plus"></i>' +
+                    '</button>' +
+                '</div>';
+            }).join('');
+        }
+
         function quickAddToCart(id) {
-            const p = products.find(prod => prod.id == id);
-            if (p) addToCart(p, '');
+            var p = products.find(function(prod) { return prod.id == id; });
+            if (p && p.isAvailable) {
+                addToCart({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    size: p.size,
+                    image: (p.images && p.images.length > 0) ? p.images[0] : p.image
+                }, '');
+            }
         }
 
-        function addToCart(product, customNote = '') {
-            const existingIndex = cart.findIndex(item => item.id == product.id && item.customNote === customNote);
+        function addToCart(itemPayload, customNote) {
+            var existingIndex = cart.findIndex(function(item) { 
+                return item.id == itemPayload.id && item.name === itemPayload.name && item.customNote === customNote; 
+            });
+
             if (existingIndex > -1) {
                 cart[existingIndex].qty += 1;
             } else {
                 cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    size: product.size,
-                    image: product.image,
-                    isPo: product.isPo,
-                    poDays: product.poDays,
+                    id: itemPayload.id,
+                    name: itemPayload.name,
+                    price: itemPayload.price,
+                    size: itemPayload.size,
+                    image: itemPayload.image,
                     customNote: customNote,
                     qty: 1
                 });
             }
             updateCartUI();
-            toggleCartDrawer(true);
+            openCartWithSlug();
         }
 
         function updateCartQty(index, delta) {
+            if (!cart[index]) return;
             cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
-            updateCartUI();
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
+            if (cart[index].qty <= 0) cart.splice(index, 1);
             updateCartUI();
         }
 
         function updateCartUI() {
-            const countBadge = document.getElementById('cartCount');
-            const list = document.getElementById('cartItemsList');
-            const subtotalEl = document.getElementById('cartSubtotal');
-            const grandTotalEl = document.getElementById('cartGrandTotal');
-            const btnCheckout = document.getElementById('btnCheckout');
+            var countBadge = document.getElementById('cartCount');
+            var list = document.getElementById('cartItemsList');
+            var subtotalEl = document.getElementById('cartSubtotal');
+            var shippingFeeEl = document.getElementById('cartShippingFee');
+            var grandTotalEl = document.getElementById('cartGrandTotal');
+            var btnCheckout = document.getElementById('btnCheckout');
 
-            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            countBadge.innerText = totalItems;
+            var totalItems = cart.reduce(function(sum, item) { return sum + item.qty; }, 0);
+            if (countBadge) countBadge.innerText = totalItems;
 
             if (cart.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-12 text-amber-800">
-                        <i class="fa-solid fa-basket-shopping text-4xl text-amber-300 mb-2"></i>
-                        <p class="text-sm font-semibold">Keranjang masih kosong</p>
-                        <p class="text-xs">Yuk, pilih kue favoritmu sekarang!</p>
-                    </div>
-                `;
-                subtotalEl.innerText = "Rp 0";
-                grandTotalEl.innerText = "Rp 0";
-                btnCheckout.disabled = true;
+                if (list) list.innerHTML = '<div class="text-center py-12 text-amber-800"><i class="fa-solid fa-basket-shopping text-4xl text-amber-300 mb-2"></i><p class="text-sm font-semibold">Keranjang masih kosong</p></div>';
+                if (subtotalEl) subtotalEl.innerText = "Rp 0";
+                if (shippingFeeEl) shippingFeeEl.innerText = "Rp 0";
+                if (grandTotalEl) grandTotalEl.innerText = "Rp 0";
+                if (btnCheckout) btnCheckout.disabled = true;
                 return;
             }
 
-            btnCheckout.disabled = false;
+            if (btnCheckout) btnCheckout.disabled = false;
 
-            let subtotal = 0;
-            list.innerHTML = cart.map((item, idx) => {
-                const itemTotal = item.price * item.qty;
+            var subtotal = 0;
+            list.innerHTML = cart.map(function(item, idx) {
+                var itemTotal = item.price * item.qty;
                 subtotal += itemTotal;
-                return `
-                    <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80 flex gap-3 items-center">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl">
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-xs text-amber-900 truncate">${item.name}</h4>
-                            <p class="text-[11px] text-amber-800">Rp ${item.price.toLocaleString('id-ID')} / ${item.size}</p>
-                            ${item.customNote ? `<p class="text-[10px] text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 mt-0.5 truncate"><i class="fa-solid fa-comment-dots mr-1"></i>${item.customNote}</p>` : ''}
-                            
-                            <div class="flex items-center justify-between mt-2">
-                                <div class="flex items-center gap-2 bg-white px-2 py-0.5 rounded-lg border border-amber-200">
-                                    <button onclick="updateCartQty(${idx}, -1)" class="text-amber-800 font-bold px-1 hover:text-amber-600">-</button>
-                                    <span class="text-xs font-bold text-amber-900">${item.qty}</span>
-                                    <button onclick="updateCartQty(${idx}, 1)" class="text-amber-800 font-bold px-1 hover:text-amber-600">+</button>
-                                </div>
-                                <span class="font-extrabold text-xs text-amber-900">Rp ${itemTotal.toLocaleString('id-ID')}</span>
-                            </div>
-                        </div>
-                        <button onclick="removeFromCart(${idx})" class="text-amber-800/50 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                    </div>
-                `;
+                return '<div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80 flex gap-3 items-center">' +
+                    '<img src="' + item.image + '" class="w-16 h-16 object-cover rounded-xl">' +
+                    '<div class="flex-1 min-w-0">' +
+                        '<h4 class="font-bold text-xs text-amber-900 truncate">' + item.name + '</h4>' +
+                        '<p class="text-[11px] text-amber-800">Rp ' + item.price.toLocaleString('id-ID') + '</p>' +
+                        '<div class="flex items-center gap-2 bg-white px-2 py-0.5 rounded-lg border border-amber-200 mt-1 w-max">' +
+                            '<button onclick="updateCartQty(' + idx + ', -1)" class="font-bold px-1">-</button>' +
+                            '<span class="text-xs font-bold">' + item.qty + '</span>' +
+                            '<button onclick="updateCartQty(' + idx + ', 1)" class="font-bold px-1">+</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="font-extrabold text-xs">Rp ' + itemTotal.toLocaleString('id-ID') + '</span>' +
+                '</div>';
             }).join('');
 
-            const shipFee = document.getElementById('shipMethod')?.value === 'delivery' ? 10000 : 0;
-            subtotalEl.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
-            document.getElementById('cartShippingFee').innerText = `Rp ${shipFee.toLocaleString('id-ID')}`;
-            grandTotalEl.innerText = `Rp ${(subtotal + shipFee).toLocaleString('id-ID')}`;
-            document.getElementById('checkoutTotal').innerText = `Rp ${(subtotal + shipFee).toLocaleString('id-ID')}`;
+            var shipMethodEl = document.getElementById('shipMethod');
+            var shipFee = (shipMethodEl && shipMethodEl.value === 'delivery') ? 5000 : 0;
+            var grandTotal = subtotal + shipFee;
+
+            if (subtotalEl) subtotalEl.innerText = "Rp " + subtotal.toLocaleString('id-ID');
+            if (shippingFeeEl) shippingFeeEl.innerText = "Rp " + shipFee.toLocaleString('id-ID');
+            if (grandTotalEl) grandTotalEl.innerText = "Rp " + grandTotal.toLocaleString('id-ID');
+            document.getElementById('checkoutTotal').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
         }
 
-        function toggleCartDrawer(open) {
-            const drawer = document.getElementById('cartDrawer');
+        function openCartWithSlug() { window.location.hash = '#/keranjang'; }
+        function toggleCartDrawer(open, updateHash = true) {
             if (open) {
-                drawer.classList.remove('hidden');
+                if (updateHash) window.location.hash = '#/keranjang';
+                document.getElementById('cartDrawer').classList.remove('hidden');
             } else {
-                drawer.classList.add('hidden');
+                closeModalWithSlug();
             }
         }
 
-        // TAHAP 4.D: CHECKOUT & WHATSAPP GENERATOR
-        function openCheckoutModal() {
-            toggleCartDrawer(false);
-            updateCartUI();
+        function openCheckoutWithSlug() { window.location.hash = '#/checkout'; }
+        function openCheckoutModal(updateHash = true) {
+            if (updateHash) window.location.hash = '#/checkout';
             document.getElementById('checkoutModal').classList.remove('hidden');
         }
 
-        function closeCheckoutModal() {
-            document.getElementById('checkoutModal').classList.add('hidden');
-        }
+        function handleShippingChange(val) { 
+            var container = document.getElementById('addressContainer');
+            var lblDate = document.getElementById('lblDeliveryDate');
+            var lblTime = document.getElementById('lblDeliveryTime');
 
-        function handleShippingChange(val) {
-            const addrContainer = document.getElementById('addressContainer');
             if (val === 'delivery') {
-                addrContainer.classList.remove('hidden');
+                if (container) container.classList.remove('hidden');
+                if (lblDate) lblDate.innerText = "Tanggal Pengiriman *";
+                if (lblTime) lblTime.innerText = "Jam Pengiriman (24 Jam) *";
             } else {
-                addrContainer.classList.add('hidden');
+                if (container) container.classList.add('hidden');
+                if (lblDate) lblDate.innerText = "Tanggal Pengambilan *";
+                if (lblTime) lblTime.innerText = "Jam Pengambilan (24 Jam) *";
             }
-            updateCartUI();
+            
+            updateCartUI(); 
         }
 
-        async function processCheckout(e) {
+        function processCheckout(e) {
             e.preventDefault();
+            var name = document.getElementById('custName').value.trim();
+            var phone = document.getElementById('custPhone').value.trim();
+            var shipMethod = document.getElementById('shipMethod').value;
+            var address = document.getElementById('custAddress').value.trim();
+            var rawDate = document.getElementById('deliveryDate').value; 
+            var rawTime = document.getElementById('deliveryTime').value; 
+            var payMethod = document.getElementById('paymentMethod').value;
 
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
-            const shipMethod = document.getElementById('shipMethod').value;
-            const address = document.getElementById('custAddress').value.trim();
-            const delDate = document.getElementById('deliveryDate').value;
-            const delTime = document.getElementById('deliveryTime').value;
-            const payMethod = document.getElementById('paymentMethod').value;
+            var isDelivery = (shipMethod === 'delivery');
+            var labelWaktu = isDelivery ? "Waktu Pengiriman" : "Waktu Pengambilan";
 
-            if (shipMethod === 'delivery' && !address) {
-                alert("Mohon isi alamat lengkap pengiriman!");
-                return;
+            var formattedDateTime = "-";
+            if (rawDate) {
+                var dateParts = rawDate.split('-');
+                var year = dateParts[0];
+                var monthIndex = parseInt(dateParts[1], 10) - 1;
+                var day = dateParts[2];
+                var namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                var dateObj = new Date(year, monthIndex, day);
+                var namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"][dateObj.getDay()];
+                formattedDateTime = namaHari + ", " + day + " " + namaBulan[monthIndex] + " " + year + " pukul " + rawTime + " WIB";
             }
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const shipFee = shipMethod === 'delivery' ? 10000 : 0;
-            const grandTotal = subtotal + shipFee;
-            const orderId = "DLG-" + Math.floor(100000 + Math.random() * 900000);
+            var subtotal = cart.reduce(function(sum, item) { return sum + (item.price * item.qty); }, 0);
+            var shipFee = isDelivery ? 5000 : 0;
+            var grandTotal = subtotal + shipFee;
+            var orderId = "FINA-" + Math.floor(100000 + Math.random() * 900000);
 
-            // Ringkasan Teks Item
-            let itemsDetailString = cart.map(item => {
-                let text = `• ${item.name} (${item.size}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString('id-ID')}`;
-                if (item.customNote) text += `\n   Catatan: _"${item.customNote}"_`;
-                return text;
+            var itemsDetailString = cart.map(function(item) {
+                var t = "• " + item.name + " (" + item.size + ") x" + item.qty + " = Rp " + (item.price * item.qty).toLocaleString('id-ID');
+                if (item.customNote) t += "\n   Catatan: _\"" + item.customNote + "\"_";
+                return t;
             }).join('\n');
 
-            // 1. POST KE APPS SCRIPT JIKA API KONEK
-            if (apiUrl) {
-                try {
-                    const payload = {
-                        action: 'create_order',
-                        order: {
-                            orderId: orderId,
-                            customerName: name,
-                            phone: phone,
-                            shippingMethod: shipMethod === 'delivery' ? 'Kurir Toko' : 'Ambil di Toko',
-                            address: shipMethod === 'delivery' ? address : '-',
-                            deliveryDate: delDate,
-                            deliveryTime: delTime,
-                            itemsDetail: itemsDetailString,
-                            totalPrice: grandTotal
-                        }
-                    };
-                    fetch(apiUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                } catch (err) {
-                    console.error("Gagal mencatat ke Google Sheets:", err);
+            apiCall('createOrder', {
+                order: {
+                    orderId: orderId, customerName: name, phone: phone,
+                    shippingMethod: isDelivery ? 'Jasa Kirim (Ds. Kresek)' : 'Ambil Sendiri di Toko',
+                    address: isDelivery ? address : '-', deliveryDate: formattedDateTime,
+                    deliveryTime: "", itemsDetail: itemsDetailString, totalPrice: grandTotal
                 }
+            }, function() { fetchPublicOrders(); });
+
+            var storePhone = "6281574268876";
+            var waMessage = "*HALO FINA OLSHOP* 🍰✨\n" +
+                "Saya ingin mengonfirmasi pesanan kue baru:\n\n" +
+                "🆔 *Order ID:* " + orderId + "\n" +
+                "👤 *Nama Pemesan:* " + name + "\n" +
+                "📱 *No. WA:* " + phone + "\n" +
+                "🚚 *Metode:* " + (isDelivery ? 'Jasa Kirim (Ds. Kresek)' : 'Ambil Sendiri di Toko') + "\n" +
+                (isDelivery ? "📍 *Alamat:* " + address + "\n" : "") +
+                "📅 *" + labelWaktu + ":* " + formattedDateTime + "\n" +
+                "💳 *Pembayaran:* " + payMethod + "\n\n" +
+                "🛒 *RINCIAN PESANAN:* \n" + itemsDetailString + "\n" +
+                (isDelivery ? "🚚 *Biaya Ongkir:* Rp 5.000\n" : "") + "\n" +
+                "-----------------------------------\n" +
+                "Total Keseluruhan: *Rp " + grandTotal.toLocaleString('id-ID') + "*";
+
+            pendingOrderData = { storePhone: storePhone, waMessage: waMessage, grandTotal: grandTotal };
+
+            if (payMethod.indexOf("QRIS") !== -1 || payMethod.indexOf("Transfer") !== -1) {
+                window.location.hash = '#/qris';
+                document.getElementById('qrisImageModal').src = appQrisUrl || "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=FINA%20OLSHOP%20QRIS";
+                document.getElementById('bankInfoDisplay').innerText = appBankInfo || "BCA: 1234567890 a.n FINA OLSHOP";
+                document.getElementById('qrisAmountDisplay').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
+                document.getElementById('qrisPaymentModal').classList.remove('hidden');
+            } else {
+                openWaConfirmModal();
             }
+        }
 
-            // 2. GENERATE WHATSAPP TEXT FORMAT
-            const storePhone = "6281574268876"; // Ganti dengan No WA Toko
-            let waMessage = `*HALO DELIGHT BAKERY & PASTRY* 🍰✨\n`;
-            waMessage += `Saya ingin mengonfirmasi pesanan kue baru:\n\n`;
-            waMessage += `🆔 *Order ID:* ${orderId}\n`;
-            waMessage += `👤 *Nama Pemesan:* ${name}\n`;
-            waMessage += `📱 *No. WA:* ${phone}\n`;
-            waMessage += `🚚 *Metode:* ${shipMethod === 'delivery' ? 'Kurir Toko (Kota Ende)' : 'Ambil Sendiri di Toko'}\n`;
-            if (shipMethod === 'delivery') {
-                waMessage += `📍 *Alamat:* ${address}\n`;
-            }
-            waMessage += `📅 *Tanggal & Jam:* ${delDate} pukul ${delTime} WIB\n`;
-            waMessage += `💳 *Pembayaran:* ${payMethod}\n\n`;
-            waMessage += `🛒 *RINCIAN PESANAN:* \n${itemsDetailString}\n\n`;
-            waMessage += `-----------------------------------\n`;
-            waMessage += `Subtotal: Rp ${subtotal.toLocaleString('id-ID')}\n`;
-            waMessage += `Ongkir: Rp ${shipFee.toLocaleString('id-ID')}\n`;
-            waMessage += `*TOTAL KESELURUHAN:* *Rp ${grandTotal.toLocaleString('id-ID')}*\n\n`;
-            waMessage += `Mohon konfirmasi ketersediaan dan instruksi pembayaran selanjutnya. Terima kasih! 🙏`;
+        function openWaConfirmModal() {
+            closeAllModals();
+            document.getElementById('waConfirmModal').classList.remove('hidden');
+        }
 
-            const encodedMessage = encodeURIComponent(waMessage);
-            const waUrl = `https://wa.me/${storePhone}?text=${encodedMessage}`;
-
-            // Reset Cart & Close Modal
+        function executeSendWhatsApp() {
+            if (!pendingOrderData) return;
             cart = [];
             updateCartUI();
-            closeCheckoutModal();
-
-            // Open WhatsApp
-            window.open(waUrl, '_blank');
-        }
-
-        // TAHAP 4.E: MODAL SETUP API & QUICK ADMIN
-        function openApiModal() {
-            document.getElementById('apiModal').classList.remove('hidden');
-        }
-
-        function closeApiModal() {
-            document.getElementById('apiModal').classList.add('hidden');
-        }
-
-        function saveApiUrl() {
-            const url = document.getElementById('apiUrlInput').value.trim();
-            if (!url) {
-                alert("URL API tidak boleh kosong!");
-                return;
-            }
-            localStorage.setItem('delight_bakery_api', url);
-            apiUrl = url;
-            alert("URL API Berhasil disimpan!");
-            closeApiModal();
-            initApp();
-        }
-
-        function clearApiUrl() {
-            localStorage.removeItem('delight_bakery_api');
-            apiUrl = '';
-            document.getElementById('apiUrlInput').value = '';
-            alert("Menggunakan data Lokal Dummy.");
-            closeApiModal();
-            initApp();
-        }
-
-        async function testApiConnection() {
-            const url = document.getElementById('apiUrlInput').value.trim();
-            if (!url) return alert("Masukkan URL API terlebih dahulu");
-            
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    alert("Koneksi Sukses! Data ditemukan: " + data.length + " item.");
-                } else {
-                    alert("Terhubung, tapi format JSON tidak sesuai.");
-                }
-            } catch (err) {
-                alert("Gagal terhubung ke API: " + err.message);
-            }
-        }
-
-        // ADMIN QUICK ADD PRODUCT
-        function promptAdminAdd() {
-            const pwd = prompt("Masukkan password Admin:");
-            if (pwd === "123123") {
-                document.getElementById('adminModal').classList.remove('hidden');
-            } else if (pwd !== null) {
-                alert("Password Salah!");
-            }
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('hidden');
-        }
-
-        async function submitNewProduct(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('btnSaveProduct');
-            btn.innerText = "Menyimpan...";
-            btn.disabled = true;
-
-            const newProduct = {
-                id: new Date().getTime(),
-                name: document.getElementById('admName').value.trim(),
-                category: document.getElementById('admCategory').value,
-                price: Number(document.getElementById('admPrice').value),
-                size: document.getElementById('admSize').value.trim(),
-                isPo: document.getElementById('admIsPo').value === 'true',
-                poDays: Number(document.getElementById('admPoDays').value) || 0,
-                rating: 5.0,
-                sold: 0,
-                image: document.getElementById('admImage').value.trim(),
-                description: document.getElementById('admDesc').value.trim(),
-                ingredients: document.getElementById('admIngredients').value.split(',').map(s => s.trim()).filter(Boolean),
-                shelfLife: document.getElementById('admShelfLife').value.trim() || '3 Hari Suhu Ruang'
-            };
-
-            if (apiUrl) {
-                try {
-                    await fetch(apiUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'add_product', product: newProduct })
-                    });
-                    alert("Produk dikirim ke Google Sheets! Halaman akan dimuat ulang.");
-                    setTimeout(() => {
-                        fetchProductsFromApi().then(() => renderProducts());
-                    }, 1000);
-                } catch (err) {
-                    alert("Gagal menyimpan ke API: " + err.message);
-                }
-            } else {
-                products.unshift(newProduct);
-                renderProducts();
-                alert("Produk berhasil ditambahkan ke Data Lokal Dummy!");
-            }
-
-            btn.innerText = "Simpan Kue";
-            btn.disabled = false;
-            document.getElementById('adminForm').reset();
-            closeAdminModal();
+            closeModalWithSlug();
+            window.open("https://wa.me/" + pendingOrderData.storePhone + "?text=" + encodeURIComponent(pendingOrderData.waMessage), '_blank');
+            pendingOrderData = null;
         }
     </script>
 </body>
