@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delight Bakery & Pastry - Ema Ende</title>
+    
+    <!-- CDN & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        rose: {
+                            600: '#e11d48',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fef3c7;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-amber-50/60 text-amber-900 font-sans min-h-screen flex flex-col justify-between custom-scrollbar">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-30 bg-amber-50/90 backdrop-blur-md border-b border-amber-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between gap-4">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-tr from-amber-600 to-amber-500 text-white p-2.5 rounded-2xl shadow-md">
+                        <i class="fa-solid me-0.5 fa-cake-candles text-xl sm:text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-serif font-bold text-lg sm:text-2xl text-amber-900 tracking-tight leading-none">Delight Bakery</h1>
+                            <span class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">Ema Ende</span>
+                        </div>
+                        <p class="text-xs text-amber-800 font-medium hidden sm:block mt-0.5">Kue Basah, Pastry & Premium Tart</p>
+                    </div>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div class="flex-1 max-w-md hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Cari kue, bolu, atau bahan (mis: Wijsman)..." 
+                            class="w-full pl-10 pr-4 py-2 bg-white border border-amber-200 rounded-full text-sm text-amber-900 placeholder-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-800/60 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- Right Actions & Connection Status -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    
+                    <!-- Connection Badge -->
+                    <button onclick="openApiModal()" id="statusBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="statusDot"></span>
+                        <span id="statusText">Lokal Dummy</span>
+                    </button>
+
+                    <!-- Tambah Kue Admin -->
+                    <button onclick="promptAdminAdd()" class="hidden sm:flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-full text-xs font-bold transition">
+                        <i class="fa-solid fa-plus text-amber-800"></i>
+                        <span>Kue Baru</span>
+                    </button>
+
+                    <!-- Floating Cart Button -->
+                    <button onclick="toggleCartDrawer(true)" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-full shadow-md flex items-center gap-2 transition transform active:scale-95">
+                        <i class="fa-solid fa-basket-shopping text-base"></i>
+                        <span class="text-xs font-bold hidden sm:inline">Keranjang</span>
+                        <span id="cartCount" class="bg-rose-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-amber-50">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="mt-2.5 md:hidden">
+                <div class="relative">
+                    <input type="text" oninput="handleSearch(this.value)" placeholder="Cari kue basah, pastry..." 
+                        class="w-full pl-9 pr-4 py-1.5 bg-white border border-amber-200 rounded-full text-xs text-amber-900 placeholder-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-amber-800/60 text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Quick Categories -->
+            <div class="flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
+                <button onclick="filterCategory('All')" class="cat-btn active px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-amber-900 text-white border-amber-900">Semua Menu</button>
+                <button onclick="filterCategory('Kue Basah')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Kue Basah</button>
+                <button onclick="filterCategory('Cookies')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Cookies</button>
+                <button onclick="filterCategory('Bolu')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Bolu</button>
+                <button onclick="filterCategory('Tart')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Tart</button>
+                <button onclick="filterCategory('Pastry')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Pastry</button>
+                <button onclick="filterCategory('Dessert')" class="cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400">Dessert</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+        
+        <!-- Filter Bar & Toggle Stock -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-amber-100/60 p-3 rounded-2xl border border-amber-200">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> Filter Status:</span>
+                <button onclick="togglePoFilter('all')" id="btnPoAll" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white">Semua</button>
+                <button onclick="togglePoFilter('ready')" id="btnPoReady" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Ready Stock</button>
+                <button onclick="togglePoFilter('po')" id="btnPoOnly" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Pre-Order (PO)</button>
+            </div>
+            <div class="text-xs text-amber-800 font-medium">
+                Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Render via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-cookie-bite"></i>
+            </div>
+            <h3 class="font-serif text-xl font-bold text-amber-900 mb-1">Kue Tidak Ditemukan</h3>
+            <p class="text-sm text-amber-800">Coba ganti kata kunci pencarian atau ubah filter kategori Anda.</p>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-amber-900 text-amber-100 mt-12 border-t border-amber-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-center md:text-left">
+                    <h2 class="font-serif font-bold text-lg text-white">Delight Bakery & Pastry</h2>
+                    <p class="text-xs text-amber-200/80 mt-0.5">Dibuat secara segar dengan bahan olahan kualitas terbaik di Ende.</p>
+                </div>
+                <div class="flex items-center gap-4 text-xs">
+                    <button onclick="openApiModal()" class="hover:underline text-amber-200"><i class="fa-solid fa-gear mr-1"></i>Pengaturan API GAS</button>
+                    <span>•</span>
+                    <a href="https://wa.me/6281574268876" target="_blank" class="hover:underline text-amber-200"><i class="fa-brands fa-whatsapp mr-1"></i>Hubungi Admin</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL DETAIL KUE -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-amber-100 transform transition-all">
+            <div class="relative">
+                <img id="modalImage" src="" alt="" class="w-full h-64 sm:h-80 object-cover rounded-t-3xl">
+                <button onclick="closeDetailModal()" class="absolute top-4 right-4 bg-white/80 hover:bg-white text-amber-900 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div id="modalBadgePo" class="absolute bottom-4 left-4"></div>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+                    <div>
+                        <span id="modalCategory" class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">Category</span>
+                        <h2 id="modalTitle" class="font-serif text-2xl font-bold text-amber-900 mt-2">Nama Kue</h2>
+                    </div>
+                    <div class="text-right">
+                        <div id="modalPrice" class="text-2xl font-extrabold text-amber-900">Rp 0</div>
+                        <span id="modalSize" class="text-xs text-amber-800 font-medium">Loyang</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs text-amber-800 mb-4 pb-4 border-b border-amber-100">
+                    <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="modalRating">4.9</span></div>
+                    <div>•</div>
+                    <div><i class="fa-solid fa-fire text-rose-500 mr-1"></i><span id="modalSold">100+</span> Terjual</div>
+                    <div>•</div>
+                    <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i>Simpan: <span id="modalShelfLife" class="font-semibold text-amber-900">-</span></div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">Deskripsi Kue</h3>
+                    <p id="modalDescription" class="text-sm text-amber-800/90 leading-relaxed">Deskripsi produk...</p>
+                </div>
+
+                <!-- Ingredients list -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Bahan-Bahan Utama</h3>
+                    <div id="modalIngredients" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <!-- Custom Notes Field -->
+                <div class="mb-6 bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
+                    <label class="block text-xs font-bold text-amber-900 mb-1">
+                        <i class="fa-solid fa-pen-to-square mr-1 text-amber-600"></i> Catatan Khusus untuk Item Ini (Opsional)
+                    </label>
+                    <input type="text" id="modalCustomNote" placeholder="Contoh: Tulis ucapan 'Happy Birthday Mom', potong 16 bagian..." 
+                        class="w-full text-xs p-2.5 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button onclick="closeDetailModal()" class="px-5 py-2.5 rounded-full text-xs font-bold text-amber-800 hover:bg-amber-100 transition">Batal</button>
+                    <button id="modalAddBtn" onclick="" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-cart-plus"></i> Tambahkan ke Keranjang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER SLIDE-IN -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 hidden">
+        <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"></div>
+        
+        <div class="absolute right-0 top-0 bottom-0 max-w-md w-full bg-white shadow-2xl flex flex-col justify-between transform transition-transform custom-scrollbar">
+            
+            <!-- Cart Header -->
+            <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-basket-shopping text-amber-600 text-lg"></i>
+                    <h2 class="font-serif font-bold text-lg text-amber-900">Keranjang Belanja</h2>
+                </div>
+                <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Cart Summary & Checkout Trigger -->
+            <div class="p-4 border-t border-amber-100 bg-amber-50/50 space-y-3">
+                <div class="space-y-1.5 text-xs text-amber-800">
+                    <div class="flex justify-between">
+                        <span>Subtotal Item</span>
+                        <span id="cartSubtotal" class="font-bold text-amber-900">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Estimasi Pengiriman</span>
+                        <span id="cartShippingFee" class="font-bold text-amber-900">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-extrabold text-amber-900 pt-2 border-t border-amber-200">
+                        <span>Total Keseluruhan</span>
+                        <span id="cartGrandTotal" class="text-rose-600">Rp 0</span>
+                    </div>
+                </div>
+
+                <button onclick="openCheckoutModal()" id="btnCheckout" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50">
+                    <span>Lanjut ke Pembayaran</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM CHECKOUT -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl p-6 border border-amber-100">
+            
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-amber-100">
+                <h2 class="font-serif font-bold text-xl text-amber-900"><i class="fa-solid fa-clipboard-check text-amber-600 mr-2"></i>Form Pemesanan</h2>
+                <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="checkoutForm" onsubmit="processCheckout(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">Nama Lengkap *</label>
+                    <input type="text" id="custName" required placeholder="Siti Rahmawati" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">Nomor WhatsApp *</label>
+                    <input type="tel" id="custPhone" required placeholder="081234567890" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">Metode Pengiriman *</label>
+                    <select id="shipMethod" onchange="handleShippingChange(this.value)" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="pickup">Ambil Sendiri di Toko (Gratis / Rp 0)</option>
+                        <option value="delivery">Kurir Toko (Kota Ende - Rp 10.000)</option>
+                    </select>
+                </div>
+
+                <div id="addressContainer" class="hidden">
+                    <label class="block font-bold text-amber-900 mb-1">Alamat Lengkap Pengiriman *</label>
+                    <textarea id="custAddress" rows="2" placeholder="Jl. Soekarno Hatta No. 12, Kel. Mautapaga, Ende..." class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Tanggal Pengambilan *</label>
+                        <input type="date" id="deliveryDate" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Estimasi Jam *</label>
+                        <input type="time" id="deliveryTime" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">Metode Pembayaran *</label>
+                    <select id="paymentMethod" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="Transfer Bank (BCA/Mandiri)">Transfer Bank (BCA / Mandiri)</option>
+                        <option value="QRIS All Payment">QRIS All Payment</option>
+                        <option value="COD / Bayar di Toko">COD / Bayar di Toko</option>
+                    </select>
+                </div>
+
+                <div class="pt-4 border-t border-amber-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-amber-800">Total Pembayaran:</span>
+                        <div id="checkoutTotal" class="text-lg font-extrabold text-rose-600">Rp 0</div>
+                    </div>
+                    <button type="submit" id="btnSubmitOrder" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white px-6 py-3 rounded-2xl font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>Kirim via WhatsApp</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL SETUP API GAS -->
+    <div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 border border-amber-100 text-xs">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
+                <h2 class="font-serif font-bold text-lg text-amber-900"><i class="fa-solid fa-cloud-bolt text-amber-600 mr-2"></i>Setup API Google Apps Script</h2>
+                <button onclick="closeApiModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <p class="text-amber-800 mb-3">Masukkan URL Web App Deployment Google Apps Script untuk sinkronisasi katalog realtime & pencatatan pesanan otomatis.</p>
+
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block font-bold text-amber-900 mb-1">Web App URL</label>
+                    <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/AKfycbzFgN8Inyc3M0UIJ4Se2lYkEW4Jh33RodFbu7pU5ugJDH0YKVt7riKfTHsW8gWgFiKy/exec" class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="saveApiUrl()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold transition">Simpan API</button>
+                    <button onclick="testApiConnection()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-4 py-2 rounded-xl font-bold transition">Tes Koneksi</button>
+                    <button onclick="clearApiUrl()" class="text-rose-600 hover:underline px-2 font-semibold">Gunakan Dummy</button>
+                </div>
+            </div>
+
+            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200">
+                <h4 class="font-bold text-amber-900 mb-1">Langkah Deployment Singkat:</h4>
+                <ol class="list-decimal pl-4 space-y-1 text-amber-800">
+                    <li>Buka Google Sheets & Klik <code class="bg-amber-200/60 px-1 rounded">Extensions > Apps Script</code>.</li>
+                    <li>Salin kode <code class="bg-amber-200/60 px-1 rounded">Code.gs</code> yang disediakan ke editor.</li>
+                    <li>Klik <code class="bg-amber-200/60 px-1 rounded">Deploy > New Deployment</code>.</li>
+                    <li>Pilih type <code class="bg-amber-200/60 px-1 rounded">Web App</code>, set Access ke <code class="bg-amber-200/60 px-1 rounded">Anyone</code>.</li>
+                    <li>Salin URL hasil deploy dan tempel di atas.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QUICK ADMIN ADD PRODUCT -->
+    <div id="adminModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 border border-amber-100 text-xs">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
+                <h2 class="font-serif font-bold text-lg text-amber-900"><i class="fa-solid fa-plus-circle text-amber-600 mr-2"></i>Tambah Varian Kue Baru</h2>
+                <button onclick="closeAdminModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="adminForm" onsubmit="submitNewProduct(event)" class="space-y-3">
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Nama Kue *</label>
+                    <input type="text" id="admName" required placeholder="mis: Bolu Gulung Keju" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Kategori *</label>
+                        <select id="admCategory" required class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="Kue Basah">Kue Basah</option>
+                            <option value="Cookies">Cookies</option>
+                            <option value="Bolu">Bolu</option>
+                            <option value="Tart">Tart</option>
+                            <option value="Pastry">Pastry</option>
+                            <option value="Dessert">Dessert</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Harga (Rp) *</label>
+                        <input type="number" id="admPrice" required placeholder="85000" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Ukuran / Porsi *</label>
+                        <input type="text" id="admSize" required placeholder="Loyang 20cm / Toples" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-0.5">Sistem Stok *</label>
+                        <select id="admIsPo" onchange="document.getElementById('admPoDaysBox').classList.toggle('hidden', this.value === 'false')" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="false">Ready Stock</option>
+                            <option value="true">Pre-Order (PO)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="admPoDaysBox" class="hidden">
+                    <label class="block font-bold text-amber-900 mb-0.5">Lama Waktu PO (Hari)</label>
+                    <input type="number" id="admPoDays" value="1" min="1" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">URL Gambar (Unsplash/Direct) *</label>
+                    <input type="url" id="admImage" required placeholder="https://images.unsplash.com/photo-..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Deskripsi *</label>
+                    <textarea id="admDesc" required rows="2" placeholder="Jelaskan kelezatan kue..." class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Bahan Utama (Pisahkan dengan koma)</label>
+                    <input type="text" id="admIngredients" placeholder="Wijsman, Keju, Keju Edam" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Masa Simpan</label>
+                    <input type="text" id="admShelfLife" placeholder="3 Hari Suhu Ruang" class="w-full p-2 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeAdminModal()" class="px-4 py-2 rounded-xl font-bold text-amber-800 hover:bg-amber-100">Batal</button>
+                    <button type="submit" id="btnSaveProduct" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-md transition">Simpan Kue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // TAHAP 2: DUMMY DATA FALLBACK
+        const dummyProducts = [
+            {
+                id: 1,
+                name: "Nastar Premium Wijsman",
+                category: "Cookies",
+                price: 175000,
+                size: "Toples 500g",
+                isPo: false,
+                poDays: 0,
+                rating: 4.9,
+                sold: 340,
+                image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=600&q=80",
+                description: "Nastar lembut dengan mentega Wijsman pilihan dan isian selai nanas asli buatan rumah yang pas manis dan asamnya.",
+                ingredients: ["Mentega Wijsman", "Keju Edam", "Nanas Palembang"],
+                shelfLife: "1 Bulan Suhu Ruang"
+            },
+            {
+                id: 2,
+                name: "Lapis Legit Original",
+                category: "Bolu",
+                price: 350000,
+                size: "Loyang 20x20cm",
+                isPo: true,
+                poDays: 2,
+                rating: 5.0,
+                sold: 120,
+                image: "https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80",
+                description: "Lapis legit tradisional beraroma rempah bumbu spekkoek yang kaya rasa, lembut, dan berlapis rapi.",
+                ingredients: ["Kuning Telur", "Mentega Wijsman", "Bumbu Spekkoek"],
+                shelfLife: "7 Hari Suhu Ruang"
+            },
+            {
+                id: 3,
+                name: "Fudgy Brownies Shiny Crust",
+                category: "Dessert",
+                price: 85000,
+                size: "Loyang 20x10cm",
+                isPo: false,
+                poDays: 0,
+                rating: 4.8,
+                sold: 510,
+                image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
+                description: "Brownies cokelat lumer dengan lapisan atas shiny crust renyah dan potongan cokelat melimpah di setiap gigitan.",
+                ingredients: ["Dark Chocolate 70%", "Butter", "Belgian Cocoa"],
+                shelfLife: "5 Hari Suhu Ruang"
+            },
+            {
+                id: 4,
+                name: "Strawberry Shortcake",
+                category: "Tart",
+                price: 275000,
+                size: "Diameter 18cm",
+                isPo: true,
+                poDays: 1,
+                rating: 4.9,
+                sold: 85,
+                image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80",
+                description: "Sponge cake vanila yang sangat lembut berlapis fresh cream whipped dan potongan buah stroberi segar pilihan.",
+                ingredients: ["Stroberi Fresh", "Whipping Cream", "Vanilla Bean"],
+                shelfLife: "2 Hari di Kulkas"
+            },
+            {
+                id: 5,
+                name: "Croissant Butter French",
+                category: "Pastry",
+                price: 28000,
+                size: "Pcs (Large)",
+                isPo: false,
+                poDays: 0,
+                rating: 4.7,
+                sold: 420,
+                image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80",
+                description: "Croissant khas Prancis yang renyah di luar dan bertumpuk berongga lembut beraroma butter kaya di dalam.",
+                ingredients: ["French Butter", "Flour", "Yeast"],
+                shelfLife: "2 Hari Suhu Ruang"
+            },
+            {
+                id: 6,
+                name: "Klepon Cake Lumer",
+                category: "Kue Basah",
+                price: 220000,
+                size: "Diameter 16cm",
+                isPo: true,
+                poDays: 1,
+                rating: 4.9,
+                sold: 190,
+                image: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=600&q=80",
+                description: "Perpaduan rasa kue tradisional klepon dengan pandan asli, unti kelapa gula merah lumer, dan cream lembut.",
+                ingredients: ["Pandan Asli", "Gula Aren Organik", "Kelapa Parut"],
+                shelfLife: "2 Hari Suhu Ruang"
+            }
+        ];
+
+        // GLOBAL APP STATE
+        let products = [];
+        let cart = [];
+        let currentCategory = 'All';
+        let currentSearchQuery = '';
+        let currentPoFilter = 'all'; // 'all', 'ready', 'po'
+        let apiUrl = localStorage.getItem('delight_bakery_api') || '';
+        let isOnline = false;
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Set default date picker to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deliveryDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('deliveryTime').value = "10:00";
+        });
+
+        async function initApp() {
+            if (apiUrl) {
+                document.getElementById('apiUrlInput').value = apiUrl;
+                await fetchProductsFromApi();
+            } else {
+                loadLocalDummy();
+            }
+            renderProducts();
+            updateCartUI();
+        }
+
+        function loadLocalDummy() {
+            products = [...dummyProducts];
+            isOnline = false;
+            updateConnectionBadge(false, "Data Lokal Dummy");
+        }
+
+        async function fetchProductsFromApi() {
+            updateConnectionBadge(false, "Memuat Data...");
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    products = data;
+                    isOnline = true;
+                    updateConnectionBadge(true, "Online Realtime");
+                } else {
+                    throw new Error("Format data tidak valid");
+                }
+            } catch (err) {
+                console.warn("Gagal terhubung ke API, menggunakan data dummy:", err);
+                loadLocalDummy();
+            }
+        }
+
+        function updateConnectionBadge(online, text) {
+            const badge = document.getElementById('statusBadge');
+            const dot = document.getElementById('statusDot');
+            const txt = document.getElementById('statusText');
+
+            txt.innerText = text;
+            if (online) {
+                badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            } else {
+                badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition";
+                dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+            }
+        }
+
+        // RENDER PRODUCTS & FILTERS
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const empty = document.getElementById('emptyState');
+            
+            let filtered = products.filter(p => {
+                const matchCat = (currentCategory === 'All') || (p.category.toLowerCase() === currentCategory.toLowerCase());
+                
+                const q = currentSearchQuery.toLowerCase();
+                const matchSearch = p.name.toLowerCase().includes(q) || 
+                                    p.description.toLowerCase().includes(q) ||
+                                    (p.ingredients && p.ingredients.some(ing => ing.toLowerCase().includes(q)));
+                
+                let matchPo = true;
+                if (currentPoFilter === 'ready') matchPo = !p.isPo;
+                if (currentPoFilter === 'po') matchPo = p.isPo;
+
+                return matchCat && matchSearch && matchPo;
+            });
+
+            document.getElementById('itemCountDisplay').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-white rounded-3xl overflow-hidden border border-amber-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <!-- Product Image & Badges -->
+                        <div class="relative overflow-hidden h-48">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            
+                            <!-- PO / Ready Badge -->
+                            <div class="absolute top-3 left-3">
+                                ${p.isPo 
+                                    ? `<span class="bg-rose-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-hourglass-start mr-1"></i>PO H-${p.poDays}</span>`
+                                    : `<span class="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-bolt mr-1"></i>Ready Stock</span>`
+                                }
+                            </div>
+
+                            <button onclick="openDetailModal(${p.id})" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-amber-900 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="p-4">
+                            <div class="flex items-center justify-between text-[11px] text-amber-800 mb-1">
+                                <span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">${p.category}</span>
+                                <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span class="font-bold text-amber-900">${p.rating || '5.0'}</span></div>
+                            </div>
+
+                            <h3 onclick="openDetailModal(${p.id})" class="font-serif font-bold text-base text-amber-900 cursor-pointer hover:text-amber-600 transition line-clamp-1">${p.name}</h3>
+                            <p class="text-xs text-amber-800/80 line-clamp-2 mt-1 mb-3">${p.description}</p>
+                            
+                            <div class="text-[11px] text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 inline-block">
+                                <i class="fa-solid fa-box mr-1 text-amber-600"></i>${p.size}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Price & Add Action -->
+                    <div class="p-4 pt-0 flex items-center justify-between gap-2 border-t border-amber-50 mt-2">
+                        <div>
+                            <span class="text-[10px] text-amber-800 block">Harga</span>
+                            <span class="font-extrabold text-amber-900 text-base">Rp ${p.price.toLocaleString('id-ID')}</span>
+                        </div>
+                        <button onclick="quickAddToCart(${p.id})" class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2.5 rounded-2xl transition font-bold text-xs flex items-center gap-1">
+                            <i class="fa-solid fa-cart-plus text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // FILTER HANDLERS
+        function handleSearch(val) {
+            currentSearchQuery = val;
+            renderProducts();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.innerText.trim().toLowerCase() === cat.toLowerCase() || (cat === 'All' && btn.innerText.includes('Semua'))) {
+                    btn.className = "cat-btn active px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-amber-900 text-white border-amber-900";
+                } else {
+                    btn.className = "cat-btn px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-white text-amber-800 border-amber-200 hover:border-amber-400";
+                }
+            });
+            renderProducts();
+        }
+
+        function togglePoFilter(type) {
+            currentPoFilter = type;
+            const btnAll = document.getElementById('btnPoAll');
+            const btnReady = document.getElementById('btnPoReady');
+            const btnPo = document.getElementById('btnPoOnly');
+
+            [btnAll, btnReady, btnPo].forEach(btn => btn.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300");
+
+            if (type === 'all') btnAll.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
+            if (type === 'ready') btnReady.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
+            if (type === 'po') btnPo.className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white";
+
+            renderProducts();
+        }
+
+        // TAHAP 4.B: MODAL DETAIL KUE
+        function openDetailModal(id) {
+            const p = products.find(prod => prod.id == id);
+            if (!p) return;
+
+            document.getElementById('modalImage').src = p.image;
+            document.getElementById('modalTitle').innerText = p.name;
+            document.getElementById('modalCategory').innerText = p.category;
+            document.getElementById('modalPrice').innerText = `Rp ${p.price.toLocaleString('id-ID')}`;
+            document.getElementById('modalSize').innerText = p.size;
+            document.getElementById('modalRating').innerText = p.rating || '5.0';
+            document.getElementById('modalSold').innerText = (p.sold || 50) + '+';
+            document.getElementById('modalShelfLife').innerText = p.shelfLife || '3 Hari Suhu Ruang';
+            document.getElementById('modalDescription').innerText = p.description;
+            document.getElementById('modalCustomNote').value = '';
+
+            // Ingredients
+            const ingBox = document.getElementById('modalIngredients');
+            if (p.ingredients && p.ingredients.length > 0) {
+                ingBox.innerHTML = p.ingredients.map(ing => `
+                    <span class="bg-amber-100 text-amber-900 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-amber-200">
+                        <i class="fa-solid fa-wheat-awn mr-1 text-amber-600"></i>${ing}
+                    </span>
+                `).join('');
+            } else {
+                ingBox.innerHTML = '<span class="text-xs text-amber-800">Resep rahasia bakery</span>';
+            }
+
+            // PO Badge
+            const badgeBox = document.getElementById('modalBadgePo');
+            if (p.isPo) {
+                badgeBox.innerHTML = `<span class="bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"><i class="fa-solid fa-hourglass-start mr-1"></i>Pre-Order H-${p.poDays}</span>`;
+            } else {
+                badgeBox.innerHTML = `<span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"><i class="fa-solid fa-bolt mr-1"></i>Ready Stock</span>`;
+            }
+
+            // Set Action Button
+            document.getElementById('modalAddBtn').onclick = () => {
+                const customNote = document.getElementById('modalCustomNote').value.trim();
+                addToCart(p, customNote);
+                closeDetailModal();
+            };
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // TAHAP 4.C: KERANJANG BELANJA (CART SYSTEM)
+        function quickAddToCart(id) {
+            const p = products.find(prod => prod.id == id);
+            if (p) addToCart(p, '');
+        }
+
+        function addToCart(product, customNote = '') {
+            const existingIndex = cart.findIndex(item => item.id == product.id && item.customNote === customNote);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    size: product.size,
+                    image: product.image,
+                    isPo: product.isPo,
+                    poDays: product.poDays,
+                    customNote: customNote,
+                    qty: 1
+                });
+            }
+            updateCartUI();
+            toggleCartDrawer(true);
+        }
+
+        function updateCartQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const countBadge = document.getElementById('cartCount');
+            const list = document.getElementById('cartItemsList');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const grandTotalEl = document.getElementById('cartGrandTotal');
+            const btnCheckout = document.getElementById('btnCheckout');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            countBadge.innerText = totalItems;
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-12 text-amber-800">
+                        <i class="fa-solid fa-basket-shopping text-4xl text-amber-300 mb-2"></i>
+                        <p class="text-sm font-semibold">Keranjang masih kosong</p>
+                        <p class="text-xs">Yuk, pilih kue favoritmu sekarang!</p>
+                    </div>
+                `;
+                subtotalEl.innerText = "Rp 0";
+                grandTotalEl.innerText = "Rp 0";
+                btnCheckout.disabled = true;
+                return;
+            }
+
+            btnCheckout.disabled = false;
+
+            let subtotal = 0;
+            list.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+                return `
+                    <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80 flex gap-3 items-center">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-xs text-amber-900 truncate">${item.name}</h4>
+                            <p class="text-[11px] text-amber-800">Rp ${item.price.toLocaleString('id-ID')} / ${item.size}</p>
+                            ${item.customNote ? `<p class="text-[10px] text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 mt-0.5 truncate"><i class="fa-solid fa-comment-dots mr-1"></i>${item.customNote}</p>` : ''}
+                            
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-center gap-2 bg-white px-2 py-0.5 rounded-lg border border-amber-200">
+                                    <button onclick="updateCartQty(${idx}, -1)" class="text-amber-800 font-bold px-1 hover:text-amber-600">-</button>
+                                    <span class="text-xs font-bold text-amber-900">${item.qty}</span>
+                                    <button onclick="updateCartQty(${idx}, 1)" class="text-amber-800 font-bold px-1 hover:text-amber-600">+</button>
+                                </div>
+                                <span class="font-extrabold text-xs text-amber-900">Rp ${itemTotal.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${idx})" class="text-amber-800/50 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    </div>
+                `;
+            }).join('');
+
+            const shipFee = document.getElementById('shipMethod')?.value === 'delivery' ? 10000 : 0;
+            subtotalEl.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('cartShippingFee').innerText = `Rp ${shipFee.toLocaleString('id-ID')}`;
+            grandTotalEl.innerText = `Rp ${(subtotal + shipFee).toLocaleString('id-ID')}`;
+            document.getElementById('checkoutTotal').innerText = `Rp ${(subtotal + shipFee).toLocaleString('id-ID')}`;
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            if (open) {
+                drawer.classList.remove('hidden');
+            } else {
+                drawer.classList.add('hidden');
+            }
+        }
+
+        // TAHAP 4.D: CHECKOUT & WHATSAPP GENERATOR
+        function openCheckoutModal() {
+            toggleCartDrawer(false);
+            updateCartUI();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function handleShippingChange(val) {
+            const addrContainer = document.getElementById('addressContainer');
+            if (val === 'delivery') {
+                addrContainer.classList.remove('hidden');
+            } else {
+                addrContainer.classList.add('hidden');
+            }
+            updateCartUI();
+        }
+
+        async function processCheckout(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const shipMethod = document.getElementById('shipMethod').value;
+            const address = document.getElementById('custAddress').value.trim();
+            const delDate = document.getElementById('deliveryDate').value;
+            const delTime = document.getElementById('deliveryTime').value;
+            const payMethod = document.getElementById('paymentMethod').value;
+
+            if (shipMethod === 'delivery' && !address) {
+                alert("Mohon isi alamat lengkap pengiriman!");
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const shipFee = shipMethod === 'delivery' ? 10000 : 0;
+            const grandTotal = subtotal + shipFee;
+            const orderId = "DLG-" + Math.floor(100000 + Math.random() * 900000);
+
+            // Ringkasan Teks Item
+            let itemsDetailString = cart.map(item => {
+                let text = `• ${item.name} (${item.size}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString('id-ID')}`;
+                if (item.customNote) text += `\n   Catatan: _"${item.customNote}"_`;
+                return text;
+            }).join('\n');
+
+            // 1. POST KE APPS SCRIPT JIKA API KONEK
+            if (apiUrl) {
+                try {
+                    const payload = {
+                        action: 'create_order',
+                        order: {
+                            orderId: orderId,
+                            customerName: name,
+                            phone: phone,
+                            shippingMethod: shipMethod === 'delivery' ? 'Kurir Toko' : 'Ambil di Toko',
+                            address: shipMethod === 'delivery' ? address : '-',
+                            deliveryDate: delDate,
+                            deliveryTime: delTime,
+                            itemsDetail: itemsDetailString,
+                            totalPrice: grandTotal
+                        }
+                    };
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } catch (err) {
+                    console.error("Gagal mencatat ke Google Sheets:", err);
+                }
+            }
+
+            // 2. GENERATE WHATSAPP TEXT FORMAT
+            const storePhone = "6281574268876"; // Ganti dengan No WA Toko
+            let waMessage = `*HALO DELIGHT BAKERY & PASTRY* 🍰✨\n`;
+            waMessage += `Saya ingin mengonfirmasi pesanan kue baru:\n\n`;
+            waMessage += `🆔 *Order ID:* ${orderId}\n`;
+            waMessage += `👤 *Nama Pemesan:* ${name}\n`;
+            waMessage += `📱 *No. WA:* ${phone}\n`;
+            waMessage += `🚚 *Metode:* ${shipMethod === 'delivery' ? 'Kurir Toko (Kota Ende)' : 'Ambil Sendiri di Toko'}\n`;
+            if (shipMethod === 'delivery') {
+                waMessage += `📍 *Alamat:* ${address}\n`;
+            }
+            waMessage += `📅 *Tanggal & Jam:* ${delDate} pukul ${delTime} WIB\n`;
+            waMessage += `💳 *Pembayaran:* ${payMethod}\n\n`;
+            waMessage += `🛒 *RINCIAN PESANAN:* \n${itemsDetailString}\n\n`;
+            waMessage += `-----------------------------------\n`;
+            waMessage += `Subtotal: Rp ${subtotal.toLocaleString('id-ID')}\n`;
+            waMessage += `Ongkir: Rp ${shipFee.toLocaleString('id-ID')}\n`;
+            waMessage += `*TOTAL KESELURUHAN:* *Rp ${grandTotal.toLocaleString('id-ID')}*\n\n`;
+            waMessage += `Mohon konfirmasi ketersediaan dan instruksi pembayaran selanjutnya. Terima kasih! 🙏`;
+
+            const encodedMessage = encodeURIComponent(waMessage);
+            const waUrl = `https://wa.me/${storePhone}?text=${encodedMessage}`;
+
+            // Reset Cart & Close Modal
+            cart = [];
+            updateCartUI();
+            closeCheckoutModal();
+
+            // Open WhatsApp
+            window.open(waUrl, '_blank');
+        }
+
+        // TAHAP 4.E: MODAL SETUP API & QUICK ADMIN
+        function openApiModal() {
+            document.getElementById('apiModal').classList.remove('hidden');
+        }
+
+        function closeApiModal() {
+            document.getElementById('apiModal').classList.add('hidden');
+        }
+
+        function saveApiUrl() {
+            const url = document.getElementById('apiUrlInput').value.trim();
+            if (!url) {
+                alert("URL API tidak boleh kosong!");
+                return;
+            }
+            localStorage.setItem('delight_bakery_api', url);
+            apiUrl = url;
+            alert("URL API Berhasil disimpan!");
+            closeApiModal();
+            initApp();
+        }
+
+        function clearApiUrl() {
+            localStorage.removeItem('delight_bakery_api');
+            apiUrl = '';
+            document.getElementById('apiUrlInput').value = '';
+            alert("Menggunakan data Lokal Dummy.");
+            closeApiModal();
+            initApp();
+        }
+
+        async function testApiConnection() {
+            const url = document.getElementById('apiUrlInput').value.trim();
+            if (!url) return alert("Masukkan URL API terlebih dahulu");
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    alert("Koneksi Sukses! Data ditemukan: " + data.length + " item.");
+                } else {
+                    alert("Terhubung, tapi format JSON tidak sesuai.");
+                }
+            } catch (err) {
+                alert("Gagal terhubung ke API: " + err.message);
+            }
+        }
+
+        // ADMIN QUICK ADD PRODUCT
+        function promptAdminAdd() {
+            const pwd = prompt("Masukkan password Admin:");
+            if (pwd === "123123") {
+                document.getElementById('adminModal').classList.remove('hidden');
+            } else if (pwd !== null) {
+                alert("Password Salah!");
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        async function submitNewProduct(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnSaveProduct');
+            btn.innerText = "Menyimpan...";
+            btn.disabled = true;
+
+            const newProduct = {
+                id: new Date().getTime(),
+                name: document.getElementById('admName').value.trim(),
+                category: document.getElementById('admCategory').value,
+                price: Number(document.getElementById('admPrice').value),
+                size: document.getElementById('admSize').value.trim(),
+                isPo: document.getElementById('admIsPo').value === 'true',
+                poDays: Number(document.getElementById('admPoDays').value) || 0,
+                rating: 5.0,
+                sold: 0,
+                image: document.getElementById('admImage').value.trim(),
+                description: document.getElementById('admDesc').value.trim(),
+                ingredients: document.getElementById('admIngredients').value.split(',').map(s => s.trim()).filter(Boolean),
+                shelfLife: document.getElementById('admShelfLife').value.trim() || '3 Hari Suhu Ruang'
+            };
+
+            if (apiUrl) {
+                try {
+                    await fetch(apiUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add_product', product: newProduct })
+                    });
+                    alert("Produk dikirim ke Google Sheets! Halaman akan dimuat ulang.");
+                    setTimeout(() => {
+                        fetchProductsFromApi().then(() => renderProducts());
+                    }, 1000);
+                } catch (err) {
+                    alert("Gagal menyimpan ke API: " + err.message);
+                }
+            } else {
+                products.unshift(newProduct);
+                renderProducts();
+                alert("Produk berhasil ditambahkan ke Data Lokal Dummy!");
+            }
+
+            btn.innerText = "Simpan Kue";
+            btn.disabled = false;
+            document.getElementById('adminForm').reset();
+            closeAdminModal();
+        }
+    </script>
+</body>
+</html>
