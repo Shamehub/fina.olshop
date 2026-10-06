@@ -353,22 +353,26 @@
                 <div class="bg-amber-50/80 p-3 rounded-2xl border border-amber-200 space-y-2">
                     <label class="block font-bold text-amber-900">Opsi Pilihan Produk *</label>
                     <select id="crudVariantType" onchange="toggleVariantInputs(this.value)" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none font-medium">
-                        <option value="SINGLE">Satuan Saja (Standar)</option>
-                        <option value="PAKET">Paket Saja</option>
-                        <option value="BOTH">Pilihan Satuan & Paket (Pelanggan Bisa Memilih)</option>
+                        <option value="SINGLE">Tunggal</option>
+                        <option value="VARIAN">Banyak Variasi</option>
+                        <option value="PAKET">Paket</option>
                     </select>
 
-                    <div id="variantPriceInputs" class="hidden space-y-2 pt-1 border-t border-amber-200">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block font-bold text-amber-800 text-[11px]">Harga Satuan (Rp)</label>
-                                <input type="number" id="crudPriceSatuan" placeholder="15000" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-amber-800 text-[11px]">Harga Paket (Rp)</label>
-                                <input type="number" id="crudPricePaket" placeholder="135000" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none">
-                            </div>
+                    <!-- Kontainer Varian Dinamis (Muncul jika Banyak Variasi dipilih) -->
+                    <div id="variantDynamicInputs" class="hidden space-y-2 pt-2 border-t border-amber-200">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-amber-900 text-xs">Daftar Variasi Produk:</span>
+                            <button type="button" onclick="addVariantRow()" class="bg-amber-800 hover:bg-amber-900 text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> Tambah Variasi
+                            </button>
                         </div>
+                        <div id="variantRowsContainer" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Kontainer Harga Paket (Muncul jika Paket dipilih) -->
+                    <div id="paketPriceInput" class="hidden space-y-1 pt-2 border-t border-amber-200">
+                        <label class="block font-bold text-amber-800 text-[11px]">Harga Paket (Rp) *</label>
+                        <input type="number" id="crudPricePaket" placeholder="135000" class="w-full p-2 bg-white border border-amber-200 rounded-xl outline-none">
                     </div>
                 </div>
 
@@ -699,9 +703,44 @@
         }
 
         function toggleVariantInputs(val) {
-            var box = document.getElementById('variantPriceInputs');
-            if (val === 'BOTH') box.classList.remove('hidden');
-            else box.classList.add('hidden');
+            var varBox = document.getElementById('variantDynamicInputs');
+            var pakBox = document.getElementById('paketPriceInput');
+
+            varBox.classList.add('hidden');
+            pakBox.classList.add('hidden');
+
+            if (val === 'VARIAN') {
+                varBox.classList.remove('hidden');
+                var container = document.getElementById('variantRowsContainer');
+                if (container.children.length === 0) {
+                    addVariantRow();
+                }
+            } else if (val === 'PAKET') {
+                pakBox.classList.remove('hidden');
+            }
+        }
+
+        function addVariantRow(nameVal, priceVal) {
+            var container = document.getElementById('variantRowsContainer');
+            var rowId = 'variantRow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+            var rowDiv = document.createElement('div');
+            rowDiv.id = rowId;
+            rowDiv.className = "flex items-center gap-2 bg-white p-2 rounded-xl border border-amber-200";
+
+            rowDiv.innerHTML = 
+                '<input type="text" placeholder="Nama Variasi (mis: Toples 250g / Cokelat)" value="' + (nameVal || '') + '" class="variant-name-input flex-1 p-1.5 bg-amber-50 border border-amber-200 rounded-lg outline-none text-xs">' +
+                '<input type="number" placeholder="Harga (Rp)" value="' + (priceVal || '') + '" class="variant-price-input w-28 p-1.5 bg-amber-50 border border-amber-200 rounded-lg outline-none text-xs">' +
+                '<button type="button" onclick="removeVariantRow(\'' + rowId + '\')" class="w-7 h-7 bg-rose-100 hover:bg-rose-200 text-rose-600 rounded-lg flex items-center justify-center font-bold transition text-xs shrink-0">' +
+                    '<i class="fa-solid fa-trash-can"></i>' +
+                '</button>';
+
+            container.appendChild(rowDiv);
+        }
+
+        function removeVariantRow(rowId) {
+            var row = document.getElementById(rowId);
+            if (row) row.remove();
         }
 
         function handleMultiImageUpload(e) {
@@ -838,6 +877,7 @@
             document.getElementById('crudForm').reset();
             document.getElementById('crudRowIndex').value = "";
             document.getElementById('uploadProgressText').innerText = "";
+            document.getElementById('variantRowsContainer').innerHTML = "";
             uploadedImages = [];
             renderMultiImagePreviews();
             toggleVariantInputs("SINGLE");
@@ -868,14 +908,19 @@
             document.getElementById('crudVariantType').value = vType;
             toggleVariantInputs(vType);
 
-            if (vType === 'BOTH' && p.variants && p.variants.length >= 2) {
-                document.getElementById('crudPriceSatuan').value = p.variants[0].price || p.price;
-                document.getElementById('crudPricePaket').value = p.variants[1].price || (p.price * 10);
+            document.getElementById('variantRowsContainer').innerHTML = "";
+            if (vType === 'VARIAN' && p.variants && p.variants.length > 0) {
+                p.variants.forEach(function(v) {
+                    addVariantRow(v.name, v.price);
+                });
+            } else if (vType === 'PAKET') {
+                document.getElementById('crudPricePaket').value = (p.variants && p.variants[0]) ? p.variants[0].price : p.price;
             }
 
             document.getElementById('productCrudModal').classList.remove('hidden');
         }
 
+        // Sesuaikan fungsi saveProductSubmit
         function saveProductSubmit(e) {
             e.preventDefault();
             if (uploadedImages.length === 0) {
@@ -890,12 +935,22 @@
             var vType = document.getElementById('crudVariantType').value;
             
             var variantsArr = [];
-            if (vType === 'BOTH') {
-                var priceSat = Number(document.getElementById('crudPriceSatuan').value) || Number(document.getElementById('crudPrice').value);
-                var pricePak = Number(document.getElementById('crudPricePaket').value) || (priceSat * 10);
-                variantsArr = [{ name: "Satuan", price: priceSat }, { name: "Paket", price: pricePak }];
+            if (vType === 'VARIAN') {
+                var rows = document.querySelectorAll('#variantRowsContainer > div');
+                rows.forEach(function(row) {
+                    var nameVal = row.querySelector('.variant-name-input').value.trim();
+                    var priceVal = Number(row.querySelector('.variant-price-input').value) || 0;
+                    if (nameVal) {
+                        variantsArr.push({ name: nameVal, price: priceVal });
+                    }
+                });
+                if (variantsArr.length === 0) {
+                    btn.innerText = "Simpan Data"; btn.disabled = false;
+                    return showPremiumAlert("Peringatan", "Wajib mengisi minimal 1 variasi produk!", "error");
+                }
             } else if (vType === 'PAKET') {
-                variantsArr = [{ name: "Paket", price: Number(document.getElementById('crudPrice').value) }];
+                var pricePak = Number(document.getElementById('crudPricePaket').value) || Number(document.getElementById('crudPrice').value);
+                variantsArr = [{ name: "Paket", price: pricePak }];
             } else {
                 variantsArr = [{ name: "Satuan", price: Number(document.getElementById('crudPrice').value) }];
             }
