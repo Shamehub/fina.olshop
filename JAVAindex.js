@@ -91,10 +91,25 @@ function copyCurrentShareableLink() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchProductsFromBackend();
-    fetchStoreSettings();
-    fetchPublicOrders();
-    
+    // 🚀 Mencegah gestur geser ke bawah (pull-to-refresh) di browser ponsel
+    var startY = 0;
+    document.body.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            startY = e.touches[0].clientY;
+        }
+    }, { passive: false });
+
+    document.body.addEventListener('touchmove', function(e) {
+        var currentY = e.touches[0].clientY;
+        // Jika berada di paling atas layar dan ditarik ke bawah, cegah refresh
+        if (window.scrollY === 0 && currentY > startY) {
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false });
+
+    // 🚀 Optimasi: Muat semua data utama secara paralel menggunakan Promise.all
+    initInitialAppData();
+
     window.addEventListener('hashchange', handleRouting);
 
     var tomorrow = new Date();
@@ -125,6 +140,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, true);
 });
+
+async function initInitialAppData() {
+    try {
+        // Ambil produk, settings, dan order secara bersamaan agar memuat jauh lebih cepat
+        let [prodsData, settingsData] = await Promise.all([
+            apiGet('getProducts'),
+            apiGet('getSettings'),
+            fetchPublicOrders()
+        ]);
+
+        // Process Products
+        products = Array.isArray(prodsData) ? prodsData : [];
+        renderCategoryButtons();
+        renderProducts();
+        updateCartUI();
+        handleRouting();
+
+        // Process Settings
+        if (settingsData) {
+            currentStoreStatus = settingsData.storeStatus ? settingsData.storeStatus.toUpperCase().trim() : 'BUKA';
+            storeAnnouncementText = settingsData.storeAnnouncement || 'Mohon maaf, toko kami saat ini sedang LIBUR/TUTUP.';
+
+            updateStoreStatusUI(currentStoreStatus);
+            if (settingsData.logoUrl) {
+                var logo = document.getElementById('appLogo');
+                if (logo) logo.src = settingsData.logoUrl;
+            }
+            if (settingsData.qrisUrl) appQrisUrl = settingsData.qrisUrl;
+            if (settingsData.bankInfo) appBankInfo = settingsData.bankInfo;
+
+            updatePaymentMethodsUI(settingsData);
+
+            if (currentStoreStatus === 'LIBUR' || currentStoreStatus === 'TUTUP') {
+                showStoreAnnouncementModal();
+            }
+        }
+    } catch(err) {
+        showPremiumAlert("Gagal Memuat Data", "Terjadi gangguan koneksi saat memuat data toko.", "error");
+    }
+}
 
 function showPremiumAlert(title, message, type, confirmCallback) {
     var modal = document.getElementById('premiumAlertModal');
@@ -167,43 +222,6 @@ function showPremiumAlert(title, message, type, confirmCallback) {
 
 function closePremiumAlert() {
     document.getElementById('premiumAlertModal').classList.add('hidden');
-}
-
-async function fetchProductsFromBackend() {
-    try {
-        let data = await apiGet('getProducts');
-        products = Array.isArray(data) ? data : [];
-        renderCategoryButtons();
-        renderProducts();
-        updateCartUI();
-        handleRouting(); // Cek URL hash setelah produk dimuat
-    } catch(err) {
-        showPremiumAlert("Gagal Memuat Produk", "Terjadi gangguan koneksi ke server.", "error");
-    }
-}
-
-async function fetchStoreSettings() {
-    try {
-        let settings = await apiGet('getSettings');
-        if (settings) {
-            currentStoreStatus = settings.storeStatus ? settings.storeStatus.toUpperCase().trim() : 'BUKA';
-            storeAnnouncementText = settings.storeAnnouncement || 'Mohon maaf, toko kami saat ini sedang LIBUR/TUTUP.';
-
-            updateStoreStatusUI(currentStoreStatus);
-            if (settings.logoUrl) {
-                var logo = document.getElementById('appLogo');
-                if (logo) logo.src = settings.logoUrl;
-            }
-            if (settings.qrisUrl) appQrisUrl = settings.qrisUrl;
-            if (settings.bankInfo) appBankInfo = settings.bankInfo;
-
-            updatePaymentMethodsUI(settings);
-
-            if (currentStoreStatus === 'LIBUR' || currentStoreStatus === 'TUTUP') {
-                showStoreAnnouncementModal();
-            }
-        }
-    } catch(err) {}
 }
 
 function showStoreAnnouncementModal() {
@@ -350,14 +368,13 @@ function renderProducts() {
 
     if (empty) empty.classList.add('hidden');
 
-    grid.innerHTML = filtered.map(function(p) {
+    var htmlOutput = filtered.map(function(p) {
         var mainImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
-        var pSlug = generateSlug(p.name);
 
         return '<div class="bg-white rounded-3xl overflow-hidden border border-amber-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group ' + (!p.isAvailable ? 'opacity-60' : '') + '">' +
             '<div>' +
                 '<div onclick="openDetailModalById(' + p.id + ')" class="relative overflow-hidden h-48 cursor-pointer">' +
-                    '<img src="' + mainImg + '" alt="' + p.name + '" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">' +
+                    '<img src="' + mainImg + '" alt="' + p.name + '" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">' +
                     '<div class="absolute top-3 left-3 flex flex-col gap-1 items-start">' +
                         (p.isPo 
                             ? '<span class="bg-rose-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-hourglass-start mr-1"></i>Pre Order H-' + p.poDays + '</span>'
@@ -389,6 +406,11 @@ function renderProducts() {
             '</div>' +
         '</div>';
     }).join('');
+
+    // Menggunakan requestAnimationFrame untuk render DOM yang efisien dan lancar
+    window.requestAnimationFrame(function() {
+        grid.innerHTML = htmlOutput;
+    });
 }
 
 function handleSearch(val) { currentSearchQuery = val; renderProducts(); }
@@ -563,7 +585,7 @@ function renderRelatedProducts(currentId) {
         var mainImg = (rp.images && rp.images.length > 0) ? rp.images[0] : rp.image;
 
         return '<div onclick="openDetailModalById(' + rp.id + ')" class="bg-white p-2.5 rounded-2xl border border-amber-100 hover:border-amber-300 shadow-sm transition cursor-pointer flex gap-3 items-center group">' +
-            '<img src="' + mainImg + '" alt="' + rp.name + '" class="w-14 h-14 object-cover rounded-xl border border-amber-100 flex-shrink-0">' +
+            '<img src="' + mainImg + '" alt="' + rp.name + '" loading="lazy" class="w-14 h-14 object-cover rounded-xl border border-amber-100 flex-shrink-0">' +
             '<div class="flex-1 min-w-0">' +
                 '<span class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">' + rp.category + '</span>' +
                 '<h4 class="font-serif font-bold text-xs text-amber-900 truncate mt-0.5 group-hover:text-amber-600 transition">' + rp.name + '</h4>' +
