@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINA OLSHOP - Menerima Pesanan Berbagai Jenis Kue Tradisional</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 800: '#92400e', 900: '#78350f' },
+                        rose: { 600: '#e11d48' }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="Stylesheet.css">
+</head>
+<body class="bg-amber-50/60 text-amber-900 font-sans min-h-screen flex flex-col justify-between custom-scrollbar">
+
+    <!-- NAVBAR PELANGGAN -->
+    <header class="sticky top-0 z-30 bg-amber-50/90 backdrop-blur-md border-b border-amber-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between gap-4">
+                
+                <div class="flex items-center gap-3">
+                    <img id="appLogo" src="https://cdn-icons-png.flaticon.com/512/3081/3081986.png" alt="FINA OLSHOP Logo" class="w-10 h-10 object-contain rounded-2xl bg-amber-100 p-1 border border-amber-200 shadow-sm">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-serif font-bold text-lg sm:text-2xl text-amber-900 tracking-tight leading-none">FINA OLSHOP</h1>                            
+                        </div>
+                        <p class="text-xs text-amber-800 font-medium hidden sm:block mt-0.5">Menerima Pesanan Berbagai Jenis Kue Tradisional</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 max-w-md hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Cari kue..." 
+                            class="w-full pl-10 pr-4 py-2 bg-white border border-amber-200 rounded-full text-sm text-amber-900 placeholder-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-800/60 text-sm"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div id="storeStatusBadge" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-emerald-600 text-white">
+                      <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                      <span id="storeStatusText">Toko Buka</span>
+                    </div>
+                    
+                    <button onclick="navigateTo('#cart')" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-full shadow-md flex items-center gap-2 transition transform active:scale-95">
+                        <i class="fa-solid fa-basket-shopping text-base"></i>
+                        <span class="text-xs font-bold hidden sm:inline">Keranjang</span>
+                        <span id="cartCount" class="bg-rose-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-amber-50">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-2.5 md:hidden">
+                <div class="relative">
+                    <input type="text" oninput="handleSearch(this.value)" placeholder="Cari kue basah, pastry..." 
+                        class="w-full pl-9 pr-4 py-1.5 bg-white border border-amber-200 rounded-full text-xs text-amber-900 placeholder-amber-800/50 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-amber-800/60 text-xs"></i>
+                </div>
+            </div>
+
+            <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
+                <button onclick="filterCategory('All')" class="cat-btn active px-3.5 py-1.5 rounded-full font-semibold border transition whitespace-nowrap bg-amber-900 text-white border-amber-900">Semua Menu</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- KATALOG UTAMA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-10">
+        <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-amber-100/60 p-3 rounded-2xl border border-amber-200">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> Filter Status:</span>
+                    <button onclick="togglePoFilter('all')" id="btnPoAll" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white">Semua</button>
+                    <button onclick="togglePoFilter('ready')" id="btnPoReady" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Ready Stock</button>
+                    <button onclick="togglePoFilter('po')" id="btnPoOnly" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Pre-Order (PO)</button>
+                </div>
+                <div class="text-xs text-amber-800 font-medium">
+                    Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+                </div>
+            </div>
+
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div class="col-span-full text-center py-20">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-amber-600 mb-3"></i>
+                    <p class="text-sm font-bold text-amber-900">Memuat Katalog FINA OLSHOP Realtime...</p>
+                </div>
+            </div>
+
+            <div id="emptyState" class="hidden text-center py-16">
+                <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-amber-900 mb-1">Kue Tidak Ditemukan</h3>
+                <p class="text-sm text-amber-800">Coba ganti kata kunci pencarian Anda.</p>
+            </div>
+        </div>
+
+        <!-- RIWAYAT ORDERAN -->
+        <section class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-amber-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-amber-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-serif font-bold text-base sm:text-lg text-amber-900">Riwayat Pesanan Terbaru</h2>
+                        <p class="text-xs text-amber-800/80">Pantau status pesanan yang telah diproses &amp; selesai.</p>
+                    </div>
+                </div>
+                <button onclick="fetchPublicOrders()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1 border border-amber-200">
+                    <i class="fa-solid fa-rotate text-amber-600"></i> Refresh Status
+                </button>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-amber-100/60 text-amber-900 uppercase font-bold border-b border-amber-200/80 text-[11px]">
+                            <th class="p-3 rounded-l-xl">Order ID</th>
+                            <th class="p-3">Pelanggan</th>
+                            <th class="p-3">Detail Item</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 rounded-r-xl">Waktu Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publicOrdersTable" class="divide-y divide-amber-100/80">
+                        <tr>
+                            <td colspan="5" class="p-6 text-center text-amber-800">
+                                <i class="fa-solid fa-spinner fa-spin text-xl text-amber-600 mb-1 block"></i>
+                                <span>Memuat riwayat pesanan...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-amber-900 text-amber-100 mt-12 border-t border-amber-800 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="font-serif font-bold text-lg text-white">FINA OLSHOP</h2>
+            <p class="text-xs text-amber-200/80 mt-1">Menghadirkan Beragam Jenis Kue Tradisional Dengan Tetap Menjaga Cita Rasa yang Khas Berkualitas.</p>
+            <p class="text-xs text-amber-200/80 mt-1">Powered By BankSAM Digital.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL ALERT CUSTOM PREMIUM -->
+    <div id="premiumAlertModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div id="alertIconBox" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl mb-4 shadow-inner"></div>
+            <h3 id="alertTitle" class="font-serif font-bold text-lg text-amber-900 mb-1">Notifikasi</h3>
+            <p id="alertMessage" class="text-xs text-amber-800/90 leading-relaxed mb-6">Pesan notifikasi...</p>
+            <div id="alertActions" class="flex justify-center gap-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL KUE (FULLSCREEN SPA WITH SLUG SHAREABLE) -->
+    <div id="detailModal" class="fullscreen-page-modal hidden">
+        <div class="w-full min-h-screen flex flex-col justify-between bg-white">
+            <div class="bg-amber-50 border-b border-amber-200/80 px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button onclick="closeModalAndClearHash()" class="w-9 h-9 rounded-full bg-amber-200/80 hover:bg-amber-300 text-amber-900 flex items-center justify-center transition font-bold">
+                        <i class="fa-solid fa-arrow-left text-base"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <img id="modalAppLogo" src="https://cdn-icons-png.flaticon.com/512/3081/3081986.png" class="w-7 h-7 object-contain">
+                        <span class="font-serif font-bold text-amber-900 text-sm sm:text-base">Detail Produk &amp; Varian</span>
+                    </div>
+                </div>
+                <button onclick="copyCurrentShareableLink()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-share-nodes text-amber-700"></i>
+                    <span class="hidden sm:inline">Bagikan</span>
+                </button>
+            </div>
+
+            <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 flex flex-col lg:flex-row gap-8">
+                <div class="flex-1 space-y-6">
+                    <div class="space-y-2">
+                        <div class="relative overflow-hidden rounded-3xl border border-amber-100 bg-amber-50/30 flex items-center justify-center h-[320px] sm:h-[420px] group shadow-inner">
+                            <img id="modalMainImage" src="" class="w-full h-full object-cover transition-all duration-300">
+                            
+                            <div class="absolute top-4 left-4">
+                                <span id="modalCategory" class="text-xs font-bold uppercase text-rose-600 bg-white/95 px-3.5 py-1.5 rounded-full border border-rose-200 shadow-sm">Category</span>
+                            </div>
+
+                            <button onclick="prevGalleryImage()" id="btnPrevImage" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-amber-900 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition">
+                                <i class="fa-solid fa-chevron-left text-lg"></i>
+                            </button>
+                            <button onclick="nextGalleryImage()" id="btnNextImage" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-amber-900 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition">
+                                <i class="fa-solid fa-chevron-right text-lg"></i>
+                            </button>
+                        </div>
+
+                        <div id="modalGalleryThumbnails" class="flex gap-2.5 overflow-x-auto no-scrollbar py-2"></div>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap items-start justify-between gap-4 mb-3">
+                            <div>
+                                <h2 id="modalTitle" class="font-poppins font-bold text-2xl sm:text-4xl text-amber-900">Nama Kue</h2>
+                                <p class="text-xs sm:text-sm text-amber-800/80 mt-1">Sajian kue lezat buatan FINA OLSHOP dengan resep spesial.</p>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <div id="modalPrice" class="text-3xl sm:text-4xl font-extrabold text-amber-900">Rp 0</div>
+                                <span id="modalSize" class="text-xs text-amber-800 font-bold bg-amber-100/80 px-3 py-1 rounded-lg inline-block mt-1">Loyang</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-xs text-amber-800 py-3 my-3 border-y border-amber-100">
+                            <div><i class="fa-solid fa-star text-amber-500 mr-1"></i><span id="modalRating" class="font-bold text-amber-900">4.9</span></div>
+                            <div>•</div>
+                            <div><i class="fa-solid fa-fire text-rose-500 mr-1"></i><span id="modalSold" class="font-bold text-amber-900">100+</span> Terjual</div>
+                            <div>•</div>
+                            <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i>Simpan: <span id="modalShelfLife" class="font-semibold text-amber-900">-</span></div>
+                        </div>
+                    </div>
+
+                    <div id="modalVariantSection" class="bg-amber-100/50 p-4 rounded-2xl border border-amber-200 space-y-2">
+                        <span class="block text-xs font-bold text-amber-900 uppercase tracking-wider">
+                            <i class="fa-solid fa-boxes-packing mr-1 text-amber-600"></i> Pilih Varian / Opsi Produk:
+                        </span>
+                        <div id="modalVariantOptions" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-align-left text-amber-600"></i> Deskripsi Kue
+                        </h3>
+                        <p id="modalDescription" class="text-xs sm:text-sm text-amber-800/90 leading-relaxed bg-amber-50/40 p-4 rounded-2xl border border-amber-100">Deskripsi produk...</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-wheat-awn text-amber-600"></i> Bahan-Bahan Utama
+                        </h3>
+                        <div id="modalIngredients" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200">
+                        <label class="block text-xs font-bold text-amber-900 mb-1">
+                            <i class="fa-solid fa-pen-to-square mr-1 text-amber-600"></i> Catatan Khusus untuk Item Ini (Opsional)
+                        </label>
+                        <input type="text" id="modalCustomNote" placeholder="Contoh: Tulis ucapan 'Happy Birthday Mom'..." 
+                            class="w-full text-xs p-3 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <div class="pt-3 flex items-center justify-end gap-3 flex-wrap">
+                        <button onclick="closeModalAndClearHash()" class="px-5 py-3 rounded-xl text-xs font-bold text-amber-800 hover:bg-amber-100 transition">Kembali</button>
+                        <button onclick="askProductViaWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-base"></i>
+                            <span>Tanya Kue</span>
+                        </button>
+                        <button id="modalAddBtn" class="bg-amber-800 hover:bg-amber-900 text-white px-7 py-3 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus text-base"></i> 
+                            <span>Tambahkan ke Keranjang</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-80 bg-amber-50/30 p-5 rounded-3xl space-y-4 shrink-0 border border-amber-100">
+                    <div class="pb-2 border-b border-amber-200/80">
+                        <h3 class="font-serif font-bold text-base text-amber-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Produk Lainnya
+                        </h3>
+                        <p class="text-[11px] text-amber-800/80">Rekomendasi pilihan untuk Anda</p>
+                    </div>
+                    <div id="modalRelatedProductsList" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER / FULLSCREEN MODAL (#cart) -->
+    <div id="cartDrawer" class="fullscreen-page-modal hidden">
+        <div class="max-w-3xl mx-auto min-h-screen flex flex-col justify-between p-4 sm:p-6 bg-white">
+            <div class="p-4 border-b border-amber-100 bg-amber-50 flex items-center justify-between rounded-2xl mb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="closeModalAndClearHash()" class="w-8 h-8 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+                    <i class="fa-solid fa-basket-shopping text-amber-600 text-xl"></i>
+                    <h2 class="font-serif font-bold text-lg text-amber-900">Keranjang Belanja</h2>
+                </div>
+                <button onclick="copyCurrentShareableLink()" class="text-xs bg-amber-100 p-2 rounded-xl text-amber-900 font-bold"><i class="fa-solid fa-share-nodes"></i> Bagikan</button>
+            </div>
+
+            <div id="cartItemsList" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar mb-4"></div>
+
+            <div class="p-5 border border-amber-100 bg-amber-50/50 rounded-3xl space-y-4">
+                <div class="bg-white p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <label class="block text-xs font-bold text-amber-900"><i class="fa-solid fa-ticket text-amber-600 mr-1"></i>Punya Kode Promo / Kupon?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cartPromoInput" placeholder="Masukkan kode..." class="flex-1 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs uppercase font-bold text-amber-900 outline-none">
+                        <button onclick="applyPromoCode()" id="btnApplyPromo" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition">Gunakan</button>
+                    </div>
+                    <div id="promoMessageText" class="text-xs font-semibold hidden"></div>
+                </div>
+
+                <div class="space-y-2 text-xs text-amber-800">
+                    <div class="flex justify-between"><span>Subtotal Item</span><span id="cartSubtotal" class="font-bold text-amber-900">Rp 0</span></div>
+                    <div id="cartDiscountRow" class="flex justify-between text-emerald-600 hidden"><span>Diskon Promo (<span id="cartAppliedPromoCode"></span>)</span><span id="cartDiscountAmount" class="font-bold">-Rp 0</span></div>
+                    <div class="flex justify-between"><span>Estimasi Pengiriman</span><span id="cartShippingFee" class="font-bold text-amber-900">Rp 0</span></div>
+                    <div class="flex justify-between text-base font-extrabold text-amber-900 pt-2 border-t border-amber-200"><span>Total Keseluruhan</span><span id="cartGrandTotal" class="text-rose-600">Rp 0</span></div>
+                </div>
+
+                <button onclick="navigateTo('#checkout')" id="btnCheckout" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3.5 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50">
+                    <span>Lanjut ke Form Pemesanan</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM CHECKOUT (#checkout) -->
+    <div id="checkoutModal" class="fullscreen-page-modal hidden">
+        <div class="max-w-2xl mx-auto min-h-screen p-4 sm:p-8 bg-white flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-amber-100">
+                    <div class="flex items-center gap-3">
+                        <button onclick="navigateTo('#cart')" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+                        <h2 class="font-serif font-bold text-xl text-amber-900"><i class="fa-solid fa-clipboard-check text-amber-600 mr-2"></i>Form Pemesanan</h2>
+                    </div>
+                </div>
+
+                <form id="checkoutForm" onsubmit="processCheckout(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Nama Lengkap *</label>
+                        <input type="text" id="custName" required placeholder="Siti Rahmawati" class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Nomor WhatsApp *</label>
+                        <input type="tel" id="custPhone" required placeholder="08123456789" class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Metode Pengiriman *</label>
+                        <select id="shipMethod" onchange="handleShippingChange(this.value)" class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="pickup">Ambil Sendiri di Rumah/Toko (Gratis / Rp 0)</option>
+                            <option value="delivery">Antar ke Rumah (Khusus Area Ds. Kresek - Biaya Rp 5.000)</option>
+                        </select>
+                    </div>
+
+                    <div id="addressContainer" class="hidden">
+                        <label class="block font-bold text-amber-900 mb-1">Alamat Pengiriman / Patokan *</label>
+                        <textarea id="custAddress" rows="2" placeholder="Masukkan alamat pengiriman..." class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label id="lblDeliveryDate" class="block font-bold text-amber-900 mb-1">Tanggal Pengambilan *</label>
+                            <input type="date" id="deliveryDate" required class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label id="lblDeliveryTime" class="block font-bold text-amber-900 mb-1">Jam Pengambilan *</label>
+                            <select id="deliveryTime" required class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-medium">
+                                <option value="08:00">08:00 WIB</option>
+                                <option value="10:00">10:00 WIB</option>
+                                <option value="12:00">12:00 WIB</option>
+                                <option value="14:00" selected>14:00 WIB</option>
+                                <option value="16:00">16:00 WIB</option>
+                                <option value="18:00">18:00 WIB</option>
+                                <option value="20:00">20:00 WIB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Metode Pembayaran *</label>
+                        <select id="paymentMethod" class="w-full p-3 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-semibold">
+                            <option value="QRIS All Payment">QRIS All Payment (Gopay/OVO/Dana/BCA/dll)</option>
+                            <option value="Transfer Bank (BCA/Mandiri)">Transfer Bank (BCA / Mandiri)</option>
+                            <option value="COD / Bayar di Toko">COD / Bayar di Toko</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-6 border-t border-amber-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-amber-800">Total Pembayaran:</span>
+                            <div id="checkoutTotal" class="text-xl font-extrabold text-rose-600">Rp 0</div>
+                        </div>
+                        <button type="submit" id="btnSubmitOrder" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white px-7 py-3.5 rounded-2xl font-bold shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-right text-base"></i>
+                            <span>Lanjutkan Pembayaran</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PEMBAYARAN BARCODE QRIS (#qris) -->
+    <div id="qrisPaymentModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div class="flex items-center justify-between border-b border-amber-100 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-amber-600 text-lg"></i>
+                    <h3 class="font-serif font-bold text-base text-amber-900">Scan QRIS Pembayaran</h3>
+                </div>
+                <button onclick="closeQrisModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 mb-4 space-y-3">
+                <img id="qrisImageModal" src="" class="w-52 h-52 object-contain mx-auto rounded-xl border border-white shadow-md">
+                
+                <div class="text-left space-y-1 text-xs">
+                    <div id="bankInfoDisplay" class="font-bold text-amber-900 text-center bg-white p-2 rounded-xl border border-amber-200">
+                        BCA: 1234567890 a.n FINA OLSHOP
+                    </div>
+                    <p class="text-[11px] text-amber-800 text-center">Silakan scan QRIS di atas atau transfer ke rekening tertera sejumlah:</p>
+                    <div id="qrisAmountDisplay" class="text-xl font-extrabold text-rose-600 text-center">Rp 0</div>
+                </div>
+            </div>
+
+            <button onclick="openWaConfirmModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-circle text-base"></i>
+                <span>Saya Sudah Bayar (Konfirmasi WA)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI WHATSAPP -->
+    <div id="waConfirmModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200 mx-auto flex items-center justify-center text-3xl mb-3 shadow-inner">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <h3 class="font-serif font-bold text-lg text-amber-900 mb-1">Konfirmasi Pesanan WA</h3>
+            <p class="text-xs text-amber-800/90 leading-relaxed mb-5">
+                Pesanan Anda telah disimpan! Klik tombol di bawah untuk meneruskan rincian pesanan & bukti transfer langsung ke WhatsApp FINA OLSHOP.
+            </p>
+
+            <button onclick="executeSendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Kirim Pesanan via WhatsApp</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP PENGUMUMAN TOKO LIBUR / TUTUP -->
+    <div id="storeAnnouncementModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop relative">
+            <button onclick="closeAnnouncementModal(event)" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold flex items-center justify-center transition shadow-sm">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
+            <div class="w-16 h-16 rounded-full bg-rose-100 text-rose-600 border border-rose-200 mx-auto flex items-center justify-center text-3xl mb-4 shadow-inner">
+                <i class="fa-solid fa-store-slash"></i>
+            </div>
+            <h3 id="announcementTitle" class="font-serif font-bold text-lg text-amber-900 mb-2">Pemberitahuan Toko</h3>
+            <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 mb-4">
+                <p id="announcementMessageText" class="text-xs text-amber-900/90 leading-relaxed font-medium whitespace-pre-line">
+                    Mohon maaf, toko kami saat ini sedang LIBUR/TUTUP.
+                </p>
+            </div>
+            <button onclick="closeAnnouncementModal(event)" class="w-full bg-amber-800 hover:bg-amber-900 text-white py-2.5 rounded-2xl font-bold text-xs shadow-md transition">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <script src="JAVAindex.js"></script>
+</body>
+</html>
