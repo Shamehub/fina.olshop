@@ -189,7 +189,7 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL KUE (FULLSCREEN SEAKAN PINDAH HALAMAN) -->
+    <!-- MODAL DETAIL KUE -->
     <div id="detailModal" class="fixed inset-0 z-50 hidden bg-amber-50/95 flex items-center justify-center p-0 transition-opacity duration-200">
         <div class="bg-white w-full h-full flex flex-col overflow-hidden animate-modal-pop">
             
@@ -259,6 +259,19 @@
                             <i class="fa-solid fa-boxes-packing mr-1 text-amber-600"></i> Pilih Varian / Opsi Produk:
                         </span>
                         <div id="modalVariantOptions" class="grid grid-cols-2 gap-2"></div>
+                    </div>
+
+                    <!-- INPUT KUANTITAS / JUMLAH BELI DENGAN VALIDASI MINIMAL -->
+                    <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-center justify-between gap-3">
+                        <div>
+                            <span class="block text-xs font-bold text-amber-900 uppercase tracking-wider">Jumlah Pembelian:</span>
+                            <span id="minQtyNotice" class="text-[11px] font-semibold text-rose-600 block mt-0.5">Minimal pembelian: 1 Pcs</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-amber-200 shadow-sm">
+                            <button type="button" onclick="adjustModalQty(-1)" class="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-bold flex items-center justify-center hover:bg-amber-200 transition">-</button>
+                            <span id="modalQtyInput" class="font-bold text-sm w-8 text-center">1</span>
+                            <button type="button" onclick="adjustModalQty(1)" class="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-bold flex items-center justify-center hover:bg-amber-200 transition">+</button>
+                        </div>
                     </div>
 
                     <div class="space-y-1.5">
@@ -367,7 +380,7 @@
         </div>
     </div>
 
-    <!-- FORM CHECKOUT (FULLSCREEN MODAL) -->
+    <!-- FORM CHECKOUT -->
     <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-amber-50/95 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[95vh] overflow-y-auto custom-scrollbar shadow-2xl p-6 border border-amber-100 animate-modal-pop">
             <div class="flex items-center justify-between pb-4 mb-4 border-b border-amber-100">
@@ -525,9 +538,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT FRONTEND & ROUTER SLUG -->
+    <!-- SCRIPT FRONTEND -->
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT WEB APP ANDA DI SINI
         var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ50rr_42lp2HIVb-lhbconyeqETclWoIWnJO5tcSCbze-p2_zhI40SlkLJu_2oJIwfA/exec";
 
         var products = [];
@@ -540,6 +552,7 @@
         var currentImageIndex = 0;
         var currentSelectedProduct = null;
         var currentSelectedVariant = null;
+        var currentModalQty = 1;
 
         var appliedPromo = null;
         var appQrisUrl = '';
@@ -549,7 +562,6 @@
         var currentStoreStatus = 'BUKA';
         var storeAnnouncementText = '';
 
-        // API CALL HELPERS WITH CORS
         function apiGet(action, params) {
             var url = APPS_SCRIPT_URL + "?action=" + action;
             if (params) {
@@ -582,7 +594,6 @@
         function handleRoute() {
             var hash = window.location.hash.replace('#', '');
 
-            // Hide all modals
             document.getElementById('detailModal').classList.add('hidden');
             document.getElementById('cartDrawer').classList.add('hidden');
             document.getElementById('checkoutModal').classList.add('hidden');
@@ -960,14 +971,16 @@
                 addBtn.onclick = function() {
                     var finalPrice = currentSelectedVariant ? currentSelectedVariant.price : p.price;
                     var finalVariantName = currentSelectedVariant ? currentSelectedVariant.name : p.size;
+                    var minQty = currentSelectedVariant ? (currentSelectedVariant.minQty || 1) : 1;
 
                     addToCart({
                         id: p.id,
                         name: p.name + (currentSelectedVariant ? ' (' + currentSelectedVariant.name + ')' : ''),
                         price: finalPrice,
                         size: finalVariantName,
+                        minQty: minQty,
                         image: currentGalleryImages[0]
-                    }, document.getElementById('modalCustomNote').value.trim());
+                    }, document.getElementById('modalCustomNote').value.trim(), currentModalQty);
 
                     navigateToHash('');
                 };
@@ -978,6 +991,17 @@
 
             renderRelatedProducts(p.id);
             document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function adjustModalQty(delta) {
+            var minAllowed = currentSelectedVariant ? (currentSelectedVariant.minQty || 1) : 1;
+            var newQty = currentModalQty + delta;
+            if (newQty < minAllowed) {
+                showPremiumAlert("Minimal Pembelian", "Minimal pembelian untuk varian ini adalah " + minAllowed + " Pcs.", "error");
+                return;
+            }
+            currentModalQty = newQty;
+            document.getElementById('modalQtyInput').innerText = currentModalQty;
         }
 
         function shareCurrentProduct() {
@@ -1050,12 +1074,18 @@
             if (p.variantType === 'BOTH' && p.variants && p.variants.length > 0) {
                 box.classList.remove('hidden');
                 currentSelectedVariant = p.variants[0];
+                currentModalQty = Number(currentSelectedVariant.minQty) || 1;
 
                 container.innerHTML = p.variants.map(function(v, idx) {
                     var isSel = (idx === 0);
+                    var minBadge = (v.minQty && v.minQty > 1) ? '<span class="text-[9px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-md font-bold mt-1 inline-block">Min. ' + v.minQty + ' Pcs</span>' : '';
+                    
                     return '<button type="button" onclick="selectVariantOption(' + idx + ')" id="variantBtn-' + idx + '" class="p-2.5 rounded-xl text-left border transition font-bold text-xs flex flex-col justify-between ' +
                         (isSel ? 'bg-amber-800 text-white border-amber-800 shadow-sm' : 'bg-white text-amber-900 border-amber-200 hover:border-amber-400') + '">' +
-                        '<span>' + v.name + '</span>' +
+                        '<div>' +
+                            '<span>' + v.name + '</span>' +
+                            (isSel ? '' : minBadge) +
+                        '</div>' +
                         '<span class="text-sm font-extrabold mt-1">Rp ' + v.price.toLocaleString('id-ID') + '</span>' +
                     '</button>';
                 }).join('');
@@ -1064,13 +1094,22 @@
             } else {
                 box.classList.add('hidden');
                 currentSelectedVariant = null;
+                currentModalQty = 1;
                 updateModalPriceDisplay(p.price);
             }
+
+            var minQtyVal = currentSelectedVariant ? (currentSelectedVariant.minQty || 1) : 1;
+            document.getElementById('minQtyNotice').innerText = "Minimal pembelian: " + minQtyVal + " Pcs";
+            document.getElementById('modalQtyInput').innerText = currentModalQty;
         }
 
         function selectVariantOption(idx) {
             if (!currentSelectedProduct || !currentSelectedProduct.variants) return;
             currentSelectedVariant = currentSelectedProduct.variants[idx];
+
+            currentModalQty = Number(currentSelectedVariant.minQty) || 1;
+            document.getElementById('minQtyNotice').innerText = "Minimal pembelian: " + currentModalQty + " Pcs";
+            document.getElementById('modalQtyInput').innerText = currentModalQty;
 
             currentSelectedProduct.variants.forEach(function(v, i) {
                 var btn = document.getElementById('variantBtn-' + i);
@@ -1120,23 +1159,27 @@
         function quickAddToCart(id) {
             var p = products.find(function(prod) { return prod.id == id; });
             if (p && p.isAvailable) {
+                var defaultMin = (p.variants && p.variants[0]) ? (p.variants[0].minQty || 1) : 1;
                 addToCart({
                     id: p.id,
                     name: p.name,
                     price: p.price,
                     size: p.size,
+                    minQty: defaultMin,
                     image: (p.images && p.images.length > 0) ? p.images[0] : p.image
-                }, '');
+                }, '', defaultMin);
             }
         }
 
-        function addToCart(itemPayload, customNote) {
+        function addToCart(itemPayload, customNote, qty) {
+            var qtyToAdd = qty || (itemPayload.minQty || 1);
+
             var existingIndex = cart.findIndex(function(item) { 
                 return item.id == itemPayload.id && item.name === itemPayload.name && item.customNote === customNote; 
             });
 
             if (existingIndex > -1) {
-                cart[existingIndex].qty += 1;
+                cart[existingIndex].qty += qtyToAdd;
             } else {
                 cart.push({
                     id: itemPayload.id,
@@ -1144,8 +1187,9 @@
                     price: itemPayload.price,
                     size: itemPayload.size,
                     image: itemPayload.image,
+                    minQty: itemPayload.minQty || 1,
                     customNote: customNote,
-                    qty: 1
+                    qty: qtyToAdd
                 });
             }
             updateCartUI();
@@ -1154,7 +1198,18 @@
 
         function updateCartQty(index, delta) {
             if (!cart[index]) return;
-            cart[index].qty += delta;
+            var minAllowed = cart[index].minQty || 1;
+            var newQty = cart[index].qty + delta;
+
+            if (delta < 0 && newQty < minAllowed) {
+                showPremiumAlert("Hapus Item", "Kurangi jumlah hingga di bawah minimal (" + minAllowed + " Pcs) akan menghapus item ini dari keranjang. Lanjutkan?", "confirm", function() {
+                    cart.splice(index, 1);
+                    updateCartUI();
+                });
+                return;
+            }
+
+            cart[index].qty = newQty;
             if (cart[index].qty <= 0) cart.splice(index, 1);
             updateCartUI();
         }
@@ -1215,11 +1270,14 @@
             list.innerHTML = cart.map(function(item, idx) {
                 var itemTotal = item.price * item.qty;
                 subtotal += itemTotal;
+                var minInfo = (item.minQty && item.minQty > 1) ? '<span class="text-[10px] text-rose-600 block">Min. Beli: ' + item.minQty + ' Pcs</span>' : '';
+
                 return '<div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80 flex gap-3 items-center">' +
                     '<img src="' + item.image + '" class="w-16 h-16 object-cover rounded-xl">' +
                     '<div class="flex-1 min-w-0">' +
                         '<h4 class="font-bold text-xs text-amber-900 truncate">' + item.name + '</h4>' +
                         '<p class="text-[11px] text-amber-800">Rp ' + item.price.toLocaleString('id-ID') + '</p>' +
+                        minInfo +
                         '<div class="flex items-center gap-2 bg-white px-2 py-0.5 rounded-lg border border-amber-200 mt-1 w-max">' +
                             '<button onclick="updateCartQty(' + idx + ', -1)" class="font-bold px-1 text-amber-900 hover:text-amber-600">-</button>' +
                             '<span class="text-xs font-bold">' + item.qty + '</span>' +
