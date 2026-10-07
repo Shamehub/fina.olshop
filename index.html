@@ -648,32 +648,62 @@
         });
 
         function fetchInitData() {
+            // 1. Render instan dari cache browser lokal jika tersedia (< 1 detik)
+            var cachedLocal = localStorage.getItem('fina_olshop_cache');
+            if (cachedLocal) {
+                try {
+                    var localData = JSON.parse(cachedLocal);
+                    if (Array.isArray(localData.products)) {
+                        products = localData.products;
+                        renderCategoryButtons();
+                        renderProducts();
+                    }
+                    if (Array.isArray(localData.orders)) {
+                        renderPublicOrdersTable(localData.orders);
+                    }
+                    if (localData.settings) {
+                        currentStoreStatus = localData.settings.storeStatus ? localData.settings.storeStatus.toUpperCase().trim() : 'BUKA';
+                        storeAnnouncementText = localData.settings.storeAnnouncement || 'Mohon maaf, toko kami sedang LIBUR/TUTUP.';
+                        updateStoreStatusUI(currentStoreStatus);
+                        if (localData.settings.logoUrl) document.getElementById('appLogo').src = localData.settings.logoUrl;
+                        if (localData.settings.qrisUrl) appQrisUrl = localData.settings.qrisUrl;
+                        if (localData.settings.bankInfo) appBankInfo = localData.settings.bankInfo;
+                        updatePaymentMethodsUI(localData.settings);
+                    }
+                } catch(e) {}
+            }
+        
+            // 2. Pembacaan batch tunggal dari Google Apps Script
             apiGet('getInitData').then(function(res) {
                 if (res && res.status === 'success') {
                     var data = res.data;
+                    
+                    // Simpan cache lokal terbaru
+                    localStorage.setItem('fina_olshop_cache', JSON.stringify(data));
+        
                     products = Array.isArray(data.products) ? data.products : [];
                     renderCategoryButtons();
                     renderProducts();
                     updateCartUI();
-
+        
                     if (data.settings) {
                         currentStoreStatus = data.settings.storeStatus ? data.settings.storeStatus.toUpperCase().trim() : 'BUKA';
                         storeAnnouncementText = data.settings.storeAnnouncement || 'Mohon maaf, toko kami sedang LIBUR/TUTUP.';
                         updateStoreStatusUI(currentStoreStatus);
-
+        
                         if (data.settings.logoUrl) document.getElementById('appLogo').src = data.settings.logoUrl;
                         if (data.settings.qrisUrl) appQrisUrl = data.settings.qrisUrl;
                         if (data.settings.bankInfo) appBankInfo = data.settings.bankInfo;
-
+        
                         updatePaymentMethodsUI(data.settings);
-
+        
                         if (currentStoreStatus === 'LIBUR' || currentStoreStatus === 'TUTUP') {
                             showStoreAnnouncementModal();
                         }
                     }
-
+        
                     if (data.orders) renderPublicOrdersTable(data.orders);
-
+        
                     handleRoute();
                 }
             }).catch(function(err) {
