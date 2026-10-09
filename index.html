@@ -443,13 +443,14 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-amber-900 mb-1">Metode Pembayaran *</label>
-                    <select id="paymentMethod" class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-semibold">
-                        <option value="QRIS All Payment">QRIS All Payment (Gopay/OVO/Dana/BCA/dll)</option>
-                        <option value="Transfer Bank (BCA/Mandiri)">Transfer Bank (BCA / Mandiri)</option>
-                        <option value="COD / Bayar di Toko">COD / Bayar di Toko</option>
-                    </select>
-                </div>
+                  <label class="block font-bold text-amber-900 mb-1">Metode Pembayaran *</label>
+                  <select id="paymentMethod" required class="w-full p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-semibold">
+                      <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
+                      <option value="QRIS All Payment">QRIS All Payment (Gopay/OVO/Dana/BCA/dll)</option>
+                      <option value="Transfer Bank (BCA/Mandiri)">Transfer Bank (BCA / Mandiri)</option>
+                      <option value="COD / Bayar di Toko">COD / Bayar di Toko</option>
+                  </select>
+              </div>
 
                 <div class="pt-4 border-t border-amber-100 flex items-center justify-between">
                     <div>
