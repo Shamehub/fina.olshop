@@ -906,9 +906,65 @@
                     '<td class="p-3.5 border-b border-amber-100"><div class="whitespace-pre-line leading-relaxed text-amber-900">' + (o.itemsDetail || '-') + '</div></td>' +
                     '<td class="p-3.5 font-extrabold text-rose-600 border-b border-amber-100 whitespace-nowrap">Rp ' + price.toLocaleString('id-ID') + '</td>' +
                     '<td class="p-3.5 border-b border-amber-100"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-block ' + getStatusBadgeClass(statusVal) + '">' + statusVal + '</span></td>' +
-                    '<td class="p-3.5 border-b border-amber-100"><select onchange="changeStatus(' + o.rowIndex + ', this.value)" class="text-[11px] p-1.5 border border-amber-200 rounded-lg bg-white font-semibold text-amber-900 outline-none cursor-pointer hover:border-amber-400 transition">' + optionsHtml + '</select></td>' +
+                    '<td class="p-3.5 border-b border-amber-100 flex flex-col gap-1.5">' +
+                        '<select onchange="changeStatus(' + o.rowIndex + ', this.value)" class="text-[11px] p-1.5 border border-amber-200 rounded-lg bg-white font-semibold text-amber-900 outline-none cursor-pointer hover:border-amber-400 transition">' + optionsHtml + '</select>' +
+                        '<button onclick="printOrderCard(' + o.rowIndex + ')" class="bg-amber-800 hover:bg-amber-900 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] transition shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-print"></i> Cetak Kartu</button>' +
+                    '</td>' +
                 '</tr>';
             }).join('');
+        }
+
+        function printOrderCard(rowIndex) {
+            var order = rawOrdersData.find(function(item) { return item.rowIndex == rowIndex; });
+            if (!order) return;
+
+            var printWin = window.open('', '_blank', 'width=450,height=600');
+            var priceFormatted = (order.totalPrice && !isNaN(order.totalPrice)) ? Number(order.totalPrice).toLocaleString('id-ID') : '0';
+
+            printWin.document.write('<!DOCTYPE html><html><head><title>Kartu Pesanan ' + order.orderId + '</title>');
+            printWin.document.write('<style>');
+            printWin.document.write('body { font-family: sans-serif; padding: 12px; margin: 0; background: #fff; text-align: left; }');
+            printWin.document.write('.card { border: 2px dashed #78350f; padding: 12px; border-radius: 12px; max-width: 320px; margin: auto; background: #fff8f0; }');
+            printWin.document.write('.header { text-align: center; border-bottom: 2px solid #78350f; padding-bottom: 8px; mb-2; }');
+            printWin.document.write('.header h2 { margin: 0; font-size: 16px; color: #78350f; font-weight: bold; }');
+            printWin.document.write('.header p { margin: 2px 0 0; font-size: 10px; color: #92400e; }');
+            printWin.document.write('.order-id { font-size: 12px; font-weight: bold; background: #78350f; color: #fff; display: inline-block; padding: 2px 8px; border-radius: 4px; margin-top: 5px; }');
+            printWin.document.write('.section { margin-top: 10px; font-size: 11px; color: #333; }');
+            printWin.document.write('.label { font-weight: bold; color: #78350f; }');
+            printWin.document.write('.items-box { background: #fff; border: 1px solid #fef3c7; border-radius: 6px; padding: 8px; margin-top: 4px; font-size: 11px; white-space: pre-line; line-height: 1.4; }');
+            printWin.document.write('.total { margin-top: 10px; border-top: 1px solid #78350f; padding-top: 6px; font-size: 13px; font-weight: bold; text-align: right; color: #e11d48; }');
+            printWin.document.write('.footer-note { text-align: center; font-size: 9px; color: #888; margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 4px; }');
+            printWin.document.write('</style></head><body>');
+
+            printWin.document.write('<div class="card">');
+            printWin.document.write('<div class="header">');
+            printWin.document.write('<h2>FINA OLSHOP</h2>');
+            printWin.document.write('<p>Kue Tradisional &amp; Lezat</p>');
+            printWin.document.write('<div class="order-id">ID: ' + order.orderId + '</div>');
+            printWin.document.write('</div>');
+
+            printWin.document.write('<div class="section"><span class="label">Penerima:</span> ' + order.customerName + ' (' + order.phone + ')</div>');
+            printWin.document.write('<div class="section"><span class="label">Metode:</span> ' + order.shippingMethod + '</div>');
+            if (order.address && order.address !== '-') {
+                printWin.document.write('<div class="section"><span class="label">Alamat:</span> ' + order.address + '</div>');
+            }
+            printWin.document.write('<div class="section"><span class="label">Waktu Ambil/Kirim:</span><br>' + order.deliveryDateTime + '</div>');
+
+            printWin.document.write('<div class="section" style="margin-top:8px;"><span class="label">Rincian Kue:</span>');
+            printWin.document.write('<div class="items-box">' + order.itemsDetail + '</div>');
+            printWin.document.write('</div>');
+
+            printWin.document.write('<div class="total">Total: Rp ' + priceFormatted + '</div>');
+            printWin.document.write('<div class="footer-note">Tempelkan label ini pada bungkusan pesanan. Terima kasih!</div>');
+            printWin.document.write('</div>');
+
+            printWin.document.write('</body></html>');
+            printWin.document.close();
+
+            setTimeout(function() {
+                printWin.focus();
+                printWin.print();
+            }, 500);
         }
 
         function getStatusBadgeClass(status) {
