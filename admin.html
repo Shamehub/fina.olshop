@@ -108,7 +108,7 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button onclick="loadAdminOrders(); loadAdminProducts(); loadAdminPromos();" class="text-xs bg-amber-800 hover:bg-amber-700 text-amber-100 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-amber-700">
+                    <button onclick="loadAllAdminInitData();" class="text-xs bg-amber-800 hover:bg-amber-700 text-amber-100 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-amber-700">
                         <i class="fa-solid fa-rotate text-amber-400"></i>
                         <span>Refresh Data</span>
                     </button>
@@ -177,6 +177,10 @@
                 <button onclick="navigateToTab('promos')" id="tabBtnPromos" class="pb-3 px-3 text-amber-800/60 hover:text-amber-900 transition flex items-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-ticket"></i>
                     <span>Kelola Kode Promo</span>
+                </button>
+                <button onclick="navigateToTab('tutorials')" id="tabBtnTutorials" class="pb-3 px-3 text-amber-800/60 hover:text-amber-900 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Kelola Slide Tutorial</span>
                 </button>
                 <button onclick="navigateToTab('settings')" id="tabBtnSettings" class="pb-3 px-3 text-amber-800/60 hover:text-amber-900 transition flex items-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-sliders"></i>
@@ -293,7 +297,33 @@
                 </div>
             </section>
 
-            <!-- TAB 4: PENGATURAN SISTEM & SETTINGS -->
+            <!-- TAB 4: KELOLA SLIDE TUTORIAL (FITUR BARU) -->
+            <section id="tabTutorials" class="hidden space-y-4">
+                <div class="bg-white p-4 rounded-3xl border border-amber-100 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-amber-100 pb-3">
+                        <div>
+                            <h2 class="font-serif font-bold text-base text-amber-900">Kelola Slide Tutorial Toko Buka</h2>
+                            <p class="text-xs text-amber-800/80">Foto slide ini akan ditampilkan saat pelanggan pertama kali masuk aplikasi jika toko sedang buka[cite: 5].</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
+                                <input type="checkbox" id="toggleTutorialActive" onchange="toggleTutorialStatus(this.checked)" class="w-4 h-4 text-amber-800 focus:ring-amber-500 rounded">
+                                <span class="text-xs font-bold text-amber-900">Aktifkan Pop-up Tutorial</span>
+                            </label>
+                            <button onclick="openAddTutorialModal()" class="bg-amber-800 hover:bg-amber-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>+ Slide Baru</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="adminTutorialsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: PENGATURAN SISTEM & SETTINGS -->
             <section id="tabSettings" class="hidden space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- LOGO TOKO -->
@@ -400,7 +430,7 @@
                             <i class="fa-solid fa-bullhorn text-amber-600"></i>
                             <h3 class="font-serif font-bold text-base text-amber-900">Pengumuman Toko Libur / Tutup</h3>
                         </div>
-                        <p class="text-xs text-amber-800/80">Teks ini akan muncul sebagai pop-up ketika status toko diset ke **LIBUR** atau **TUTUP**.</p>
+                        <p class="text-xs text-amber-800/80">Teks ini akan muncul sebagai pop-up ketika status toko diset ke **LIBUR** atau **TUTUP**[cite: 5].</p>
                         
                         <div>
                             <label class="block font-bold text-amber-900 text-xs mb-1">Isi Pesan Pengumuman *</label>
@@ -426,7 +456,7 @@
         </div>
     </div>
 
-    <!-- MODAL FORM CRUD PRODUK (FULLSCREEN MODAL) -->
+    <!-- MODAL FORM CRUD PRODUK -->
     <div id="productCrudModal" class="fixed inset-0 z-50 hidden bg-amber-50/95 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 border border-amber-100 text-xs custom-scrollbar max-h-[95vh] overflow-y-auto animate-modal-pop">
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
@@ -592,14 +622,66 @@
         </div>
     </div>
 
-    <!-- SCRIPT ADMIN FRONTEND & ROUTER TAB SLUG -->
+    <!-- MODAL FORM CRUD TUTORIAL SLIDE (FITUR BARU) -->
+    <div id="tutorialCrudModal" class="fixed inset-0 z-50 hidden bg-amber-50/95 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 border border-amber-100 text-xs custom-scrollbar max-h-[95vh] overflow-y-auto animate-modal-pop">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-100">
+                <h3 id="tutorialModalTitle" class="font-serif font-bold text-lg text-amber-900">Tambah Slide Tutorial</h3>
+                <button onclick="closeTutorialCrudModal()" class="w-7 h-7 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="tutorialForm" onsubmit="saveTutorialSubmit(event)" class="space-y-3">
+                <input type="hidden" id="tutorialRowIndex">
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Judul Slide *</label>
+                    <input type="text" id="tutorialTitle" required placeholder="mis: Selamat Datang di FINA OLSHOP!" class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Deskripsi / Petunjuk *</label>
+                    <textarea id="tutorialDesc" required rows="2" placeholder="Jelaskan langkah atau petunjuk pemesanan..." class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-amber-900 mb-0.5">Urutan Slide (Angka) *</label>
+                    <input type="number" id="tutorialOrder" required value="1" min="1" class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl outline-none font-bold">
+                </div>
+
+                <div class="bg-amber-50/80 p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <label class="block font-bold text-amber-900">Foto Slide *</label>
+                    
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="tutorialFileInput" accept="image/*" onchange="handleTutorialImageUpload(event)" class="hidden">
+                        <button type="button" onclick="document.getElementById('tutorialFileInput').click()" class="bg-amber-800 hover:bg-amber-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Gambar Slide
+                        </button>
+                        <span id="tutorialUploadProgress" class="text-[11px] font-semibold text-amber-800"></span>
+                    </div>
+
+                    <div id="tutorialPreviewContainer" class="hidden relative rounded-xl overflow-hidden border border-amber-200 h-36 bg-amber-100">
+                        <img id="tutorialImgPreview" src="" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-amber-100">
+                    <button type="button" onclick="closeTutorialCrudModal()" class="px-4 py-2 rounded-xl font-bold text-amber-800 hover:bg-amber-100">Batal</button>
+                    <button type="submit" id="btnSaveTutorial" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-md transition">Simpan Slide</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT ADMIN FRONTEND -->
     <script>
         var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ50rr_42lp2HIVb-lhbconyeqETclWoIWnJO5tcSCbze-p2_zhI40SlkLJu_2oJIwfA/exec";
 
         var rawOrdersData = [];
         var rawProductsData = [];
         var rawPromosData = [];
+        var rawTutorialsData = [];
         var uploadedImages = [];
+        var uploadedTutorialImg = "";
 
         function apiGet(action, params) {
             var url = APPS_SCRIPT_URL + "?action=" + action;
@@ -660,7 +742,6 @@
                     document.getElementById('adminAuthOverlay').classList.add('hidden');
                     document.getElementById('adminDashboardContent').classList.remove('hidden');
         
-                    // Panggil seluruh data admin dalam 1 request cepat
                     loadAllAdminInitData();
                     handleAdminRoute();
                 } else {
@@ -687,6 +768,9 @@
         
                     rawPromosData = Array.isArray(data.promos) ? data.promos : [];
                     renderAdminPromosTable(rawPromosData);
+
+                    rawTutorialsData = Array.isArray(data.tutorials) ? data.tutorials : [];
+                    renderAdminTutorialsGrid(rawTutorialsData);
         
                     if (data.settings) {
                         var s = data.settings;
@@ -697,15 +781,13 @@
                         if (s.paymentTransferStatus) document.getElementById('statusTransferPay').value = s.paymentTransferStatus;
                         if (s.paymentCodStatus) document.getElementById('statusCodPay').value = s.paymentCodStatus;
                         if (s.storeAnnouncement) document.getElementById('settingStoreAnnouncement').value = s.storeAnnouncement;
+                        if (document.getElementById('toggleTutorialActive')) {
+                            document.getElementById('toggleTutorialActive').checked = (s.tutorialActive !== false && s.tutorialActive !== 'false');
+                        }
                     }
                 }
             });
         }
-        
-        function loadAdminOrders() { loadAllAdminInitData(); }
-        function loadAdminProducts() { loadAllAdminInitData(); }
-        function loadAdminPromos() { loadAllAdminInitData(); }
-        function loadAdminSettings() { loadAllAdminInitData(); }
 
         function loadAdminProductsData(products) {
             var grid = document.getElementById('adminProductsGrid');
@@ -774,6 +856,37 @@
             }).join('');
         }
 
+        // RENDER SLIDE TUTORIAL (FITUR BARU)
+        function renderAdminTutorialsGrid(tutorials) {
+            var grid = document.getElementById('adminTutorialsGrid');
+            if (!grid) return;
+
+            if (!tutorials || tutorials.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-8 text-amber-800 font-semibold">Belum ada slide tutorial. Klik "+ Slide Baru" untuk menambahkan.</div>';
+                return;
+            }
+
+            tutorials.sort(function(a, b) { return (a.orderIndex || 0) - (b.orderIndex || 0); });
+
+            grid.innerHTML = tutorials.map(function(t) {
+                return '<div class="bg-amber-50/50 p-3 rounded-2xl border border-amber-200 flex flex-col justify-between gap-2 shadow-sm">' +
+                    '<div class="space-y-2">' +
+                        '<div class="relative h-36 rounded-xl overflow-hidden bg-amber-100 border border-amber-200">' +
+                            '<img src="' + t.imageUrl + '" class="w-full h-full object-cover">' +
+                            '<span class="absolute top-2 left-2 bg-amber-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Slide ' + (t.orderIndex || 1) + '</span>' +
+                        '</div>' +
+                        '<h4 class="font-bold text-xs text-amber-900 leading-snug">' + t.title + '</h4>' +
+                        '<p class="text-[11px] text-amber-800/90 line-clamp-2 leading-relaxed">' + t.description + '</p>' +
+                    '</div>' +
+
+                    '<div class="flex items-center justify-end gap-2 pt-2 border-t border-amber-200/80">' +
+                        '<button onclick="openEditTutorialModal(' + t.rowIndex + ')" class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg font-bold text-xs hover:bg-blue-100"><i class="fa-solid fa-pen-to-square mr-1"></i>Edit</button>' +
+                        '<button onclick="confirmDeleteTutorial(' + t.rowIndex + ')" class="bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg font-bold text-xs hover:bg-rose-100"><i class="fa-solid fa-trash-can mr-1"></i>Hapus</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
         function showPremiumAlert(title, message, type, confirmCallback) {
             var modal = document.getElementById('premiumAlertModal');
             var iconBox = document.getElementById('alertIconBox');
@@ -816,8 +929,8 @@
         function closePremiumAlert() { document.getElementById('premiumAlertModal').classList.add('hidden'); }
 
         function switchTab(tab) {
-            var tabs = ['tabOrders', 'tabProducts', 'tabPromos', 'tabSettings'];
-            var btns = ['tabBtnOrders', 'tabBtnProducts', 'tabBtnPromos', 'tabBtnSettings'];
+            var tabs = ['tabOrders', 'tabProducts', 'tabPromos', 'tabTutorials', 'tabSettings'];
+            var btns = ['tabBtnOrders', 'tabBtnProducts', 'tabBtnPromos', 'tabBtnTutorials', 'tabBtnSettings'];
 
             tabs.forEach(function(t) { document.getElementById(t).classList.add('hidden'); });
             btns.forEach(function(b) { 
@@ -833,6 +946,9 @@
             } else if (tab === 'promos') {
                 document.getElementById('tabPromos').classList.remove('hidden');
                 document.getElementById('tabBtnPromos').className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2 whitespace-nowrap";
+            } else if (tab === 'tutorials') {
+                document.getElementById('tabTutorials').classList.remove('hidden');
+                document.getElementById('tabBtnTutorials').className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2 whitespace-nowrap";
             } else if (tab === 'settings') {
                 document.getElementById('tabSettings').classList.remove('hidden');
                 document.getElementById('tabBtnSettings').className = "pb-3 px-3 border-b-2 border-amber-800 text-amber-900 font-bold transition flex items-center gap-2 whitespace-nowrap";
@@ -840,17 +956,6 @@
         }
 
         // ==================== ORDERS ====================
-        function loadAdminOrders() {
-            var tbody = document.getElementById('adminOrdersTable');
-            tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-amber-800"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i><span>Memuat data pesanan...</span></td></tr>';
-
-            apiGet('getOrders').then(function(res) {
-                rawOrdersData = (res && res.status === 'success' && Array.isArray(res.data)) ? res.data : [];
-                updateOrderStatistics(rawOrdersData);
-                renderAdminOrdersTable(rawOrdersData);
-            });
-        }
-
         function updateOrderStatistics(orders) {
             document.getElementById('statTotalOrders').innerText = orders.length;
             document.getElementById('statPendingOrders').innerText = orders.filter(function(o) { return String(o.status).trim().toUpperCase() === 'PENDING'; }).length;
@@ -955,7 +1060,7 @@
             printWin.document.write('</div>');
 
             printWin.document.write('<div class="total">Total: Rp ' + priceFormatted + '</div>');
-            printWin.document.write('<div class="footer-note">Terima kasih atas orderannya. Ditunggu orderan selanjutnya (^_^)</div>');
+            printWin.document.write('<div class="footer-note">Tempelkan label ini pada bungkusan pesanan. Terima kasih!</div>');
             printWin.document.write('</div>');
 
             printWin.document.write('</body></html>');
@@ -979,7 +1084,7 @@
         function changeStatus(rowIndex, status) {
             apiPost('updateOrderStatus', { rowIndex: rowIndex, status: status }).then(function() {
                 showPremiumAlert("Status Diperbarui", "Status pesanan berhasil diubah menjadi " + status, "success");
-                loadAdminOrders();
+                loadAllAdminInitData();
             });
         }
         
@@ -989,7 +1094,7 @@
             });
         }
 
-        // ==================== PRODUCTS ====================
+        // ==================== PRODUCTS CRUD ====================
         function toggleVariantInputs(val) {
             var boxVariants = document.getElementById('variantPriceInputs');
             var boxPaket = document.getElementById('paketPriceInputs');
@@ -1103,51 +1208,9 @@
             renderMultiImagePreviews();
         }
 
-        function loadAdminProducts() {
-            var grid = document.getElementById('adminProductsGrid');
-            grid.innerHTML = '<div class="col-span-full text-center py-12 text-amber-800"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i><span>Memuat katalog kue...</span></div>';
-
-            apiGet('getProducts').then(function(res) {
-                rawProductsData = (res && res.status === 'success' && Array.isArray(res.data)) ? res.data : [];
-                if (rawProductsData.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-8 text-amber-800 font-semibold">Tidak ada kue di katalog.</div>';
-                    return;
-                }
-
-                grid.innerHTML = rawProductsData.map(function(p) {
-                    var mainImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
-                    var totalPhotos = (p.images && p.images.length > 0) ? p.images.length : 1;
-
-                    return '<div class="bg-white p-4 rounded-3xl border border-amber-100 shadow-sm flex flex-col justify-between gap-3 hover:shadow-md transition">' +
-                        '<div class="flex items-center gap-3">' +
-                            '<div class="relative w-16 h-16 flex-shrink-0">' +
-                                '<img src="' + mainImg + '" alt="' + p.name + '" class="w-16 h-16 object-cover rounded-2xl border border-amber-100">' +
-                                '<span class="absolute -bottom-1 -right-1 bg-amber-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full"><i class="fa-solid fa-images mr-0.5"></i>' + totalPhotos + '</span>' +
-                            '</div>' +
-                            '<div class="flex-1 min-w-0">' +
-                                '<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">' + p.category + '</span>' +
-                                '<h4 class="font-serif font-bold text-xs truncate text-amber-900 mt-1">' + p.name + '</h4>' +
-                                '<p class="text-[11px] font-bold text-amber-900 mt-0.5">Rp ' + Number(p.price).toLocaleString('id-ID') + ' / ' + p.size + '</p>' +
-                            '</div>' +
-                        '</div>' +
-
-                        '<div class="flex items-center justify-between pt-2 border-t border-amber-100 text-xs">' +
-                            '<button onclick="toggleStock(' + p.rowIndex + ', ' + p.isAvailable + ')" class="px-2.5 py-1 rounded-lg font-bold text-[11px] ' + (p.isAvailable ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-800') + '">' +
-                                (p.isAvailable ? 'Set Habis' : 'Set Ada') +
-                            '</button>' +
-                            '<div class="flex gap-2">' +
-                                '<button onclick="navigateToTab(\'products\'); openEditProductModal(' + p.rowIndex + ')" class="bg-blue-50 text-blue-600 p-1.5 rounded-lg hover:bg-blue-100 font-bold"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
-                                '<button onclick="confirmDeleteProduct(' + p.rowIndex + ', \'' + p.name + '\')" class="bg-rose-50 text-rose-600 p-1.5 rounded-lg hover:bg-rose-100 font-bold"><i class="fa-solid fa-trash-can"></i> Hapus</button>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-                }).join('');
-            });
-        }
-
         function toggleStock(rowIndex, currentStatus) {
             apiPost('toggleProductAvailability', { rowIndex: rowIndex, currentStatus: currentStatus }).then(function() {
-                loadAdminProducts();
+                loadAllAdminInitData();
             });
         }
 
@@ -1255,7 +1318,7 @@
                 showPremiumAlert("Berhasil", "Data kue berhasil disimpan!", "success");
                 btn.innerText = "Simpan Data"; btn.disabled = false;
                 closeProductCrudModal();
-                loadAdminProducts();
+                loadAllAdminInitData();
             });
         }
 
@@ -1263,50 +1326,15 @@
             showPremiumAlert("Hapus Kue", "Apakah Anda yakin ingin menghapus kue '" + productName + "'?", "confirm", function() {
                 apiPost('deleteProduct', { rowIndex: rowIndex }).then(function() {
                     showPremiumAlert("Terhapus", "Data kue berhasil dihapus!", "success");
-                    loadAdminProducts();
+                    loadAllAdminInitData();
                 });
             });
         }
 
         // ==================== PROMOS ====================
-        function loadAdminPromos() {
-            var tbody = document.getElementById('adminPromosTable');
-            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-amber-800"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-600 mb-2 block"></i><span>Memuat data promo...</span></td></tr>';
-
-            apiGet('getPromos').then(function(res) {
-                rawPromosData = (res && res.status === 'success' && Array.isArray(res.data)) ? res.data : [];
-                if (rawPromosData.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-amber-800 font-semibold">Belum ada kode promo.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = rawPromosData.map(function(p) {
-                    var discText = p.discountType === 'PERCENT' ? p.discountValue + '%' : 'Rp ' + Number(p.discountValue).toLocaleString('id-ID');
-                    
-                    return '<tr class="hover:bg-amber-50/80 transition text-xs">' +
-                        '<td class="p-3.5 font-bold text-amber-900 border-b border-amber-100"><span class="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-200">' + p.code + '</span></td>' +
-                        '<td class="p-3.5 font-extrabold text-rose-600 border-b border-amber-100">' + discText + '</td>' +
-                        '<td class="p-3.5 font-medium text-amber-900 border-b border-amber-100">Rp ' + Number(p.minSpend).toLocaleString('id-ID') + '</td>' +
-                        '<td class="p-3.5 border-b border-amber-100">' + (p.expiryDate || 'Selamanya') + '</td>' +
-                        '<td class="p-3.5 border-b border-amber-100">' +
-                            '<button onclick="togglePromo(' + p.rowIndex + ', ' + p.isActive + ')" class="px-2.5 py-1 rounded-lg font-bold text-[10px] ' + (p.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700') + '">' +
-                                (p.isActive ? 'Aktif' : 'Nonaktif') +
-                            '</button>' +
-                        '</td>' +
-                        '<td class="p-3.5 border-b border-amber-100">' +
-                            '<div class="flex gap-2">' +
-                                '<button onclick="openEditPromoModal(' + p.rowIndex + ')" class="bg-blue-50 text-blue-600 p-1.5 rounded-lg hover:bg-blue-100 font-bold"><i class="fa-solid fa-pen-to-square"></i></button>' +
-                                '<button onclick="confirmDeletePromo(' + p.rowIndex + ', \'' + p.code + '\')" class="bg-rose-50 text-rose-600 p-1.5 rounded-lg hover:bg-rose-100 font-bold"><i class="fa-solid fa-trash-can"></i></button>' +
-                            '</div>' +
-                        '</td>' +
-                    '</tr>';
-                }).join('');
-            });
-        }
-
         function togglePromo(rowIndex, currentStatus) {
             apiPost('togglePromoStatus', { rowIndex: rowIndex, currentStatus: currentStatus }).then(function() {
-                loadAdminPromos();
+                loadAllAdminInitData();
             });
         }
 
@@ -1354,7 +1382,7 @@
                 showPremiumAlert("Berhasil", "Kode promo berhasil disimpan!", "success");
                 btn.innerText = "Simpan Promo"; btn.disabled = false;
                 closePromoCrudModal();
-                loadAdminPromos();
+                loadAllAdminInitData();
             });
         }
 
@@ -1362,27 +1390,134 @@
             showPremiumAlert("Hapus Promo", "Apakah Anda yakin ingin menghapus kode promo '" + code + "'?", "confirm", function() {
                 apiPost('deletePromo', { rowIndex: rowIndex }).then(function() {
                     showPremiumAlert("Terhapus", "Kode promo berhasil dihapus!", "success");
-                    loadAdminPromos();
+                    loadAllAdminInitData();
+                });
+            });
+        }
+
+        // ==================== TUTORIAL SLIDES (FITUR BARU) ====================
+        function toggleTutorialStatus(isActive) {
+            apiPost('updateTutorialActiveStatus', { active: isActive }).then(function() {
+                showPremiumAlert("Status Slide Tutorial", "Status modal tutorial diubah menjadi " + (isActive ? "AKTIF" : "NONAKTIF"), "success");
+            });
+        }
+
+        function openAddTutorialModal() {
+            document.getElementById('tutorialModalTitle').innerText = "Tambah Slide Tutorial Baru";
+            document.getElementById('tutorialForm').reset();
+            document.getElementById('tutorialRowIndex').value = "";
+            document.getElementById('tutorialOrder').value = (rawTutorialsData.length + 1);
+            document.getElementById('tutorialUploadProgress').innerText = "";
+            document.getElementById('tutorialPreviewContainer').classList.add('hidden');
+            uploadedTutorialImg = "";
+            document.getElementById('tutorialCrudModal').classList.remove('hidden');
+        }
+
+        function openEditTutorialModal(rowIndex) {
+            var t = rawTutorialsData.find(function(item) { return item.rowIndex == rowIndex; });
+            if (!t) return;
+
+            document.getElementById('tutorialModalTitle').innerText = "Edit Slide Tutorial";
+            document.getElementById('tutorialRowIndex').value = t.rowIndex;
+            document.getElementById('tutorialTitle').value = t.title;
+            document.getElementById('tutorialDesc').value = t.description;
+            document.getElementById('tutorialOrder').value = t.orderIndex || 1;
+            uploadedTutorialImg = t.imageUrl;
+
+            if (uploadedTutorialImg) {
+                document.getElementById('tutorialImgPreview').src = uploadedTutorialImg;
+                document.getElementById('tutorialPreviewContainer').classList.remove('hidden');
+            }
+
+            document.getElementById('tutorialCrudModal').classList.remove('hidden');
+        }
+
+        function closeTutorialCrudModal() {
+            document.getElementById('tutorialCrudModal').classList.add('hidden');
+        }
+
+        function handleTutorialImageUpload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+
+            var txt = document.getElementById('tutorialUploadProgress');
+            txt.innerText = "Mengunggah foto...";
+
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+                var img = new Image();
+                img.src = evt.target.result;
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var MAX_WIDTH = 800, MAX_HEIGHT = 800;
+                    var width = img.width, height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+
+                    canvas.width = width; canvas.height = height;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    apiPost('uploadImageToDrive', {
+                        base64Data: canvas.toDataURL('image/jpeg', 0.75),
+                        fileName: "Tutorial_" + new Date().getTime() + ".jpg"
+                    }).then(function(res) {
+                        if (res && res.url) {
+                            uploadedTutorialImg = res.url;
+                            document.getElementById('tutorialImgPreview').src = uploadedTutorialImg;
+                            document.getElementById('tutorialPreviewContainer').classList.remove('hidden');
+                            txt.innerText = "Berhasil!";
+                        } else {
+                            txt.innerText = "Gagal!";
+                        }
+                    }).catch(function(err) {
+                        txt.innerText = "Gagal!";
+                        showPremiumAlert("Upload Gagal", err.message, "error");
+                    });
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveTutorialSubmit(e) {
+            e.preventDefault();
+            if (!uploadedTutorialImg) return showPremiumAlert("Peringatan", "Wajib mengunggah foto slide tutorial!", "error");
+
+            var btn = document.getElementById('btnSaveTutorial');
+            btn.innerText = "Menyimpan..."; btn.disabled = true;
+
+            var rowIndex = document.getElementById('tutorialRowIndex').value;
+            var tutorialPayload = {
+                rowIndex: rowIndex ? Number(rowIndex) : null,
+                title: document.getElementById('tutorialTitle').value.trim(),
+                description: document.getElementById('tutorialDesc').value.trim(),
+                orderIndex: Number(document.getElementById('tutorialOrder').value) || 1,
+                imageUrl: uploadedTutorialImg
+            };
+
+            var actionName = rowIndex ? 'updateTutorial' : 'addTutorial';
+            apiPost(actionName, tutorialPayload).then(function() {
+                showPremiumAlert("Berhasil", "Slide tutorial berhasil disimpan!", "success");
+                btn.innerText = "Simpan Slide"; btn.disabled = false;
+                closeTutorialCrudModal();
+                loadAllAdminInitData();
+            });
+        }
+
+        function confirmDeleteTutorial(rowIndex) {
+            showPremiumAlert("Hapus Slide", "Apakah Anda yakin ingin menghapus slide tutorial ini?", "confirm", function() {
+                apiPost('deleteTutorial', { rowIndex: rowIndex }).then(function() {
+                    showPremiumAlert("Terhapus", "Slide tutorial berhasil dihapus!", "success");
+                    loadAllAdminInitData();
                 });
             });
         }
 
         // ==================== SETTINGS ====================
-        function loadAdminSettings() {
-            apiGet('getAppSettings').then(function(res) {
-                var s = (res && res.status === 'success') ? res.data : null;
-                if (s) {
-                    if (s.logoUrl) document.getElementById('settingLogoUrl').value = s.logoUrl;
-                    if (s.qrisUrl) document.getElementById('settingQrisUrl').value = s.qrisUrl;
-                    if (s.bankInfo) document.getElementById('settingBankInfo').value = s.bankInfo;
-                    if (s.paymentQrisStatus) document.getElementById('statusQrisPay').value = s.paymentQrisStatus;
-                    if (s.paymentTransferStatus) document.getElementById('statusTransferPay').value = s.paymentTransferStatus;
-                    if (s.paymentCodStatus) document.getElementById('statusCodPay').value = s.paymentCodStatus;
-                    if (s.storeAnnouncement) document.getElementById('settingStoreAnnouncement').value = s.storeAnnouncement;
-                }
-            });
-        }
-
         function saveAnnouncementSettings() {
             var announcement = document.getElementById('settingStoreAnnouncement').value.trim();
             if (!announcement) return showPremiumAlert("Peringatan", "Teks pengumuman tidak boleh kosong", "error");
