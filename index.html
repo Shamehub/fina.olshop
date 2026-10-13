@@ -219,15 +219,19 @@
 
             <!-- CONTAINER SLIDE FOTO UTUH FULL -->
             <div class="relative bg-black flex items-center justify-center h-80 sm:h-96 overflow-hidden group">
-                <!-- image menggunakan object-contain agar foto tampil full tanpa terpotong -->
-                <img id="tutorialSlideImg" src="" class="w-full h-full object-contain bg-black transition-all duration-300">
-                
-                <button onclick="prevTutorialSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
-                    <i class="fa-solid fa-chevron-left text-sm"></i>
-                </button>
-                <button onclick="nextTutorialSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
-                    <i class="fa-solid fa-chevron-right text-sm"></i>
-                </button>
+              <!-- Gambar dapat diklik untuk Fullscreen -->
+              <img id="tutorialSlideImg" src="" onclick="openTutorialFullscreen()" class="w-full h-full object-contain bg-black transition-all duration-300 cursor-zoom-in group-hover:scale-102" title="Klik untuk memperbesar gambar">
+              
+              <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2.5 py-1 rounded-full pointer-events-none flex items-center gap-1">
+                  <i class="fa-solid fa-expand"></i> Klik Foto untuk Fullscreen
+              </div>
+
+              <button onclick="prevTutorialSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
+                  <i class="fa-solid fa-chevron-left text-sm"></i>
+              </button>
+              <button onclick="nextTutorialSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
+                  <i class="fa-solid fa-chevron-right text-sm"></i>
+              </button>
             </div>
 
             <!-- TEKS DESKRIPSI KONTRAS & TEBAL -->
@@ -598,6 +602,43 @@
         </div>
     </div>
 
+    <!-- MODAL FULLSCREEN / LIGHTBOX VIEWER FOTO TUTORIAL -->
+    <div id="tutorialFullscreenModal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex flex-col justify-between overflow-hidden">
+        <!-- Header Controls -->
+        <div class="p-4 flex items-center justify-between text-white bg-gradient-to-b from-black/80 to-transparent z-10">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass-plus text-amber-400"></i>
+                <span class="text-xs sm:text-sm font-bold text-amber-100">Pratinjau Foto Tutorial (Fullscreen)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Control Zoom Buttons -->
+                <button onclick="zoomTutorialImage(0.2)" class="w-8 h-8 rounded-full bg-amber-900/80 hover:bg-amber-800 text-amber-100 flex items-center justify-center font-bold text-xs shadow transition" title="Perbesar">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button onclick="zoomTutorialImage(-0.2)" class="w-8 h-8 rounded-full bg-amber-900/80 hover:bg-amber-800 text-amber-100 flex items-center justify-center font-bold text-xs shadow transition" title="Perkecil">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button onclick="resetTutorialImageZoom()" class="px-2.5 py-1 rounded-full bg-amber-900/80 hover:bg-amber-800 text-amber-100 font-bold text-xs shadow transition" title="Reset Ukuran">
+                    Reset
+                </button>
+                <button onclick="closeTutorialFullscreen()" class="w-9 h-9 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center justify-center text-sm shadow transition ml-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Viewport Area -->
+        <div id="fullscreenViewport" class="flex-1 relative flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none">
+            <img id="tutorialFullscreenImg" src="" class="max-w-full max-h-full object-contain transition-transform duration-150 ease-out transform-gpu">
+        </div>
+
+        <!-- Footer Caption & Nav -->
+        <div class="p-4 bg-gradient-to-t from-black/90 to-transparent text-center z-10 space-y-1">
+            <p id="fullscreenCaption" class="text-xs sm:text-sm font-semibold text-white drop-shadow-md"></p>
+            <p class="text-[11px] text-amber-300/80">Gunakan tombol zoom, scroll mouse, atau gesture cubit layar untuk memperbesar foto.</p>
+        </div>
+    </div>
+
     <!-- SCRIPT FRONTEND -->
     <script>
         var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ50rr_42lp2HIVb-lhbconyeqETclWoIWnJO5tcSCbze-p2_zhI40SlkLJu_2oJIwfA/exec";
@@ -624,6 +665,89 @@
 
         var tutorialSlides = [];
         var currentTutorialIndex = 0;
+
+        var currentZoomScale = 1;
+        var isDraggingImg = false;
+        var imgStartPos = { x: 0, y: 0 };
+        var imgCurrentPos = { x: 0, y: 0 };
+
+        function openTutorialFullscreen() {
+            if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) return;
+            
+            var currentSlide = tutorialSlides[currentTutorialIndex];
+            if (!currentSlide || !currentSlide.imageUrl) return;
+
+            var modal = document.getElementById('tutorialFullscreenModal');
+            var fullImg = document.getElementById('tutorialFullscreenImg');
+            var caption = document.getElementById('fullscreenCaption');
+
+            fullImg.src = currentSlide.imageUrl;
+            caption.innerText = currentSlide.description || currentSlide.title || "Foto Tutorial Pemesanan";
+
+            resetTutorialImageZoom();
+            modal.classList.remove('hidden');
+
+            // Attach Event Listeners for Zoom/Pan
+            setupFullscreenInteractions();
+        }
+
+        function closeTutorialFullscreen() {
+            var modal = document.getElementById('tutorialFullscreenModal');
+            if (modal) modal.classList.add('hidden');
+            resetTutorialImageZoom();
+        }
+
+        function zoomTutorialImage(delta) {
+            currentZoomScale += delta;
+            if (currentZoomScale < 0.8) currentZoomScale = 0.8;
+            if (currentZoomScale > 4) currentZoomScale = 4;
+
+            applyImageTransform();
+        }
+
+        function resetTutorialImageZoom() {
+            currentZoomScale = 1;
+            imgCurrentPos = { x: 0, y: 0 };
+            applyImageTransform();
+        }
+
+        function applyImageTransform() {
+            var fullImg = document.getElementById('tutorialFullscreenImg');
+            if (fullImg) {
+                fullImg.style.transform = 'translate(' + imgCurrentPos.x + 'px, ' + imgCurrentPos.y + 'px) scale(' + currentZoomScale + ')';
+            }
+        }
+
+        function setupFullscreenInteractions() {
+            var viewport = document.getElementById('fullscreenViewport');
+            var fullImg = document.getElementById('tutorialFullscreenImg');
+            if (!viewport || !fullImg) return;
+
+            // Scroll Wheel Zoom
+            viewport.onwheel = function(e) {
+                e.preventDefault();
+                var delta = e.deltaY < 0 ? 0.15 : -0.15;
+                zoomTutorialImage(delta);
+            };
+
+            // Drag / Pan Image Event
+            viewport.onmousedown = function(e) {
+                if (currentZoomScale <= 1) return;
+                isDraggingImg = true;
+                imgStartPos = { x: e.clientX - imgCurrentPos.x, y: e.clientY - imgCurrentPos.y };
+            };
+
+            window.onmousemove = function(e) {
+                if (!isDraggingImg) return;
+                e.preventDefault();
+                imgCurrentPos = { x: e.clientX - imgStartPos.x, y: e.clientY - imgStartPos.y };
+                applyImageTransform();
+            };
+
+            window.onmouseup = function() {
+                isDraggingImg = false;
+            };
+        }
 
         function apiGet(action, params) {
             var url = APPS_SCRIPT_URL + "?action=" + action;
@@ -775,7 +899,7 @@
 
         function checkAndShowTutorial() {
             var tutorialShown = sessionStorage.getItem('fina_tutorial_shown');
-            if (!tutorialShown && tutorialSlides && tutorialSlides.length > 0) {
+            if (!tutorialShown && Array.isArray(tutorialSlides) && tutorialSlides.length > 0) {
                 currentTutorialIndex = 0;
                 renderTutorialSlide();
                 document.getElementById('tutorialModal').classList.remove('hidden');
@@ -783,9 +907,9 @@
             }
         }
 
-        /* MEMBUKA MODAL TUTORIAL KAPAN Saja SAAT KONSUMEN KLIK TOMBOL TUTORIAL */
+        /* DAPAET DIPANGGIL MANUALL LEWAT TOMBOL "TUTORIAL PEMESANAN" */
         function openTutorialModalManual() {
-            if (!tutorialSlides || tutorialSlides.length === 0) {
+            if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) {
                 showPremiumAlert("Informasi Tutorial", "Belum ada slide tutorial yang diunggah oleh admin toko.", "info");
                 return;
             }
@@ -795,29 +919,57 @@
         }
 
         function renderTutorialSlide() {
-            if (!tutorialSlides || tutorialSlides.length === 0) return;
+            if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) return;
+            
+            // Memastikan indeks tidak di luar batas
+            if (currentTutorialIndex < 0) currentTutorialIndex = 0;
+            if (currentTutorialIndex >= tutorialSlides.length) currentTutorialIndex = tutorialSlides.length - 1;
+
             var slide = tutorialSlides[currentTutorialIndex];
             
-            document.getElementById('tutorialSlideImg').src = slide.imageUrl || "https://cdn-icons-png.flaticon.com/512/3081/3081986.png";
-            document.getElementById('tutorialSlideTitle').innerText = slide.title || "TUTORIAL PEMESANAN";
-            document.getElementById('tutorialSlideDesc').innerText = slide.description || "";
-            document.getElementById('tutorialProgressText').innerText = (currentTutorialIndex + 1) + "/" + tutorialSlides.length;
+            // 1. Tampilkan Gambar Utama
+            var imgEl = document.getElementById('tutorialSlideImg');
+            if (imgEl) {
+                imgEl.src = slide.imageUrl || "https://cdn-icons-png.flaticon.com/512/3081/3081986.png";
+            }
 
+            // 2. Tampilkan Judul & Deskripsi Kontras
+            var titleEl = document.getElementById('tutorialSlideTitle');
+            if (titleEl) {
+                titleEl.innerText = slide.title || "TUTORIAL PEMESANAN";
+            }
+
+            var descEl = document.getElementById('tutorialSlideDesc');
+            if (descEl) {
+                descEl.innerText = slide.description || "";
+            }
+
+            // 3. Update Indikator Angka (Contoh: 1/3, 2/3)
+            var progressEl = document.getElementById('tutorialProgressText');
+            if (progressEl) {
+                progressEl.innerText = (currentTutorialIndex + 1) + " / " + tutorialSlides.length;
+            }
+
+            // 4. Update Titik-titik Indikator (Dots)
             var dotsContainer = document.getElementById('tutorialDots');
-            dotsContainer.innerHTML = tutorialSlides.map(function(_, idx) {
-                var activeBg = (idx === currentTutorialIndex) ? 'bg-amber-400 w-5' : 'bg-amber-700 w-2';
-                return '<span class="h-2 rounded-full transition-all duration-300 ' + activeBg + '"></span>';
-            }).join('');
+            if (dotsContainer) {
+                dotsContainer.innerHTML = tutorialSlides.map(function(_, idx) {
+                    var activeBg = (idx === currentTutorialIndex) ? 'bg-amber-400 w-5' : 'bg-amber-700/60 w-2';
+                    return '<span class="h-2 rounded-full transition-all duration-300 ' + activeBg + '"></span>';
+                }).join('');
+            }
         }
 
+        // Fungsi Pindah ke Slide Sebelumnya
         function prevTutorialSlide() {
-            if (!tutorialSlides || tutorialSlides.length === 0) return;
+            if (!Array.isArray(tutorialSlides) || tutorialSlides.length <= 1) return;
             currentTutorialIndex = (currentTutorialIndex - 1 + tutorialSlides.length) % tutorialSlides.length;
             renderTutorialSlide();
         }
 
+        // Fungsi Pindah ke Slide Selanjutnya
         function nextTutorialSlide() {
-            if (!tutorialSlides || tutorialSlides.length === 0) return;
+            if (!Array.isArray(tutorialSlides) || tutorialSlides.length <= 1) return;
             currentTutorialIndex = (currentTutorialIndex + 1) % tutorialSlides.length;
             renderTutorialSlide();
         }
