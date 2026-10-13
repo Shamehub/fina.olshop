@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -71,6 +71,12 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- TOMBOL TUTORIAL SLIDE UNTUK PELANGGAN -->
+                    <button onclick="openTutorialModalManual()" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition flex items-center gap-1.5 shadow-sm" title="Lihat Tutorial Pemesanan">
+                        <i class="fa-solid fa-book-open text-amber-700"></i>
+                        <span class="hidden sm:inline">Tutorial Pemesanan</span>
+                    </button>
+
                     <div id="storeStatusBadge" class="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 bg-emerald-600 text-white">
                       <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                       <span id="storeStatusText">Toko Buka</span>
@@ -102,14 +108,22 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-10">
         <div>
             <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-amber-100/60 p-3 rounded-2xl border border-amber-200">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-bold text-amber-900 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> Filter Status:</span>
                     <button onclick="togglePoFilter('all')" id="btnPoAll" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-amber-800 text-white">Semua</button>
                     <button onclick="togglePoFilter('ready')" id="btnPoReady" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Ready Stock</button>
                     <button onclick="togglePoFilter('po')" id="btnPoOnly" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-white text-amber-800 border border-amber-300">Pre-Order (PO)</button>
                 </div>
-                <div class="text-xs text-amber-800 font-medium">
-                    Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+
+                <div class="flex items-center gap-3">
+                    <!-- AKSES PANDUAN TUTORIAL KEDUA PADA AREA FILTER -->
+                    <button onclick="openTutorialModalManual()" class="px-3 py-1 text-xs rounded-lg font-bold bg-amber-800 hover:bg-amber-900 text-white shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>Tutorial Pemesanan</span>
+                    </button>
+                    <div class="text-xs text-amber-800 font-medium">
+                        Menampilkan <span id="itemCountDisplay" class="font-bold text-amber-900">0</span> varian kue
+                    </div>
                 </div>
             </div>
 
@@ -189,38 +203,45 @@
         </div>
     </div>
 
-    <!-- MODAL TUTORIAL SLIDE -->
+    <!-- MODAL TUTORIAL SLIDE (TAMPIL UTUH FULL & TEKS DESKRIPSI KONTRAS TEBAL) -->
     <div id="tutorialModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-amber-100 flex flex-col animate-modal-pop">
-            <div class="bg-amber-50 px-4 py-3 border-b border-amber-200 flex items-center justify-between">
+        <div class="bg-amber-950 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-amber-700 flex flex-col animate-modal-pop text-white">
+            
+            <div class="bg-amber-900 px-4 py-3 border-b border-amber-800 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info text-amber-600"></i>
-                    <h3 class="font-serif font-bold text-sm text-amber-900">Tutorial & Informasi Toko</h3>
+                    <i class="fa-solid fa-circle-info text-amber-400"></i>
+                    <h3 class="font-serif font-bold text-sm text-amber-100">Tutorial & Informasi Toko</h3>
                 </div>
-                <button onclick="closeTutorialModal()" class="w-7 h-7 rounded-full bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold flex items-center justify-center text-xs">
+                <button onclick="closeTutorialModal()" class="w-7 h-7 rounded-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold flex items-center justify-center text-xs transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="relative bg-amber-900/10 flex items-center justify-center h-64 sm:h-72 overflow-hidden group">
-                <img id="tutorialSlideImg" src="" class="w-full h-full object-cover transition-all duration-300">
-                <button onclick="prevTutorialSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
+            <!-- CONTAINER SLIDE FOTO UTUH FULL -->
+            <div class="relative bg-black flex items-center justify-center h-80 sm:h-96 overflow-hidden group">
+                <!-- image menggunakan object-contain agar foto tampil full tanpa terpotong -->
+                <img id="tutorialSlideImg" src="" class="w-full h-full object-contain bg-black transition-all duration-300">
+                
+                <button onclick="prevTutorialSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
                 </button>
-                <button onclick="nextTutorialSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center transition">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                <button onclick="nextTutorialSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-900/80 hover:bg-amber-800 text-white w-9 h-9 rounded-full flex items-center justify-center transition border border-amber-600/50 shadow-md">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
                 </button>
             </div>
 
-            <div class="p-4 bg-white space-y-3 text-center">
-                <h4 id="tutorialSlideTitle" class="font-bold text-sm text-amber-900">Selamat Datang di FINA OLSHOP</h4>
-                <p id="tutorialSlideDesc" class="text-xs text-amber-800/80 leading-relaxed min-h-[36px]">Petunjuk penggunaan dan cara pemesanan kue.</p>
+            <!-- TEKS DESKRIPSI KONTRAS & TEBAL -->
+            <div class="p-4 bg-amber-950/90 space-y-2 text-center border-t border-amber-800/60">
+                <h4 id="tutorialSlideTitle" class="font-bold text-base text-amber-300 tracking-wide uppercase">TUTORIAL PEMESANAN</h4>
+                <p id="tutorialSlideDesc" class="text-xs sm:text-sm text-white font-semibold leading-relaxed min-h-[40px] px-2 drop-shadow-md">
+                    Petunjuk penggunaan dan cara pemesanan kue.
+                </p>
                 <div id="tutorialDots" class="flex justify-center gap-1.5 pt-1"></div>
             </div>
 
-            <div class="p-3 bg-amber-50 border-t border-amber-200 flex justify-between items-center text-xs">
-                <span id="tutorialProgressText" class="font-bold text-amber-800">1/1</span>
-                <button onclick="closeTutorialModal()" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-sm transition">
+            <div class="p-3 bg-amber-900 border-t border-amber-800 flex justify-between items-center text-xs">
+                <span id="tutorialProgressText" class="font-bold text-amber-200">1/1</span>
+                <button onclick="closeTutorialModal()" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 py-2 rounded-xl font-bold shadow-md transition transform active:scale-95">
                     Mulai Belanja
                 </button>
             </div>
@@ -299,6 +320,7 @@
                         <div id="modalVariantOptions" class="grid grid-cols-2 gap-2"></div>
                     </div>
 
+                    <!-- INPUT KUANTITAS / JUMLAH BELI DENGAN VALIDASI MINIMAL -->
                     <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-center justify-between gap-3">
                         <div>
                             <span class="block text-xs font-bold text-amber-900 uppercase tracking-wider">Jumlah Pembelian:</span>
@@ -761,30 +783,41 @@
             }
         }
 
+        /* MEMBUKA MODAL TUTORIAL KAPAN Saja SAAT KONSUMEN KLIK TOMBOL TUTORIAL */
+        function openTutorialModalManual() {
+            if (!tutorialSlides || tutorialSlides.length === 0) {
+                showPremiumAlert("Informasi Tutorial", "Belum ada slide tutorial yang diunggah oleh admin toko.", "info");
+                return;
+            }
+            currentTutorialIndex = 0;
+            renderTutorialSlide();
+            document.getElementById('tutorialModal').classList.remove('hidden');
+        }
+
         function renderTutorialSlide() {
             if (!tutorialSlides || tutorialSlides.length === 0) return;
             var slide = tutorialSlides[currentTutorialIndex];
             
             document.getElementById('tutorialSlideImg').src = slide.imageUrl || "https://cdn-icons-png.flaticon.com/512/3081/3081986.png";
-            document.getElementById('tutorialSlideTitle').innerText = slide.title || "Petunjuk Toko";
+            document.getElementById('tutorialSlideTitle').innerText = slide.title || "TUTORIAL PEMESANAN";
             document.getElementById('tutorialSlideDesc').innerText = slide.description || "";
             document.getElementById('tutorialProgressText').innerText = (currentTutorialIndex + 1) + "/" + tutorialSlides.length;
 
             var dotsContainer = document.getElementById('tutorialDots');
             dotsContainer.innerHTML = tutorialSlides.map(function(_, idx) {
-                var activeBg = (idx === currentTutorialIndex) ? 'bg-amber-800 w-4' : 'bg-amber-200 w-2';
+                var activeBg = (idx === currentTutorialIndex) ? 'bg-amber-400 w-5' : 'bg-amber-700 w-2';
                 return '<span class="h-2 rounded-full transition-all duration-300 ' + activeBg + '"></span>';
             }).join('');
         }
 
         function prevTutorialSlide() {
-            if (tutorialSlides.length === 0) return;
+            if (!tutorialSlides || tutorialSlides.length === 0) return;
             currentTutorialIndex = (currentTutorialIndex - 1 + tutorialSlides.length) % tutorialSlides.length;
             renderTutorialSlide();
         }
 
         function nextTutorialSlide() {
-            if (tutorialSlides.length === 0) return;
+            if (!tutorialSlides || tutorialSlides.length === 0) return;
             currentTutorialIndex = (currentTutorialIndex + 1) % tutorialSlides.length;
             renderTutorialSlide();
         }
@@ -1281,7 +1314,6 @@
             }
         }
 
-        // OTOMATIS BUKA KERANJANG BELANJA KETIKA MENAMBAHKAN KUE
         function addToCart(itemPayload, customNote, qty) {
             var qtyToAdd = qty || (itemPayload.minQty || 1);
 
