@@ -179,46 +179,6 @@
         </div>
     </footer>
 
-    <!-- MODAL TUTORIAL FOTO SLIDE (FITUR BARU) -->
-    <div id="tutorialModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl border border-amber-100 animate-modal-pop relative flex flex-col justify-between">
-            <button onclick="closeTutorialModal()" class="absolute top-3 right-3 z-20 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold transition">
-                <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
-
-            <!-- CONTAINER Gambar Slide -->
-            <div class="relative h-64 sm:h-72 bg-amber-900 overflow-hidden">
-                <img id="tutorialSlideImg" src="" class="w-full h-full object-cover transition-all duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <span id="tutorialSlideBadge" class="absolute top-3 left-3 bg-amber-800/90 backdrop-blur-md text-amber-100 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-700">Slide 1 / 3</span>
-            </div>
-
-            <!-- Content Teks -->
-            <div class="p-5 text-center space-y-3 bg-white">
-                <h3 id="tutorialSlideTitle" class="font-serif font-bold text-lg text-amber-900 leading-snug">Judul Tutorial</h3>
-                <p id="tutorialSlideDesc" class="text-xs text-amber-800/90 leading-relaxed min-h-[3rem]">Deskripsi petunjuk penggunaan toko...</p>
-
-                <!-- Indicator Dots -->
-                <div id="tutorialDotsContainer" class="flex justify-center items-center gap-1.5 pt-1"></div>
-
-                <!-- Navigasi Action -->
-                <div class="flex items-center justify-between gap-2 pt-2 border-t border-amber-100">
-                    <button onclick="closeTutorialModal()" class="text-xs font-bold text-amber-800/70 hover:text-amber-900 px-3 py-2 rounded-xl">Lewati</button>
-                    
-                    <div class="flex items-center gap-2">
-                        <button onclick="prevTutorialSlide()" id="btnPrevTutorial" class="bg-amber-100 hover:bg-amber-200 text-amber-900 p-2.5 rounded-xl font-bold text-xs transition">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        <button onclick="nextTutorialSlide()" id="btnNextTutorial" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5">
-                            <span id="btnNextTutorialText">Lanjut</span>
-                            <i id="btnNextTutorialIcon" class="fa-solid fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL ALERT CUSTOM PREMIUM -->
     <div id="premiumAlertModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-100 text-center animate-modal-pop">
@@ -226,6 +186,44 @@
             <h3 id="alertTitle" class="font-serif font-bold text-lg text-amber-900 mb-1">Notifikasi</h3>
             <p id="alertMessage" class="text-xs text-amber-800/90 leading-relaxed mb-6">Pesan notifikasi...</p>
             <div id="alertActions" class="flex justify-center gap-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL TUTORIAL SLIDE -->
+    <div id="tutorialModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-amber-100 flex flex-col animate-modal-pop">
+            <div class="bg-amber-50 px-4 py-3 border-b border-amber-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-amber-600"></i>
+                    <h3 class="font-serif font-bold text-sm text-amber-900">Tutorial & Informasi Toko</h3>
+                </div>
+                <button onclick="closeTutorialModal()" class="w-7 h-7 rounded-full bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="relative bg-amber-900/10 flex items-center justify-center h-64 sm:h-72 overflow-hidden group">
+                <img id="tutorialSlideImg" src="" class="w-full h-full object-cover transition-all duration-300">
+                <button onclick="prevTutorialSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="nextTutorialSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+
+            <div class="p-4 bg-white space-y-3 text-center">
+                <h4 id="tutorialSlideTitle" class="font-bold text-sm text-amber-900">Selamat Datang di FINA OLSHOP</h4>
+                <p id="tutorialSlideDesc" class="text-xs text-amber-800/80 leading-relaxed min-h-[36px]">Petunjuk penggunaan dan cara pemesanan kue.</p>
+                <div id="tutorialDots" class="flex justify-center gap-1.5 pt-1"></div>
+            </div>
+
+            <div class="p-3 bg-amber-50 border-t border-amber-200 flex justify-between items-center text-xs">
+                <span id="tutorialProgressText" class="font-bold text-amber-800">1/1</span>
+                <button onclick="closeTutorialModal()" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold shadow-sm transition">
+                    Mulai Belanja
+                </button>
+            </div>
         </div>
     </div>
 
@@ -364,7 +362,7 @@
         </div>
     </div>
 
-    <!-- CART DRAWER -->
+    <!-- CART DRAWER / FULLSCREEN MODAL -->
     <div id="cartDrawer" class="fixed inset-0 z-50 hidden bg-amber-50/95 flex flex-col justify-between custom-scrollbar animate-modal-pop">
         <div class="p-4 border-b border-amber-200 bg-amber-100/80 flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -578,7 +576,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT FRONTEND PELANGGAN -->
+    <!-- SCRIPT FRONTEND -->
     <script>
         var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ50rr_42lp2HIVb-lhbconyeqETclWoIWnJO5tcSCbze-p2_zhI40SlkLJu_2oJIwfA/exec";
 
@@ -602,10 +600,8 @@
         var currentStoreStatus = 'BUKA';
         var storeAnnouncementText = '';
 
-        // VARIABEL FOTO SLIDE TUTORIAL
         var tutorialSlides = [];
-        var tutorialCurrentIndex = 0;
-        var isTutorialActiveSetting = true;
+        var currentTutorialIndex = 0;
 
         function apiGet(action, params) {
             var url = APPS_SCRIPT_URL + "?action=" + action;
@@ -705,17 +701,14 @@
                     if (Array.isArray(localData.orders)) {
                         renderPublicOrdersTable(localData.orders);
                     }
-                    if (Array.isArray(localData.tutorials)) {
-                        tutorialSlides = localData.tutorials;
-                    }
                     if (localData.settings) {
                         currentStoreStatus = localData.settings.storeStatus ? localData.settings.storeStatus.toUpperCase().trim() : 'BUKA';
                         storeAnnouncementText = localData.settings.storeAnnouncement || 'Mohon maaf, toko kami sedang LIBUR/TUTUP.';
-                        isTutorialActiveSetting = (localData.settings.tutorialActive !== false && localData.settings.tutorialActive !== 'false');
                         updateStoreStatusUI(currentStoreStatus);
                         if (localData.settings.logoUrl) document.getElementById('appLogo').src = localData.settings.logoUrl;
                         if (localData.settings.qrisUrl) appQrisUrl = localData.settings.qrisUrl;
                         if (localData.settings.bankInfo) appBankInfo = localData.settings.bankInfo;
+                        if (Array.isArray(localData.settings.tutorialSlides)) tutorialSlides = localData.settings.tutorialSlides;
                         updatePaymentMethodsUI(localData.settings);
                     }
                 } catch(e) {}
@@ -724,25 +717,19 @@
             apiGet('getInitData').then(function(res) {
                 if (res && res.status === 'success') {
                     var data = res.data;
-                    
                     localStorage.setItem('fina_olshop_cache', JSON.stringify(data));
         
                     products = Array.isArray(data.products) ? data.products : [];
                     renderCategoryButtons();
                     renderProducts();
                     updateCartUI();
-
-                    if (Array.isArray(data.tutorials)) {
-                        tutorialSlides = data.tutorials;
-                    }
         
                     if (data.settings) {
                         currentStoreStatus = data.settings.storeStatus ? data.settings.storeStatus.toUpperCase().trim() : 'BUKA';
                         storeAnnouncementText = data.settings.storeAnnouncement || 'Mohon maaf, toko kami sedang LIBUR/TUTUP.';
-                        isTutorialActiveSetting = (data.settings.tutorialActive !== false && data.settings.tutorialActive !== 'false');
+                        if (Array.isArray(data.settings.tutorialSlides)) tutorialSlides = data.settings.tutorialSlides;
                         
                         updateStoreStatusUI(currentStoreStatus);
-        
                         if (data.settings.logoUrl) document.getElementById('appLogo').src = data.settings.logoUrl;
                         if (data.settings.qrisUrl) appQrisUrl = data.settings.qrisUrl;
                         if (data.settings.bankInfo) appBankInfo = data.settings.bankInfo;
@@ -752,12 +739,11 @@
                         if (currentStoreStatus === 'LIBUR' || currentStoreStatus === 'TUTUP') {
                             showStoreAnnouncementModal();
                         } else if (currentStoreStatus === 'BUKA') {
-                            checkAndShowFirstVisitTutorial();
+                            checkAndShowTutorial();
                         }
                     }
         
                     if (data.orders) renderPublicOrdersTable(data.orders);
-        
                     handleRoute();
                 }
             }).catch(function(err) {
@@ -765,72 +751,45 @@
             });
         }
 
-        // TAMPILKAN MODAL TUTORIAL HANYA JIKA TOKO BUKA & PERTAMA KALI KUNJUNGAN
-        function checkAndShowFirstVisitTutorial() {
-            var hasSeen = sessionStorage.getItem('fina_seen_tutorial');
-            if (!hasSeen && isTutorialActiveSetting && tutorialSlides && tutorialSlides.length > 0) {
-                tutorialCurrentIndex = 0;
-                renderTutorialSlideUI();
+        function checkAndShowTutorial() {
+            var tutorialShown = sessionStorage.getItem('fina_tutorial_shown');
+            if (!tutorialShown && tutorialSlides && tutorialSlides.length > 0) {
+                currentTutorialIndex = 0;
+                renderTutorialSlide();
                 document.getElementById('tutorialModal').classList.remove('hidden');
+                sessionStorage.setItem('fina_tutorial_shown', 'true');
             }
         }
 
-        function renderTutorialSlideUI() {
+        function renderTutorialSlide() {
             if (!tutorialSlides || tutorialSlides.length === 0) return;
+            var slide = tutorialSlides[currentTutorialIndex];
+            
+            document.getElementById('tutorialSlideImg').src = slide.imageUrl || "https://cdn-icons-png.flaticon.com/512/3081/3081986.png";
+            document.getElementById('tutorialSlideTitle').innerText = slide.title || "Petunjuk Toko";
+            document.getElementById('tutorialSlideDesc').innerText = slide.description || "";
+            document.getElementById('tutorialProgressText').innerText = (currentTutorialIndex + 1) + "/" + tutorialSlides.length;
 
-            tutorialSlides.sort(function(a, b) { return (a.orderIndex || 0) - (b.orderIndex || 0); });
-            var slide = tutorialSlides[tutorialCurrentIndex];
-
-            document.getElementById('tutorialSlideImg').src = slide.imageUrl;
-            document.getElementById('tutorialSlideTitle').innerText = slide.title;
-            document.getElementById('tutorialSlideDesc').innerText = slide.description;
-            document.getElementById('tutorialSlideBadge').innerText = "Slide " + (tutorialCurrentIndex + 1) + " / " + tutorialSlides.length;
-
-            var dotsBox = document.getElementById('tutorialDotsContainer');
-            dotsBox.innerHTML = tutorialSlides.map(function(_, idx) {
-                var activeClass = (idx === tutorialCurrentIndex) ? 'bg-amber-800 w-5' : 'bg-amber-200 w-2';
-                return '<span class="h-2 rounded-full transition-all duration-300 ' + activeClass + '"></span>';
+            var dotsContainer = document.getElementById('tutorialDots');
+            dotsContainer.innerHTML = tutorialSlides.map(function(_, idx) {
+                var activeBg = (idx === currentTutorialIndex) ? 'bg-amber-800 w-4' : 'bg-amber-200 w-2';
+                return '<span class="h-2 rounded-full transition-all duration-300 ' + activeBg + '"></span>';
             }).join('');
-
-            var btnNextText = document.getElementById('btnNextTutorialText');
-            var btnNextIcon = document.getElementById('btnNextTutorialIcon');
-            var btnPrev = document.getElementById('btnPrevTutorial');
-
-            if (tutorialCurrentIndex === 0) {
-                btnPrev.classList.add('opacity-40');
-                btnPrev.disabled = true;
-            } else {
-                btnPrev.classList.remove('opacity-40');
-                btnPrev.disabled = false;
-            }
-
-            if (tutorialCurrentIndex === tutorialSlides.length - 1) {
-                btnNextText.innerText = "Mulai Belanja";
-                btnNextIcon.className = "fa-solid fa-store ml-1";
-            } else {
-                btnNextText.innerText = "Lanjut";
-                btnNextIcon.className = "fa-solid fa-chevron-right ml-1";
-            }
         }
 
         function prevTutorialSlide() {
-            if (tutorialCurrentIndex > 0) {
-                tutorialCurrentIndex--;
-                renderTutorialSlideUI();
-            }
+            if (tutorialSlides.length === 0) return;
+            currentTutorialIndex = (currentTutorialIndex - 1 + tutorialSlides.length) % tutorialSlides.length;
+            renderTutorialSlide();
         }
 
         function nextTutorialSlide() {
-            if (tutorialCurrentIndex < tutorialSlides.length - 1) {
-                tutorialCurrentIndex++;
-                renderTutorialSlideUI();
-            } else {
-                closeTutorialModal();
-            }
+            if (tutorialSlides.length === 0) return;
+            currentTutorialIndex = (currentTutorialIndex + 1) % tutorialSlides.length;
+            renderTutorialSlide();
         }
 
         function closeTutorialModal() {
-            sessionStorage.setItem('fina_seen_tutorial', 'true');
             document.getElementById('tutorialModal').classList.add('hidden');
         }
 
@@ -1134,8 +1093,6 @@
                         minQty: minQty,
                         image: currentGalleryImages[0]
                     }, document.getElementById('modalCustomNote').value.trim(), currentModalQty);
-
-                    navigateToHash('');
                 };
             } else {
                 addBtn.disabled = true;
@@ -1324,6 +1281,7 @@
             }
         }
 
+        // OTOMATIS BUKA KERANJANG BELANJA KETIKA MENAMBAHKAN KUE
         function addToCart(itemPayload, customNote, qty) {
             var qtyToAdd = qty || (itemPayload.minQty || 1);
 
