@@ -116,7 +116,6 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <!-- AKSES PANDUAN TUTORIAL KEDUA PADA AREA FILTER -->
                     <button onclick="openTutorialModalManual()" class="px-3 py-1 text-xs rounded-lg font-bold bg-amber-800 hover:bg-amber-900 text-white shadow-sm transition flex items-center gap-1.5">
                         <i class="fa-solid fa-circle-question"></i>
                         <span>Tutorial Pemesanan</span>
@@ -203,7 +202,7 @@
         </div>
     </div>
 
-    <!-- MODAL TUTORIAL SLIDE (TAMPIL UTUH FULL & TEKS DESKRIPSI KONTRAS TEBAL) -->
+    <!-- MODAL TUTORIAL SLIDE -->
     <div id="tutorialModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-amber-950 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-amber-700 flex flex-col animate-modal-pop text-white">
             
@@ -219,7 +218,6 @@
 
             <!-- CONTAINER SLIDE FOTO UTUH FULL -->
             <div class="relative bg-black flex items-center justify-center h-80 sm:h-96 overflow-hidden group">
-              <!-- Gambar dapat diklik untuk Fullscreen -->
               <img id="tutorialSlideImg" src="" onclick="openTutorialFullscreen()" class="w-full h-full object-contain bg-black transition-all duration-300 cursor-zoom-in group-hover:scale-102" title="Klik untuk memperbesar gambar">
               
               <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2.5 py-1 rounded-full pointer-events-none flex items-center gap-1">
@@ -234,7 +232,7 @@
               </button>
             </div>
 
-            <!-- TEKS DESKRIPSI KONTRAS & TEBAL -->
+            <!-- TEKS DESKRIPSI -->
             <div class="p-4 bg-amber-950/90 space-y-2 text-center border-t border-amber-800/60">
                 <h4 id="tutorialSlideTitle" class="font-bold text-base text-amber-300 tracking-wide uppercase">TUTORIAL PEMESANAN</h4>
                 <p id="tutorialSlideDesc" class="text-xs sm:text-sm text-white font-semibold leading-relaxed min-h-[40px] px-2 drop-shadow-md">
@@ -355,7 +353,7 @@
                         <label class="block text-xs font-bold text-amber-900 mb-1">
                             <i class="fa-solid fa-pen-to-square mr-1 text-amber-600"></i> Catatan Khusus untuk Item Ini (Opsional)
                         </label>
-                        <input type="text" id="modalCustomNote" placeholder="Contoh: Tolong dibuat jadi 3 bungkus..." 
+                        <input type="text" id="modalCustomNote" placeholder="Contoh: Tolong dibuat 3 bungkus..." 
                             class="w-full text-xs p-2.5 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                     </div>
 
@@ -611,7 +609,6 @@
                 <span class="text-xs sm:text-sm font-bold text-amber-100">Pratinjau Foto Tutorial (Fullscreen)</span>
             </div>
             <div class="flex items-center gap-2">
-                <!-- Control Zoom Buttons -->
                 <button onclick="zoomTutorialImage(0.2)" class="w-8 h-8 rounded-full bg-amber-900/80 hover:bg-amber-800 text-amber-100 flex items-center justify-center font-bold text-xs shadow transition" title="Perbesar">
                     <i class="fa-solid fa-plus"></i>
                 </button>
@@ -671,6 +668,31 @@
         var imgStartPos = { x: 0, y: 0 };
         var imgCurrentPos = { x: 0, y: 0 };
 
+        // Helper fungsi untuk menghitung dan menampilkan rentang harga produk secara otomatis
+        function getProductPriceDisplay(p) {
+            if (p.hargaDisplay) return p.hargaDisplay;
+
+            if (p.variants && p.variants.length > 0) {
+                var prices = p.variants.map(function(v) { return Number(v.price); }).filter(function(pr) { return !isNaN(pr) && pr > 0; });
+                if (prices.length > 0) {
+                    var minP = Math.min.apply(null, prices);
+                    var maxP = Math.max.apply(null, prices);
+                    if (minP === maxP) {
+                        return "Rp " + minP.toLocaleString('id-ID');
+                    } else {
+                        return "Rp " + minP.toLocaleString('id-ID') + " - Rp " + maxP.toLocaleString('id-ID');
+                    }
+                }
+            }
+
+            if (p.priceMin && p.priceMax && p.priceMin !== p.priceMax) {
+                return "Rp " + Number(p.priceMin).toLocaleString('id-ID') + " - Rp " + Number(p.priceMax).toLocaleString('id-ID');
+            }
+
+            var singlePrice = p.price || p.hargaMin || 0;
+            return "Rp " + Number(singlePrice).toLocaleString('id-ID');
+        }
+
         function openTutorialFullscreen() {
             if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) return;
             
@@ -687,7 +709,6 @@
             resetTutorialImageZoom();
             modal.classList.remove('hidden');
 
-            // Attach Event Listeners for Zoom/Pan
             setupFullscreenInteractions();
         }
 
@@ -723,14 +744,12 @@
             var fullImg = document.getElementById('tutorialFullscreenImg');
             if (!viewport || !fullImg) return;
 
-            // Scroll Wheel Zoom
             viewport.onwheel = function(e) {
                 e.preventDefault();
                 var delta = e.deltaY < 0 ? 0.15 : -0.15;
                 zoomTutorialImage(delta);
             };
 
-            // Drag / Pan Image Event
             viewport.onmousedown = function(e) {
                 if (currentZoomScale <= 1) return;
                 isDraggingImg = true;
@@ -907,7 +926,6 @@
             }
         }
 
-        /* DAPAET DIPANGGIL MANUALL LEWAT TOMBOL "TUTORIAL PEMESANAN" */
         function openTutorialModalManual() {
             if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) {
                 showPremiumAlert("Informasi Tutorial", "Belum ada slide tutorial yang diunggah oleh admin toko.", "info");
@@ -921,19 +939,16 @@
         function renderTutorialSlide() {
             if (!Array.isArray(tutorialSlides) || tutorialSlides.length === 0) return;
             
-            // Memastikan indeks tidak di luar batas
             if (currentTutorialIndex < 0) currentTutorialIndex = 0;
             if (currentTutorialIndex >= tutorialSlides.length) currentTutorialIndex = tutorialSlides.length - 1;
 
             var slide = tutorialSlides[currentTutorialIndex];
             
-            // 1. Tampilkan Gambar Utama
             var imgEl = document.getElementById('tutorialSlideImg');
             if (imgEl) {
                 imgEl.src = slide.imageUrl || "https://cdn-icons-png.flaticon.com/512/3081/3081986.png";
             }
 
-            // 2. Tampilkan Judul & Deskripsi Kontras
             var titleEl = document.getElementById('tutorialSlideTitle');
             if (titleEl) {
                 titleEl.innerText = slide.title || "TUTORIAL PEMESANAN";
@@ -944,13 +959,11 @@
                 descEl.innerText = slide.description || "";
             }
 
-            // 3. Update Indikator Angka (Contoh: 1/3, 2/3)
             var progressEl = document.getElementById('tutorialProgressText');
             if (progressEl) {
                 progressEl.innerText = (currentTutorialIndex + 1) + " / " + tutorialSlides.length;
             }
 
-            // 4. Update Titik-titik Indikator (Dots)
             var dotsContainer = document.getElementById('tutorialDots');
             if (dotsContainer) {
                 dotsContainer.innerHTML = tutorialSlides.map(function(_, idx) {
@@ -960,14 +973,12 @@
             }
         }
 
-        // Fungsi Pindah ke Slide Sebelumnya
         function prevTutorialSlide() {
             if (!Array.isArray(tutorialSlides) || tutorialSlides.length <= 1) return;
             currentTutorialIndex = (currentTutorialIndex - 1 + tutorialSlides.length) % tutorialSlides.length;
             renderTutorialSlide();
         }
 
-        // Fungsi Pindah ke Slide Selanjutnya
         function nextTutorialSlide() {
             if (!Array.isArray(tutorialSlides) || tutorialSlides.length <= 1) return;
             currentTutorialIndex = (currentTutorialIndex + 1) % tutorialSlides.length;
@@ -1183,7 +1194,9 @@
             grid.innerHTML = filtered.map(function(p) {
                 var mainImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
                 var slug = createSlug(p.name);
+                var priceDisplay = getProductPriceDisplay(p);
 
+                // Tampilan Card Produk (Tanpa Tombol/Icon Keranjang Belanja & Tampil Rentang Harga Otomatis)
                 return '<div class="bg-white rounded-3xl overflow-hidden border border-amber-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group ' + (!p.isAvailable ? 'opacity-60' : '') + '">' +
                     '<div>' +
                         '<div onclick="openProductDetail(' + p.id + ', \'' + slug + '\')" class="relative overflow-hidden h-48 cursor-pointer">' +
@@ -1215,10 +1228,10 @@
                     '<div class="p-4 pt-0 flex items-center justify-between gap-2 border-t border-amber-50 mt-2">' +
                         '<div>' +
                             '<span class="text-[10px] text-amber-800 block">Harga</span>' +
-                            '<span class="font-extrabold text-amber-900 text-base">Rp ' + p.price.toLocaleString('id-ID') + '</span>' +
+                            '<span class="font-extrabold text-amber-900 text-[11px] sm:text-xs">' + priceDisplay + '</span>' +
                         '</div>' +
-                        '<button onclick="quickAddToCart(' + p.id + ')" ' + (!p.isAvailable ? 'disabled' : '') + ' class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2.5 rounded-2xl transition font-bold text-xs flex items-center gap-1 disabled:opacity-40">' +
-                            '<i class="fa-solid fa-cart-plus text-sm"></i>' +
+                        '<button onclick="openProductDetail(' + p.id + ', \'' + slug + '\')" class="bg-amber-100 hover:bg-amber-800 hover:text-white text-amber-900 px-3.5 py-1.5 rounded-xl transition font-bold text-xs flex items-center gap-1 shadow-sm">' +
+                            '<span>Detail</span>' +
                         '</button>' +
                     '</div>' +
                 '</div>';
@@ -1328,7 +1341,7 @@
                 "🍰 *Nama Kue:* " + prodName + "\n" +
                 "📂 *Kategori:* " + prodCategory + "\n" +
                 "📦 *Varian/Ukuran:* " + selectedVariantName + "\n" +
-                "💰 *Harga:* Rp " + selectedPrice.toLocaleString('id-ID') + "\n" +
+                "💰 *Harga:* Rp " + Number(selectedPrice).toLocaleString('id-ID') + "\n" +
                 (note ? "📝 *Catatan Khusus:* " + note + "\n" : "") + "\n" +
                 "Tautan Produk: " + window.location.href + "\n\n" +
                 "Apakah produk ini ready / bisa dipesan? Terima kasih!";
@@ -1381,7 +1394,7 @@
                             '<span>' + v.name + '</span>' +
                             (isSel ? '' : minBadge) +
                         '</div>' +
-                        '<span class="text-sm font-extrabold mt-1">Rp ' + v.price.toLocaleString('id-ID') + '</span>' +
+                        '<span class="text-sm font-extrabold mt-1">Rp ' + Number(v.price).toLocaleString('id-ID') + '</span>' +
                     '</button>';
                 }).join('');
 
@@ -1442,28 +1455,10 @@
                     '<div class="flex-1 min-w-0">' +
                         '<span class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">' + rp.category + '</span>' +
                         '<h4 class="font-serif font-bold text-xs text-amber-900 truncate mt-0.5 group-hover:text-amber-600 transition">' + rp.name + '</h4>' +
-                        '<p class="text-[11px] font-extrabold text-amber-900 mt-0.5">Rp ' + Number(rp.price).toLocaleString('id-ID') + '</p>' +
+                        '<p class="text-[11px] font-extrabold text-amber-900 mt-0.5">' + getProductPriceDisplay(rp) + '</p>' +
                     '</div>' +
-                    '<button onclick="event.stopPropagation(); quickAddToCart(' + rp.id + ')" ' + (!rp.isAvailable ? 'disabled' : '') + ' class="bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 p-2 rounded-xl transition font-bold text-xs shrink-0 disabled:opacity-40">' +
-                        '<i class="fa-solid fa-cart-plus"></i>' +
-                    '</button>' +
                 '</div>';
             }).join('');
-        }
-
-        function quickAddToCart(id) {
-            var p = products.find(function(prod) { return prod.id == id; });
-            if (p && p.isAvailable) {
-                var defaultMin = (p.variants && p.variants[0]) ? (p.variants[0].minQty || 1) : 1;
-                addToCart({
-                    id: p.id,
-                    name: p.name,
-                    price: p.price,
-                    size: p.size,
-                    minQty: defaultMin,
-                    image: (p.images && p.images.length > 0) ? p.images[0] : p.image
-                }, '', defaultMin);
-            }
         }
 
         function addToCart(itemPayload, customNote, qty) {
@@ -1539,6 +1534,20 @@
             });
         }
 
+        function setCartQtyDirect(index, value) {
+            if (!cart[index]) return;
+            var parsedQty = parseInt(value, 10);
+            var minAllowed = cart[index].minQty || 1;
+
+            if (isNaN(parsedQty) || parsedQty < minAllowed) {
+                showPremiumAlert("Minimal Pembelian", "Jumlah minimal pembelian untuk item ini adalah " + minAllowed + " Pcs.", "error");
+                cart[index].qty = minAllowed;
+            } else {
+                cart[index].qty = parsedQty;
+            }
+            updateCartUI();
+        }
+
         function updateCartUI() {
             var countBadge = document.getElementById('cartCount');
             var list = document.getElementById('cartItemsList');
@@ -1571,16 +1580,16 @@
                     '<img src="' + item.image + '" class="w-16 h-16 object-cover rounded-xl">' +
                     '<div class="flex-1 min-w-0">' +
                         '<h4 class="font-bold text-xs text-amber-900 truncate">' + item.name + '</h4>' +
-                        '<p class="text-[11px] text-amber-800">Rp ' + item.price.toLocaleString('id-ID') + '</p>' +
+                        '<p class="text-[11px] text-amber-800">Rp ' + Number(item.price).toLocaleString('id-ID') + '</p>' +
                         minInfo +
-                        '<div class="flex items-center gap-2 bg-white px-2 py-0.5 rounded-lg border border-amber-200 mt-1 w-max">' +
-                            '<button onclick="updateCartQty(' + idx + ', -1)" class="font-bold px-1 text-amber-900 hover:text-amber-600">-</button>' +
-                            '<span class="text-xs font-bold">' + item.qty + '</span>' +
-                            '<button onclick="updateCartQty(' + idx + ', 1)" class="font-bold px-1 text-amber-900 hover:text-amber-600">+</button>' +
-                        '</div>' +
+                        '<div class="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-amber-200 mt-1 w-max">' +
+                          '<button type="button" onclick="updateCartQty(' + idx + ', -1)" class="font-bold px-1.5 text-amber-900 hover:text-amber-600">-</button>' +
+                          '<input type="number" min="' + (item.minQty || 1) + '" value="' + item.qty + '" onchange="setCartQtyDirect(' + idx + ', this.value)" class="w-12 text-center text-xs font-bold text-amber-900 bg-transparent focus:outline-none focus:ring-1 focus:ring-amber-500 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">' +
+                          '<button type="button" onclick="updateCartQty(' + idx + ', 1)" class="font-bold px-1.5 text-amber-900 hover:text-amber-600">+</button>' +
+                      '</div>' +
                     '</div>' +
                     '<div class="flex flex-col items-end gap-1">' +
-                        '<span class="font-extrabold text-xs text-amber-900">Rp ' + itemTotal.toLocaleString('id-ID') + '</span>' +
+                        '<span class="font-extrabold text-xs text-amber-900">Rp ' + Number(itemTotal).toLocaleString('id-ID') + '</span>' +
                         '<button onclick="removeFromCart(' + idx + ')" class="text-rose-600 hover:text-rose-800 p-1 rounded-lg text-xs transition" title="Hapus dari Keranjang">' +
                             '<i class="fa-solid fa-trash-can"></i>' +
                         '</button>' +
@@ -1598,15 +1607,15 @@
             if (appliedPromo) {
                 document.getElementById('cartDiscountRow').classList.remove('hidden');
                 document.getElementById('cartAppliedPromoCode').innerText = appliedPromo.code;
-                document.getElementById('cartDiscountAmount').innerText = "-Rp " + discountAmount.toLocaleString('id-ID');
+                document.getElementById('cartDiscountAmount').innerText = "-Rp " + Number(discountAmount).toLocaleString('id-ID');
             } else {
                 document.getElementById('cartDiscountRow').classList.add('hidden');
             }
 
-            if (subtotalEl) subtotalEl.innerText = "Rp " + subtotal.toLocaleString('id-ID');
-            if (shippingFeeEl) shippingFeeEl.innerText = "Rp " + shipFee.toLocaleString('id-ID');
-            if (grandTotalEl) grandTotalEl.innerText = "Rp " + grandTotal.toLocaleString('id-ID');
-            document.getElementById('checkoutTotal').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
+            if (subtotalEl) subtotalEl.innerText = "Rp " + Number(subtotal).toLocaleString('id-ID');
+            if (shippingFeeEl) shippingFeeEl.innerText = "Rp " + Number(shipFee).toLocaleString('id-ID');
+            if (grandTotalEl) grandTotalEl.innerText = "Rp " + Number(grandTotal).toLocaleString('id-ID');
+            document.getElementById('checkoutTotal').innerText = "Rp " + Number(grandTotal).toLocaleString('id-ID');
         }
 
         function handleShippingChange(val) { 
@@ -1663,7 +1672,7 @@
             var orderId = "FINA-" + Math.floor(100000 + Math.random() * 900000);
 
             var itemsDetailString = cart.map(function(item) {
-                var t = "• " + item.name + " (" + item.size + ") x" + item.qty + " = Rp " + (item.price * item.qty).toLocaleString('id-ID');
+                var t = "• " + item.name + " (" + item.size + ") x" + item.qty + " = Rp " + Number(item.price * item.qty).toLocaleString('id-ID');
                 if (item.customNote) t += "\n   Catatan: _\"" + item.customNote + "\"_";
                 return t;
             }).join('\n');
@@ -1683,8 +1692,8 @@
             });
 
             var storePhone = "6281574268876";
-            var waMessage = "*HALO FINA OLSHOP* 🍰✨\n" +
-                "Saya ingin mengonfirmasi pesanan kue baru:\n\n" +
+            var waMessage = "*HALO ADMIN FINA OLSHOP* 🍰✨\n" +
+                "Saya ingin mengonfirmasi pemesanan kue, berikut detailnya:\n\n" +
                 "🆔 *Order ID:* " + orderId + "\n" +
                 "👤 *Nama Pemesan:* " + name + "\n" +
                 "📱 *No. WA:* " + phone + "\n" +
@@ -1694,9 +1703,9 @@
                 "💳 *Pembayaran:* " + payMethod + "\n\n" +
                 "🛒 *RINCIAN PESANAN:* \n" + itemsDetailString + "\n" +
                 (isDelivery ? "🚚 *Biaya Ongkir:* Rp 5.000\n" : "") +
-                (appliedPromo ? "🏷️ *Diskon Promo (" + appliedPromo.code + "):* -Rp " + discountAmount.toLocaleString('id-ID') + "\n" : "") + "\n" +
+                (appliedPromo ? "🏷️ *Diskon Promo (" + appliedPromo.code + "):* -Rp " + Number(discountAmount).toLocaleString('id-ID') + "\n" : "") + "\n" +
                 "-----------------------------------\n" +
-                "Total Keseluruhan: *Rp " + grandTotal.toLocaleString('id-ID') + "*";
+                "Total Keseluruhan: *Rp " + Number(grandTotal).toLocaleString('id-ID') + "*";
 
             pendingOrderData = {
                 storePhone: storePhone,
@@ -1707,7 +1716,7 @@
             if (payMethod.indexOf("QRIS") !== -1 || payMethod.indexOf("Transfer") !== -1) {
                 document.getElementById('qrisImageModal').src = appQrisUrl || "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=FINA%20OLSHOP%20QRIS";
                 document.getElementById('bankInfoDisplay').innerText = appBankInfo || "BCA: 1234567890 a.n FINA OLSHOP";
-                document.getElementById('qrisAmountDisplay').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
+                document.getElementById('qrisAmountDisplay').innerText = "Rp " + Number(grandTotal).toLocaleString('id-ID');
                 navigateToHash('pembayaran');
             } else {
                 openWaConfirmModal();
