@@ -1018,6 +1018,9 @@
             var logoUrl = "https://lh3.googleusercontent.com/d/1HV4tGuBEWpflxJJQah1FnVcxv_5bolli";
             var finalTotalVal = Number(order.totalPrice) || 0;
 
+            // AMBIL METODE PEMBAYARAN DARI DATA PEMESANAN
+            var payMethod = order.paymentMethod || order.metodePembayaran || order.payment || order.payMethod || 'COD / Bayar di Toko';
+
             // PARSING DETAIL ITEM MENJADI RINCIAN TABEL BARIS PER BARIS
             var parsedItems = [];
             var totalUnits = 0;
@@ -1152,7 +1155,7 @@
             printWin.document.write('.info-label { width: 140px; font-weight: 600; color: #64748b; flex-shrink: 0; }');
             printWin.document.write('.info-val { font-weight: 700; color: #0f172a; }');
             
-            // TABEL RINCIAN DENGAN HEADER BERWARNA COKLAT
+            // TABEL RINCIAN DENGAN HEADER COKLAT
             printWin.document.write('.items-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 16px; }');
             printWin.document.write('.items-table th { background: #78350f; color: #ffffff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; }');
             printWin.document.write('.items-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }');
@@ -1166,7 +1169,6 @@
             printWin.document.write('.prod-variant { font-size: 10.5px; color: #64748b; margin-top: 2px; }');
             printWin.document.write('.prod-note { font-size: 10px; color: #d97706; font-style: italic; margin-top: 2px; }');
             
-            // RINGKASAN SUBTOTAL & POTONGAN HARGA
             printWin.document.write('.summary-box { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }');
             printWin.document.write('.summary-details { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #78350f; }');
             printWin.document.write('.summary-details div span { font-weight: 700; color: #0f172a; }');
@@ -1180,7 +1182,6 @@
             printWin.document.write('.card-box-title { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }');
             printWin.document.write('.card-box-desc { font-size: 10.5px; color: #64748b; line-height: 1.4; }');
             
-            // AREA TANDA TANGAN & STEMPEL
             printWin.document.write('.signature-container { display: flex; justify-content: flex-end; margin-bottom: 24px; }');
             printWin.document.write('.signature-box { text-align: center; font-size: 11px; color: #334155; width: 220px; }');
             printWin.document.write('.signature-title { font-weight: 600; margin-top: 4px; }');
@@ -1219,13 +1220,13 @@
             printWin.document.write('</div>');
             printWin.document.write('</div></div>');
 
-            // INFORMASI PEMESANAN (NAMA KONSUMEN & METODE PEMBAYARAN DIPERBARUI)
+            // INFORMASI PEMESANAN
             printWin.document.write('<div class="section-title">INFORMASI PEMESANAN</div>');
             printWin.document.write('<div class="info-grid">');
             printWin.document.write('<div class="info-item"><div class="info-label">Nama Konsumen</div><div class="info-val">: ' + (order.customerName || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">No. WhatsApp</div><div class="info-val">: ' + (order.phone || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">Metode Pengambilan</div><div class="info-val">: ' + (order.shippingMethod || '-') + '</div></div>');
-            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pembayaran</div><div class="info-val">: ' + (order.paymentMethod || order.status || 'COD / Bayar di Toko') + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pembayaran</div><div class="info-val">: ' + payMethod + '</div></div>');
             if (order.address && order.address !== '-') {
                 printWin.document.write('<div class="info-item"><div class="info-label">Alamat Pengiriman</div><div class="info-val">: ' + order.address + '</div></div>');
             }
@@ -1244,7 +1245,7 @@
             printWin.document.write('<tbody>' + itemsRowsHtml + '</tbody>');
             printWin.document.write('</table>');
 
-            // RINGKASAN TOTAL & POTONGAN HARGA
+            // RINGKASAN TOTAL
             printWin.document.write('<div class="summary-box">');
             printWin.document.write('<div class="summary-details">');
             printWin.document.write('<div>Total Item: <span>' + totalUnits + ' unit</span></div>');
@@ -1267,7 +1268,7 @@
             printWin.document.write('<div class="bottom-cards">');
             printWin.document.write('<div class="card-box">');
             printWin.document.write('<div class="card-box-header">PEMBAYARAN</div>');
-            printWin.document.write('<div class="card-box-title">' + (order.status || 'COD / Bayar di Toko') + '</div>');
+            printWin.document.write('<div class="card-box-title">' + payMethod + '</div>');
             printWin.document.write('<div class="card-box-desc">Pembayaran dilakukan saat pesanan diambil atau sesuai metode yang telah disepakati.</div>');
             printWin.document.write('</div>');
 
