@@ -1015,63 +1015,256 @@
             var order = rawOrdersData.find(function(item) { return item.rowIndex == rowIndex; });
             if (!order) return;
 
-            var printWin = window.open('', '_blank', 'width=800,height=900');
+            // URL Direct Logo Fina Olshop dari Google Drive
+            var logoUrl = "https://lh3.googleusercontent.com/d/1HV4tGuBEWpflxJJQah1FnVcxv_5bolli";
             var priceFormatted = (order.totalPrice && !isNaN(order.totalPrice)) ? Number(order.totalPrice).toLocaleString('id-ID') : '0';
 
-            printWin.document.write('<!DOCTYPE html><html><head><title>Faktur Penjualan - ' + order.orderId + '</title>');
+            // PARSING DETAIL ITEM MENJADI RINCIAN TABEL BARIS PER BARIS
+            var parsedItems = [];
+            var totalUnits = 0;
+
+            if (order.itemsDetail) {
+                var rawLines = order.itemsDetail.split('\n');
+                var currentItem = null;
+
+                for (var i = 0; i < rawLines.length; i++) {
+                    var line = rawLines[i].trim();
+                    if (!line) continue;
+
+                    if (line.indexOf('•') === 0 || line.indexOf('-') === 0) {
+                        if (currentItem) parsedItems.push(currentItem);
+
+                        var clean = line.replace(/^[•\-]\s*/, '');
+                        var regex = /^(.*?)\s*x(\d+)\s*=\s*Rp\s*([\d\.\,]+)/i;
+                        var match = clean.match(regex);
+
+                        if (match) {
+                            var fullTitle = match[1].trim();
+                            var qty = parseInt(match[2], 10) || 1;
+                            var totalStr = match[3].replace(/[^\d]/g, '');
+                            var totalVal = parseInt(totalStr, 10) || 0;
+                            var unitVal = qty > 0 ? Math.round(totalVal / qty) : totalVal;
+
+                            totalUnits += qty;
+
+                            var prodTitle = fullTitle;
+                            var variantText = "";
+                            var parenIndex = fullTitle.indexOf('(');
+                            if (parenIndex > 0) {
+                                prodTitle = fullTitle.substring(0, parenIndex).trim();
+                                variantText = fullTitle.substring(parenIndex).replace(/^\(/, '').replace(/\)$/, '').trim();
+                            }
+
+                            currentItem = {
+                                title: prodTitle,
+                                variant: variantText,
+                                qty: qty,
+                                unitPrice: unitVal,
+                                totalPrice: totalVal,
+                                notes: []
+                            };
+                        } else {
+                            totalUnits += 1;
+                            currentItem = {
+                                title: clean,
+                                variant: "",
+                                qty: 1,
+                                unitPrice: order.totalPrice || 0,
+                                totalPrice: order.totalPrice || 0,
+                                notes: []
+                            };
+                        }
+                    } else if (currentItem) {
+                        var cleanNote = line.replace(/^Catatan:\s*/i, '').replace(/^_\s*"/, '').replace(/"\s*_$/, '').replace(/^"/, '').replace(/"$/, '').trim();
+                        if (cleanNote) currentItem.notes.push(cleanNote);
+                    }
+                }
+                if (currentItem) parsedItems.push(currentItem);
+            }
+
+            if (parsedItems.length === 0) {
+                parsedItems.push({
+                    title: order.itemsDetail || 'Kue Tradisional Fina Olshop',
+                    variant: '',
+                    qty: 1,
+                    unitPrice: Number(order.totalPrice) || 0,
+                    totalPrice: Number(order.totalPrice) || 0,
+                    notes: []
+                });
+                totalUnits = 1;
+            }
+
+            // PEMISAHAN TANGGAL DAN JAM PENGAMBILAN
+            var datePart = order.deliveryDateTime || '-';
+            var timePart = '';
+            if (order.deliveryDateTime && order.deliveryDateTime.indexOf('pukul') !== -1) {
+                var parts = order.deliveryDateTime.split('pukul');
+                datePart = parts[0].trim();
+                timePart = parts[1].trim();
+            }
+
+            // GENERATE BARIS TABEL PRODUK
+            var itemsRowsHtml = parsedItems.map(function(item, idx) {
+                var numStr = (idx + 1) < 10 ? '0' + (idx + 1) : (idx + 1);
+                var variantHtml = item.variant ? '<div class="prod-variant">Varian: ' + item.variant + '</div>' : '';
+                var notesHtml = item.notes.length > 0 ? '<div class="prod-note">Catatan: ' + item.notes.join(', ') + '</div>' : '';
+
+                return '<tr>' +
+                    '<td class="text-center"><strong>' + numStr + '</strong></td>' +
+                    '<td><div class="prod-name">' + item.title + '</div>' + variantHtml + notesHtml + '</td>' +
+                    '<td class="text-center"><strong>' + item.qty + '</strong></td>' +
+                    '<td class="text-right">Rp ' + item.unitPrice.toLocaleString('id-ID') + '</td>' +
+                    '<td class="text-right"><strong>Rp ' + item.totalPrice.toLocaleString('id-ID') + '</strong></td>' +
+                '</tr>';
+            }).join('');
+
+            var printWin = window.open('', '_blank', 'width=850,height=950');
+
+            printWin.document.write('<!DOCTYPE html><html><head><title>Faktur Fina Olshop ' + order.orderId + '</title>');
+            printWin.document.write('<link rel="preconnect" href="https://fonts.googleapis.com">');
+            printWin.document.write('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>');
+            printWin.document.write('<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">');
             printWin.document.write('<style>');
-            printWin.document.write('body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 30px; margin: 0; color: #333; background: #fff; }');
-            printWin.document.write('.invoice-box { max-width: 750px; margin: auto; padding: 25px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }');
-            printWin.document.write('.header-table { width: 100%; border-bottom: 2px solid #78350f; padding-bottom: 15px; margin-bottom: 20px; }');
-            printWin.document.write('.brand-name { font-size: 24px; font-weight: bold; color: #78350f; margin: 0; }');
-            printWin.document.write('.brand-sub { font-size: 12px; color: #92400e; margin-top: 4px; }');
-            printWin.document.write('.inv-title { text-align: right; font-size: 20px; font-weight: bold; color: #78350f; margin: 0; }');
-            printWin.document.write('.inv-number { text-align: right; font-size: 13px; font-weight: bold; color: #555; margin-top: 4px; }');
-            printWin.document.write('.info-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 13px; }');
-            printWin.document.write('.info-table td { padding: 6px 0; vertical-align: top; }');
-            printWin.document.write('.items-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }');
-            printWin.document.write('.items-table th { background: #fef3c7; color: #78350f; padding: 10px; text-align: left; border-bottom: 2px solid #f59e0b; }');
-            printWin.document.write('.items-table td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: top; white-space: pre-line; line-height: 1.5; }');
-            printWin.document.write('.total-box { margin-top: 20px; text-align: right; font-size: 16px; font-weight: bold; color: #e11d48; border-top: 2px solid #eee; padding-top: 12px; }');
-            printWin.document.write('.footer-note { text-align: center; margin-top: 40px; font-size: 11px; color: #888; border-top: 1px dashed #ccc; padding-top: 12px; }');
-            printWin.document.write('@media print { body { padding: 0; } .invoice-box { border: none; box-shadow: none; } }');
+            printWin.document.write('* { box-sizing: border-box; margin: 0; padding: 0; }');
+            printWin.document.write('body { font-family: "Plus Jakarta Sans", sans-serif; color: #1e293b; background: #f8fafc; padding: 24px; font-size: 12px; line-height: 1.4; }');
+            printWin.document.write('.invoice-card { max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 32px; border: 1px solid #e2e8f0; }');
+            printWin.document.write('.header-container { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9; margin-bottom: 24px; }');
+            printWin.document.write('.logo-brand { display: flex; align-items: center; gap: 16px; }');
+            printWin.document.write('.logo-img { width: 72px; height: 72px; object-fit: contain; border-radius: 50%; border: 1px solid #fef3c7; }');
+            printWin.document.write('.brand-title { font-size: 22px; font-weight: 800; color: #78350f; letter-spacing: -0.5px; margin-bottom: 2px; }');
+            printWin.document.write('.brand-subtitle { font-size: 11px; color: #64748b; font-weight: 500; margin-bottom: 6px; }');
+            printWin.document.write('.meta-info { font-size: 11px; color: #334155; margin-top: 1px; }');
+            printWin.document.write('.meta-info span { font-weight: 700; color: #0f172a; }');
+            printWin.document.write('.header-right { text-align: right; }');
+            printWin.document.write('.doc-title { font-size: 24px; font-weight: 900; color: #78350f; letter-spacing: 1px; margin-bottom: 10px; }');
+            printWin.document.write('.status-badge-box { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 10px; padding: 6px 12px; display: block; text-align: right; margin-bottom: 6px; }');
+            printWin.document.write('.badge-label { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #92400e; display: block; letter-spacing: 0.5px; }');
+            printWin.document.write('.badge-value { font-size: 12px; font-weight: 800; color: #78350f; }');
+            printWin.document.write('.section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #78350f; background: #fffbeb; padding: 6px 12px; border-left: 4px solid #d97706; border-radius: 0 6px 6px 0; margin-bottom: 12px; }');
+            printWin.document.write('.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; background: #f8fafc; padding: 14px 16px; border-radius: 12px; border: 1px solid #f1f5f9; margin-bottom: 24px; }');
+            printWin.document.write('.info-item { display: flex; font-size: 11.5px; }');
+            printWin.document.write('.info-label { width: 140px; font-weight: 600; color: #64748b; flex-shrink: 0; }');
+            printWin.document.write('.info-val { font-weight: 700; color: #0f172a; }');
+            printWin.document.write('.items-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }');
+            printWin.document.write('.items-table th { background: #78350f; color: #ffffff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; }');
+            printWin.document.write('.items-table th.text-center { text-align: center; }');
+            printWin.document.write('.items-table th.text-right { text-align: right; }');
+            printWin.document.write('.items-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 11.5px; vertical-align: middle; }');
+            printWin.document.write('.items-table td.text-center { text-align: center; }');
+            printWin.document.write('.items-table td.text-right { text-align: right; }');
+            printWin.document.write('.prod-name { font-weight: 700; color: #0f172a; }');
+            printWin.document.write('.prod-variant { font-size: 10.5px; color: #64748b; margin-top: 2px; }');
+            printWin.document.write('.prod-note { font-size: 10px; color: #d97706; font-style: italic; margin-top: 2px; }');
+            printWin.document.write('.summary-box { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }');
+            printWin.document.write('.summary-details { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #78350f; }');
+            printWin.document.write('.summary-details div span { font-weight: 700; color: #0f172a; }');
+            printWin.document.write('.grand-total-container { text-align: right; }');
+            printWin.document.write('.grand-total-label { font-size: 10px; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; }');
+            printWin.document.write('.grand-total-val { font-size: 20px; font-weight: 900; color: #e11d48; margin-top: 2px; }');
+            printWin.document.write('.bottom-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }');
+            printWin.document.write('.card-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; background: #ffffff; }');
+            printWin.document.write('.card-box-header { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #78350f; letter-spacing: 0.5px; margin-bottom: 6px; }');
+            printWin.document.write('.card-box-title { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }');
+            printWin.document.write('.card-box-desc { font-size: 10.5px; color: #64748b; line-height: 1.4; }');
+            printWin.document.write('.footer-section { text-align: center; padding-top: 16px; border-top: 1px dashed #cbd5e1; }');
+            printWin.document.write('.footer-thanks { font-size: 12px; font-weight: 700; color: #78350f; margin-bottom: 4px; }');
+            printWin.document.write('.footer-disclaimer { font-size: 10px; color: #64748b; line-height: 1.4; }');
+            printWin.document.write('.footer-page { display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-top: 12px; }');
+            printWin.document.write('@media print { body { background: #ffffff; padding: 0; } .invoice-card { box-shadow: none; border: none; padding: 0; max-width: 100%; } }');
             printWin.document.write('</style></head><body>');
 
-            printWin.document.write('<div class="invoice-box">');
-            printWin.document.write('<table class="header-table"><tr>');
-            printWin.document.write('<td><div class="brand-name">FINA OLSHOP</div><div class="brand-sub">Menerima Pesanan Berbagai Jenis Kue Tradisional</div></td>');
-            printWin.document.write('<td><div class="inv-title">FAKTUR PENJUALAN</div><div class="inv-number">No: ' + order.orderId + '<br><small style="font-weight:normal;color:#666;">Tanggal: ' + (order.timestamp || '-') + '</small></div></td>');
-            printWin.document.write('</tr></table>');
+            printWin.document.write('<div class="invoice-card">');
 
-            printWin.document.write('<table class="info-table">');
-            printWin.document.write('<tr><td width="18%"><strong>Pelanggan</strong></td><td width="32%">: ' + order.customerName + '</td><td width="18%"><strong>Metode Kirim</strong></td><td width="32%">: ' + order.shippingMethod + '</td></tr>');
-            printWin.document.write('<tr><td><strong>No. WhatsApp</strong></td><td>: ' + order.phone + '</td><td><strong>Status Pesanan</strong></td><td>: ' + (order.status || 'PENDING') + '</td></tr>');
+            // KOP HEADER
+            printWin.document.write('<div class="header-container">');
+            printWin.document.write('<div class="logo-brand">');
+            printWin.document.write('<img src="' + logoUrl + '" class="logo-img" alt="Logo Fina Olshop">');
+            printWin.document.write('<div>');
+            printWin.document.write('<h1 class="brand-title">FINA OLSHOP</h1>');
+            printWin.document.write('<p class="brand-subtitle">Faktur pesanan Bukti transaksi pelanggan</p>');
+            printWin.document.write('<div class="meta-info">Order ID: <span>' + order.orderId + '</span></div>');
+            printWin.document.write('<div class="meta-info">Tanggal faktur: <span>' + (order.timestamp || '-') + '</span></div>');
+            printWin.document.write('</div></div>');
+
+            printWin.document.write('<div class="header-right">');
+            printWin.document.write('<h2 class="doc-title">FAKTUR</h2>');
+            printWin.document.write('<div class="status-badge-box">');
+            printWin.document.write('<span class="badge-label">STATUS PEMBAYARAN</span>');
+            printWin.document.write('<span class="badge-value">' + (order.status || 'PENDING') + '</span>');
+            printWin.document.write('</div>');
+            printWin.document.write('<div class="status-badge-box">');
+            printWin.document.write('<span class="badge-label">Metode Pengambilan</span>');
+            printWin.document.write('<span class="badge-value">' + (order.shippingMethod || '-') + '</span>');
+            printWin.document.write('</div>');
+            printWin.document.write('</div></div>');
+
+            // INFORMASI PEMESANAN
+            printWin.document.write('<div class="section-title">INFORMASI PEMESANAN</div>');
+            printWin.document.write('<div class="info-grid">');
+            printWin.document.write('<div class="info-item"><div class="info-label">Nama Pemesan</div><div class="info-val">: ' + (order.customerName || '-') + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">No. WhatsApp</div><div class="info-val">: ' + (order.phone || '-') + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pengambilan</div><div class="info-val">: ' + (order.shippingMethod || '-') + '</div></div>');
             if (order.address && order.address !== '-') {
-                printWin.document.write('<tr><td><strong>Alamat</strong></td><td colspan="3">: ' + order.address + '</td></tr>');
+                printWin.document.write('<div class="info-item"><div class="info-label">Alamat Pengiriman</div><div class="info-val">: ' + order.address + '</div></div>');
             }
-            printWin.document.write('<tr><td><strong>Waktu Ambil/Kirim</strong></td><td colspan="3">: ' + order.deliveryDateTime + '</td></tr>');
-            printWin.document.write('</table>');
+            printWin.document.write('</div>');
 
+            // RINCIAN PESANAN
+            printWin.document.write('<div class="section-title">RINCIAN PESANAN</div>');
             printWin.document.write('<table class="items-table">');
-            printWin.document.write('<thead><tr><th>Rincian Item / Produk</th><th width="30%" style="text-align:right;">Total Harga</th></tr></thead>');
-            printWin.document.write('<tbody><tr><td>' + order.itemsDetail + '</td><td style="text-align:right;font-weight:bold;">Rp ' + priceFormatted + '</td></tr></tbody>');
+            printWin.document.write('<thead><tr>');
+            printWin.document.write('<th class="text-center" style="width:40px;">NO.</th>');
+            printWin.document.write('<th>DESKRIPSI PRODUK</th>');
+            printWin.document.write('<th class="text-center" style="width:70px;">QTY</th>');
+            printWin.document.write('<th class="text-right" style="width:120px;">HARGA SATUAN</th>');
+            printWin.document.write('<th class="text-right" style="width:130px;">JUMLAH</th>');
+            printWin.document.write('</tr></thead>');
+            printWin.document.write('<tbody>' + itemsRowsHtml + '</tbody>');
             printWin.document.write('</table>');
 
-            printWin.document.write('<div class="total-box">TOTAL PEMBAYARAN: Rp ' + priceFormatted + '</div>');
-
-            printWin.document.write('<div class="footer-note">');
-            printWin.document.write('Terima kasih telah berbelanja di FINA OLSHOP!<br>');
-            printWin.document.write('Faktur ini dibuat secara otomatis oleh sistem dan sah sebagai bukti transaksi resmi.');
+            // RINGKASAN TOTAL
+            printWin.document.write('<div class="summary-box">');
+            printWin.document.write('<div class="summary-details">');
+            printWin.document.write('<div>Total Item: <span>' + totalUnits + ' unit</span></div>');
+            printWin.document.write('<div>Waktu Pengambilan: <span>' + datePart + '</span></div>');
+            if (timePart) {
+                printWin.document.write('<div>Jam: <span>' + timePart + '</span></div>');
+            }
             printWin.document.write('</div>');
+
+            printWin.document.write('<div class="grand-total-container">');
+            printWin.document.write('<div class="grand-total-label">TOTAL KESELURUHAN</div>');
+            printWin.document.write('<div class="grand-total-val">Rp ' + priceFormatted + '</div>');
+            printWin.document.write('</div></div>');
+
+            // KARTU INFORMASI BAWAH
+            printWin.document.write('<div class="bottom-cards">');
+            printWin.document.write('<div class="card-box">');
+            printWin.document.write('<div class="card-box-header">PEMBAYARAN</div>');
+            printWin.document.write('<div class="card-box-title">' + (order.status || 'COD / Bayar di Toko') + '</div>');
+            printWin.document.write('<div class="card-box-desc">Pembayaran dilakukan saat pesanan diambil atau sesuai metode yang telah disepakati.</div>');
             printWin.document.write('</div>');
 
-            printWin.document.write('</body></html>');
+            printWin.document.write('<div class="card-box">');
+            printWin.document.write('<div class="card-box-header">PENGAMBILAN PESANAN</div>');
+            printWin.document.write('<div class="card-box-title">' + (order.deliveryDateTime || '-') + '</div>');
+            printWin.document.write('<div class="card-box-desc">Silakan datang sesuai jadwal pengambilan yang telah ditentukan.</div>');
+            printWin.document.write('</div></div>');
+
+            // CATATAN KAKIFOTER
+            printWin.document.write('<div class="footer-section">');
+            printWin.document.write('<div class="footer-thanks">Terima kasih telah berbelanja di Fina Olshop!</div>');
+            printWin.document.write('<div class="footer-disclaimer">Mohon tunjukkan faktur ini saat pengambilan pesanan. Faktur ini merupakan ringkasan pesanan dan bukan bukti pelunasan.</div>');
+            printWin.document.write('<div class="footer-page"><span>FINA OLSHOP Order ' + order.orderId + '</span><span>Halaman 1</span></div>');
+            printWin.document.write('</div>');
+
+            printWin.document.write('</div></body></html>');
             printWin.document.close();
 
             setTimeout(function() {
                 printWin.focus();
                 printWin.print();
-            }, 500);
+            }, 600);
         }
 
         function getStatusBadgeClass(status) {
