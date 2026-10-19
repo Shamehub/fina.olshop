@@ -1219,12 +1219,13 @@
             printWin.document.write('</div>');
             printWin.document.write('</div></div>');
 
-            // INFORMASI PEMESANAN
+            // INFORMASI PEMESANAN (NAMA KONSUMEN & METODE PEMBAYARAN DIPERBARUI)
             printWin.document.write('<div class="section-title">INFORMASI PEMESANAN</div>');
             printWin.document.write('<div class="info-grid">');
-            printWin.document.write('<div class="info-item"><div class="info-label">Nama Pemesan</div><div class="info-val">: ' + (order.customerName || '-') + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">Nama Konsumen</div><div class="info-val">: ' + (order.customerName || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">No. WhatsApp</div><div class="info-val">: ' + (order.phone || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">Metode Pengambilan</div><div class="info-val">: ' + (order.shippingMethod || '-') + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pembayaran</div><div class="info-val">: ' + (order.paymentMethod || order.status || 'COD / Bayar di Toko') + '</div></div>');
             if (order.address && order.address !== '-') {
                 printWin.document.write('<div class="info-item"><div class="info-label">Alamat Pengiriman</div><div class="info-val">: ' + order.address + '</div></div>');
             }
