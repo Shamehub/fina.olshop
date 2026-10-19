@@ -951,6 +951,7 @@
                     '<td class="p-3.5 border-b border-amber-100 flex flex-col gap-1.5">' +
                         '<select onchange="changeStatus(' + o.rowIndex + ', this.value)" class="text-[11px] p-1.5 border border-amber-200 rounded-lg bg-white font-semibold text-amber-900 outline-none cursor-pointer hover:border-amber-400 transition">' + optionsHtml + '</select>' +
                         '<button onclick="printOrderCard(' + o.rowIndex + ')" class="bg-amber-800 hover:bg-amber-900 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] transition shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-print"></i> Cetak Kartu</button>' +
+                        '<button onclick="printInvoicePdf(' + o.rowIndex + ')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] transition shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-file-pdf"></i> Cetak Faktur PDF</button>' +
                     '</td>' +
                 '</tr>';
             }).join('');
@@ -1009,6 +1010,70 @@
             }, 500);
         }
 
+        // FUNGSI UNTUK MENCETAK FAKTUR PENJUALAN DALAM BENTUK PDF
+        function printInvoicePdf(rowIndex) {
+            var order = rawOrdersData.find(function(item) { return item.rowIndex == rowIndex; });
+            if (!order) return;
+
+            var printWin = window.open('', '_blank', 'width=800,height=900');
+            var priceFormatted = (order.totalPrice && !isNaN(order.totalPrice)) ? Number(order.totalPrice).toLocaleString('id-ID') : '0';
+
+            printWin.document.write('<!DOCTYPE html><html><head><title>Faktur Penjualan - ' + order.orderId + '</title>');
+            printWin.document.write('<style>');
+            printWin.document.write('body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 30px; margin: 0; color: #333; background: #fff; }');
+            printWin.document.write('.invoice-box { max-width: 750px; margin: auto; padding: 25px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }');
+            printWin.document.write('.header-table { width: 100%; border-bottom: 2px solid #78350f; padding-bottom: 15px; margin-bottom: 20px; }');
+            printWin.document.write('.brand-name { font-size: 24px; font-weight: bold; color: #78350f; margin: 0; }');
+            printWin.document.write('.brand-sub { font-size: 12px; color: #92400e; margin-top: 4px; }');
+            printWin.document.write('.inv-title { text-align: right; font-size: 20px; font-weight: bold; color: #78350f; margin: 0; }');
+            printWin.document.write('.inv-number { text-align: right; font-size: 13px; font-weight: bold; color: #555; margin-top: 4px; }');
+            printWin.document.write('.info-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 13px; }');
+            printWin.document.write('.info-table td { padding: 6px 0; vertical-align: top; }');
+            printWin.document.write('.items-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }');
+            printWin.document.write('.items-table th { background: #fef3c7; color: #78350f; padding: 10px; text-align: left; border-bottom: 2px solid #f59e0b; }');
+            printWin.document.write('.items-table td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: top; white-space: pre-line; line-height: 1.5; }');
+            printWin.document.write('.total-box { margin-top: 20px; text-align: right; font-size: 16px; font-weight: bold; color: #e11d48; border-top: 2px solid #eee; padding-top: 12px; }');
+            printWin.document.write('.footer-note { text-align: center; margin-top: 40px; font-size: 11px; color: #888; border-top: 1px dashed #ccc; padding-top: 12px; }');
+            printWin.document.write('@media print { body { padding: 0; } .invoice-box { border: none; box-shadow: none; } }');
+            printWin.document.write('</style></head><body>');
+
+            printWin.document.write('<div class="invoice-box">');
+            printWin.document.write('<table class="header-table"><tr>');
+            printWin.document.write('<td><div class="brand-name">FINA OLSHOP</div><div class="brand-sub">Menerima Pesanan Berbagai Jenis Kue Tradisional</div></td>');
+            printWin.document.write('<td><div class="inv-title">FAKTUR PENJUALAN</div><div class="inv-number">No: ' + order.orderId + '<br><small style="font-weight:normal;color:#666;">Tanggal: ' + (order.timestamp || '-') + '</small></div></td>');
+            printWin.document.write('</tr></table>');
+
+            printWin.document.write('<table class="info-table">');
+            printWin.document.write('<tr><td width="18%"><strong>Pelanggan</strong></td><td width="32%">: ' + order.customerName + '</td><td width="18%"><strong>Metode Kirim</strong></td><td width="32%">: ' + order.shippingMethod + '</td></tr>');
+            printWin.document.write('<tr><td><strong>No. WhatsApp</strong></td><td>: ' + order.phone + '</td><td><strong>Status Pesanan</strong></td><td>: ' + (order.status || 'PENDING') + '</td></tr>');
+            if (order.address && order.address !== '-') {
+                printWin.document.write('<tr><td><strong>Alamat</strong></td><td colspan="3">: ' + order.address + '</td></tr>');
+            }
+            printWin.document.write('<tr><td><strong>Waktu Ambil/Kirim</strong></td><td colspan="3">: ' + order.deliveryDateTime + '</td></tr>');
+            printWin.document.write('</table>');
+
+            printWin.document.write('<table class="items-table">');
+            printWin.document.write('<thead><tr><th>Rincian Item / Produk</th><th width="30%" style="text-align:right;">Total Harga</th></tr></thead>');
+            printWin.document.write('<tbody><tr><td>' + order.itemsDetail + '</td><td style="text-align:right;font-weight:bold;">Rp ' + priceFormatted + '</td></tr></tbody>');
+            printWin.document.write('</table>');
+
+            printWin.document.write('<div class="total-box">TOTAL PEMBAYARAN: Rp ' + priceFormatted + '</div>');
+
+            printWin.document.write('<div class="footer-note">');
+            printWin.document.write('Terima kasih telah berbelanja di FINA OLSHOP!<br>');
+            printWin.document.write('Faktur ini dibuat secara otomatis oleh sistem dan sah sebagai bukti transaksi resmi.');
+            printWin.document.write('</div>');
+            printWin.document.write('</div>');
+
+            printWin.document.write('</body></html>');
+            printWin.document.close();
+
+            setTimeout(function() {
+                printWin.focus();
+                printWin.print();
+            }, 500);
+        }
+
         function getStatusBadgeClass(status) {
             if (status === 'SELESAI') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
             if (status === 'DIPROSES' || status === 'SEDANG DIKEMAS') return 'bg-amber-100 text-amber-800 border border-amber-200';
@@ -1056,10 +1121,14 @@
             var container = document.getElementById('dynamicVariantsContainer');
             var row = document.createElement('div');
             row.className = 'flex items-center gap-2 variant-row';
+            var safeName = nameVal || '';
+            var safePrice = (priceVal !== undefined && priceVal !== null && priceVal !== '') ? priceVal : '';
+            var safeMinQty = (minQtyVal !== undefined && minQtyVal !== null && minQtyVal !== '') ? minQtyVal : 1;
+
             row.innerHTML = 
-                '<input type="text" placeholder="Nama Varian (mis: Rasa Keju)" value="' + (nameVal || '') + '" class="variant-name flex-1 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs">' +
-                '<input type="number" placeholder="Harga (Rp)" value="' + (priceVal || '') + '" class="variant-price w-28 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs">' +
-                '<input type="number" placeholder="Min Beli" value="' + (minQtyVal || 1) + '" min="1" class="variant-min-qty w-20 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs font-bold text-rose-600">' +
+                '<input type="text" placeholder="Nama Varian (mis: Rasa Keju)" value="' + safeName + '" class="variant-name flex-1 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs">' +
+                '<input type="number" placeholder="Harga (Rp)" value="' + safePrice + '" class="variant-price w-28 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs">' +
+                '<input type="number" placeholder="Min Beli" value="' + safeMinQty + '" min="1" class="variant-min-qty w-20 p-2 bg-white border border-amber-200 rounded-xl outline-none text-xs font-bold text-rose-600">' +
                 '<button type="button" onclick="removeVariantInputRow(this)" class="bg-rose-100 text-rose-600 hover:bg-rose-200 p-2 rounded-xl text-xs font-bold transition"><i class="fa-solid fa-trash-can"></i></button>';
             container.appendChild(row);
         }
@@ -1133,7 +1202,7 @@
 
             container.innerHTML = uploadedImages.map(function(url, idx) {
                 return '<div class="relative group rounded-xl overflow-hidden border border-amber-200 h-16 bg-amber-100">' +
-                    '<img src="' + url + '" class="w-full h-full object-cover">' +
+                    '<img src="' + (url || '') + '" class="w-full h-full object-cover">' +
                     '<button type="button" onclick="removeUploadedImage(' + idx + ')" class="absolute top-1 right-1 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md hover:bg-rose-700 transition">' +
                         '<i class="fa-solid fa-xmark"></i>' +
                     '</button>' +
@@ -1415,10 +1484,10 @@
             container.innerHTML = tutorialSlidesList.map(function(slide, idx) {
                 return '<div class="bg-amber-50 p-3 rounded-2xl border border-amber-200 flex items-center justify-between gap-3 text-xs">' +
                     '<div class="flex items-center gap-3 min-w-0">' +
-                        '<img src="' + slide.imageUrl + '" class="w-14 h-14 object-cover rounded-xl border border-amber-200 flex-shrink-0">' +
+                        '<img src="' + (slide.imageUrl || '') + '" class="w-14 h-14 object-cover rounded-xl border border-amber-200 flex-shrink-0">' +
                         '<div class="min-w-0">' +
-                            '<h5 class="font-bold text-amber-900 truncate">' + (idx + 1) + '. ' + slide.title + '</h5>' +
-                            '<p class="text-[11px] text-amber-800 line-clamp-1 mt-0.5">' + slide.description + '</p>' +
+                            '<h5 class="font-bold text-amber-900 truncate">' + (idx + 1) + '. ' + (slide.title || '') + '</h5>' +
+                            '<p class="text-[11px] text-amber-800 line-clamp-1 mt-0.5">' + (slide.description || '') + '</p>' +
                         '</div>' +
                     '</div>' +
                     '<button onclick="removeTutorialSlide(' + idx + ')" class="bg-rose-100 text-rose-600 hover:bg-rose-200 p-2 rounded-xl font-bold transition flex-shrink-0">' +
