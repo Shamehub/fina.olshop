@@ -1233,17 +1233,18 @@
             printWin.document.write('</div>');
 
             // RINCIAN PESANAN
-            printWin.document.write('<div class="section-title">RINCIAN PESANAN</div>');
-            printWin.document.write('<table class="items-table">');
-            printWin.document.write('<thead><tr>');
-            printWin.document.write('<th class="text-center" style="width:40px;">NO.</th>');
-            printWin.document.write('<th>DESKRIPSI PRODUK</th>');
-            printWin.document.write('<th class="text-center" style="width:70px;">QTY</th>');
-            printWin.document.write('<th class="text-right" style="width:120px;">HARGA SATUAN</th>');
-            printWin.document.write('<th class="text-right" style="width:130px;">JUMLAH</th>');
-            printWin.document.write('</tr></thead>');
-            printWin.document.write('<tbody>' + itemsRowsHtml + '</tbody>');
-            printWin.document.write('</table>');
+            printWin.document.write('.items-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 16px; }');
+            printWin.document.write('.items-table th { background: #78350f; color: #ffffff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; }');
+            printWin.document.write('.items-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }');
+            printWin.document.write('.items-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }');
+            printWin.document.write('.items-table th.text-center { text-align: center; }');
+            printWin.document.write('.items-table th.text-right { text-align: right; }');
+            printWin.document.write('.items-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 11.5px; vertical-align: middle; }');
+            printWin.document.write('.items-table td.text-center { text-align: center; }');
+            printWin.document.write('.items-table td.text-right { text-align: right; }');
+            printWin.document.write('.prod-name { font-weight: 700; color: #0f172a; }');
+            printWin.document.write('.prod-variant { font-size: 10.5px; color: #64748b; margin-top: 2px; }');
+            printWin.document.write('.prod-note { font-size: 10px; color: #d97706; font-style: italic; margin-top: 2px; }');
 
             // RINGKASAN TOTAL
             printWin.document.write('<div class="summary-box">');
