@@ -1014,43 +1014,40 @@
         function printInvoicePdf(rowIndex) {
             var order = rawOrdersData.find(function(item) { return item.rowIndex == rowIndex; });
             if (!order) return;
-
+        
             var logoUrl = "https://lh3.googleusercontent.com/d/1HV4tGuBEWpflxJJQah1FnVcxv_5bolli";
             var finalTotalVal = Number(order.totalPrice) || 0;
-
-            // AMBIL METODE PEMBAYARAN DARI DATA PEMESANAN
-            var payMethod = order.paymentMethod || order.metodePembayaran || order.payment || order.payMethod || 'COD / Bayar di Toko';
-
+        
             // PARSING DETAIL ITEM MENJADI RINCIAN TABEL BARIS PER BARIS
             var parsedItems = [];
             var totalUnits = 0;
             var subtotalVal = 0;
-
+        
             if (order.itemsDetail) {
                 var rawLines = order.itemsDetail.split('\n');
                 var currentItem = null;
-
+        
                 for (var i = 0; i < rawLines.length; i++) {
                     var line = rawLines[i].trim();
                     if (!line) continue;
-
+        
                     if (line.indexOf('•') === 0 || line.indexOf('-') === 0) {
                         if (currentItem) parsedItems.push(currentItem);
-
+        
                         var clean = line.replace(/^[•\-]\s*/, '');
                         var regex = /^(.*?)\s*x(\d+)\s*=\s*Rp\s*([\d\.\,]+)/i;
                         var match = clean.match(regex);
-
+        
                         if (match) {
                             var fullTitle = match[1].trim();
                             var qty = parseInt(match[2], 10) || 1;
                             var totalStr = match[3].replace(/[^\d]/g, '');
                             var itemTotalVal = parseInt(totalStr, 10) || 0;
                             var unitVal = qty > 0 ? Math.round(itemTotalVal / qty) : itemTotalVal;
-
+        
                             totalUnits += qty;
                             subtotalVal += itemTotalVal;
-
+        
                             var prodTitle = fullTitle;
                             var variantText = "";
                             var parenIndex = fullTitle.indexOf('(');
@@ -1058,7 +1055,7 @@
                                 prodTitle = fullTitle.substring(0, parenIndex).trim();
                                 variantText = fullTitle.substring(parenIndex).replace(/^\(/, '').replace(/\)$/, '').trim();
                             }
-
+        
                             currentItem = {
                                 title: prodTitle,
                                 variant: variantText,
@@ -1086,7 +1083,7 @@
                 }
                 if (currentItem) parsedItems.push(currentItem);
             }
-
+        
             if (parsedItems.length === 0) {
                 parsedItems.push({
                     title: order.itemsDetail || 'Kue Tradisional Fina Olshop',
@@ -1099,10 +1096,10 @@
                 totalUnits = 1;
                 subtotalVal = finalTotalVal;
             }
-
+        
             // HITUNG POTONGAN HARGA / PROMO
             var discountVal = subtotalVal > finalTotalVal ? (subtotalVal - finalTotalVal) : 0;
-
+        
             // PEMISAHAN TANGGAL DAN JAM PENGAMBILAN
             var datePart = order.deliveryDateTime || '-';
             var timePart = '';
@@ -1111,13 +1108,13 @@
                 datePart = parts[0].trim();
                 timePart = parts[1].trim();
             }
-
+        
             // GENERATE BARIS TABEL PRODUK
             var itemsRowsHtml = parsedItems.map(function(item, idx) {
                 var numStr = (idx + 1) < 10 ? '0' + (idx + 1) : (idx + 1);
                 var variantHtml = item.variant ? '<div class="prod-variant">Varian: ' + item.variant + '</div>' : '';
                 var notesHtml = item.notes.length > 0 ? '<div class="prod-note">Catatan: ' + item.notes.join(', ') + '</div>' : '';
-
+        
                 return '<tr>' +
                     '<td class="text-center"><strong>' + numStr + '</strong></td>' +
                     '<td><div class="prod-name">' + item.title + '</div>' + variantHtml + notesHtml + '</td>' +
@@ -1126,9 +1123,9 @@
                     '<td class="text-right"><strong>Rp ' + item.totalPrice.toLocaleString('id-ID') + '</strong></td>' +
                 '</tr>';
             }).join('');
-
+        
             var printWin = window.open('', '_blank', 'width=850,height=950');
-
+        
             printWin.document.write('<!DOCTYPE html><html><head><title>Faktur Fina Olshop ' + order.orderId + '</title>');
             printWin.document.write('<link rel="preconnect" href="https://fonts.googleapis.com">');
             printWin.document.write('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>');
@@ -1194,9 +1191,9 @@
             printWin.document.write('.footer-page { display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-top: 12px; }');
             printWin.document.write('@media print { body { background: #ffffff; padding: 0; } .invoice-card { box-shadow: none; border: none; padding: 0; max-width: 100%; } }');
             printWin.document.write('</style></head><body>');
-
+        
             printWin.document.write('<div class="invoice-card">');
-
+        
             // KOP HEADER
             printWin.document.write('<div class="header-container">');
             printWin.document.write('<div class="logo-brand">');
@@ -1207,11 +1204,11 @@
             printWin.document.write('<div class="meta-info">Order ID: <span>' + order.orderId + '</span></div>');
             printWin.document.write('<div class="meta-info">Tanggal faktur: <span>' + (order.timestamp || '-') + '</span></div>');
             printWin.document.write('</div></div>');
-
+        
             printWin.document.write('<div class="header-right">');
             printWin.document.write('<h2 class="doc-title">FAKTUR</h2>');
             printWin.document.write('<div class="status-badge-box">');
-            printWin.document.write('<span class="badge-label">STATUS PEMESANAN</span>');
+            printWin.document.write('<span class="badge-label">STATUS PEMBAYARAN</span>');
             printWin.document.write('<span class="badge-value">' + (order.status || 'PENDING') + '</span>');
             printWin.document.write('</div>');
             printWin.document.write('<div class="status-badge-box">');
@@ -1219,33 +1216,32 @@
             printWin.document.write('<span class="badge-value">' + (order.shippingMethod || '-') + '</span>');
             printWin.document.write('</div>');
             printWin.document.write('</div></div>');
-
-            // INFORMASI PEMESANAN
+        
+            // INFORMASI PEMESANAN (NAMA KONSUMEN & METODE PEMBAYARAN DIPERBARUI)
             printWin.document.write('<div class="section-title">INFORMASI PEMESANAN</div>');
             printWin.document.write('<div class="info-grid">');
             printWin.document.write('<div class="info-item"><div class="info-label">Nama Konsumen</div><div class="info-val">: ' + (order.customerName || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">No. WhatsApp</div><div class="info-val">: ' + (order.phone || '-') + '</div></div>');
             printWin.document.write('<div class="info-item"><div class="info-label">Metode Pengambilan</div><div class="info-val">: ' + (order.shippingMethod || '-') + '</div></div>');
-            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pembayaran</div><div class="info-val">: ' + payMethod + '</div></div>');
+            printWin.document.write('<div class="info-item"><div class="info-label">Metode Pembayaran</div><div class="info-val">: ' + (order.paymentMethod || order.status || 'COD / Bayar di Toko') + '</div></div>');
             if (order.address && order.address !== '-') {
                 printWin.document.write('<div class="info-item"><div class="info-label">Alamat Pengiriman</div><div class="info-val">: ' + order.address + '</div></div>');
             }
             printWin.document.write('</div>');
-
+        
             // RINCIAN PESANAN
-            printWin.document.write('.items-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 16px; }');
-            printWin.document.write('.items-table th { background: #78350f; color: #ffffff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; }');
-            printWin.document.write('.items-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }');
-            printWin.document.write('.items-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }');
-            printWin.document.write('.items-table th.text-center { text-align: center; }');
-            printWin.document.write('.items-table th.text-right { text-align: right; }');
-            printWin.document.write('.items-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 11.5px; vertical-align: middle; }');
-            printWin.document.write('.items-table td.text-center { text-align: center; }');
-            printWin.document.write('.items-table td.text-right { text-align: right; }');
-            printWin.document.write('.prod-name { font-weight: 700; color: #0f172a; }');
-            printWin.document.write('.prod-variant { font-size: 10.5px; color: #64748b; margin-top: 2px; }');
-            printWin.document.write('.prod-note { font-size: 10px; color: #d97706; font-style: italic; margin-top: 2px; }');
-
+            printWin.document.write('<div class="section-title">RINCIAN PESANAN</div>');
+            printWin.document.write('<table class="items-table">');
+            printWin.document.write('<thead><tr>');
+            printWin.document.write('<th class="text-center" style="width:40px;">NO.</th>');
+            printWin.document.write('<th>DESKRIPSI PRODUK</th>');
+            printWin.document.write('<th class="text-center" style="width:70px;">QTY</th>');
+            printWin.document.write('<th class="text-right" style="width:120px;">HARGA SATUAN</th>');
+            printWin.document.write('<th class="text-right" style="width:130px;">JUMLAH</th>');
+            printWin.document.write('</tr></thead>');
+            printWin.document.write('<tbody>' + itemsRowsHtml + '</tbody>');
+            printWin.document.write('</table>');
+        
             // RINGKASAN TOTAL
             printWin.document.write('<div class="summary-box">');
             printWin.document.write('<div class="summary-details">');
@@ -1259,45 +1255,45 @@
                 printWin.document.write('<div>Jam: <span>' + timePart + '</span></div>');
             }
             printWin.document.write('</div>');
-
+        
             printWin.document.write('<div class="grand-total-container">');
             printWin.document.write('<div class="grand-total-label">TOTAL KESELURUHAN</div>');
             printWin.document.write('<div class="grand-total-val">Rp ' + finalTotalVal.toLocaleString('id-ID') + '</div>');
             printWin.document.write('</div></div>');
-
+        
             // KARTU INFORMASI BAWAH
             printWin.document.write('<div class="bottom-cards">');
             printWin.document.write('<div class="card-box">');
             printWin.document.write('<div class="card-box-header">PEMBAYARAN</div>');
-            printWin.document.write('<div class="card-box-title">' + payMethod + '</div>');
+            printWin.document.write('<div class="card-box-title">' + (order.paymentMethod || order.status || 'COD / Bayar di Toko') + '</div>');
             printWin.document.write('<div class="card-box-desc">Pembayaran dilakukan saat pesanan diambil atau sesuai metode yang telah disepakati.</div>');
             printWin.document.write('</div>');
-
+        
             printWin.document.write('<div class="card-box">');
             printWin.document.write('<div class="card-box-header">PENGAMBILAN PESANAN</div>');
             printWin.document.write('<div class="card-box-title">' + (order.deliveryDateTime || '-') + '</div>');
             printWin.document.write('<div class="card-box-desc">Silakan datang sesuai jadwal pengambilan yang telah ditentukan.</div>');
             printWin.document.write('</div></div>');
-
+        
             // AREA TANDA TANGAN DAN STEMPEL PENJUAL
             printWin.document.write('<div class="signature-container">');
             printWin.document.write('<div class="signature-box">');
             printWin.document.write('<div>Tangerang, ' + (datePart !== '-' ? datePart : (order.timestamp || '-')) + '</div>');
-            printWin.document.write('<div class="signature-title">Penjual / Pengelola Toko</div>');
+            printWin.document.write('<div class="signature-title">CEO / FOUNDER</div>');
             printWin.document.write('<div class="signature-space"></div>');
-            printWin.document.write('<div class="signature-name">......................</div>');
+            printWin.document.write('<div class="signature-name">FINA OLSHOP</div>');
             printWin.document.write('</div></div>');
-
+        
             // CATATAN KAKI
             printWin.document.write('<div class="footer-section">');
             printWin.document.write('<div class="footer-thanks">Terima kasih telah berbelanja di Fina Olshop!</div>');
             printWin.document.write('<div class="footer-disclaimer">Mohon tunjukkan faktur ini saat pengambilan pesanan. Faktur ini merupakan ringkasan pesanan dan bukan bukti pelunasan.</div>');
             printWin.document.write('<div class="footer-page"><span>FINA OLSHOP Order ' + order.orderId + '</span><span>Halaman 1</span></div>');
             printWin.document.write('</div>');
-
+        
             printWin.document.write('</div></body></html>');
             printWin.document.close();
-
+        
             setTimeout(function() {
                 printWin.focus();
                 printWin.print();
