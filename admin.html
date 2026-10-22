@@ -465,6 +465,24 @@
                             Simpan Pengumuman
                         </button>
                     </div>
+
+                    <!-- PENGATURAN BATAS MAKSIMAL PEMESANAN KUE -->
+                    <div class="bg-white p-5 rounded-3xl border border-amber-100 shadow-sm space-y-3 md:col-span-2">
+                        <div class="flex items-center gap-2 border-b border-amber-100 pb-2">
+                            <i class="fa-solid fa-calculator text-amber-600"></i>
+                            <h3 class="font-serif font-bold text-base text-amber-900">Batas Maksimal Pemesanan Kue</h3>
+                        </div>
+                        <p class="text-xs text-amber-800/80">Atur batas maksimal jumlah kue (Pcs) yang dapat dipesan oleh pelanggan dalam satu transaksi.</p>
+                        
+                        <div>
+                            <label class="block font-bold text-amber-900 text-xs mb-1">Batas Maksimal Pemesanan (Pcs) *</label>
+                            <input type="number" id="settingMaxOrderLimit" min="1" placeholder="300" class="w-full p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-900 outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+
+                        <button onclick="saveMaxOrderLimitSettings()" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow-sm">
+                            Simpan Batas Pemesanan
+                        </button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -755,6 +773,7 @@
                             tutorialSlidesList = s.tutorialSlides;
                             renderAdminTutorialSlides();
                         }
+                        if (s.maxOrderLimit) document.getElementById('settingMaxOrderLimit').value = s.maxOrderLimit;
                     }
                 }
             });
@@ -1785,6 +1804,19 @@
             apiPost('updateAdminPassword', { newPassword: pwd }).then(function() {
                 showPremiumAlert("Berhasil", "Kata sandi admin berhasil diperbarui!", "success");
                 document.getElementById('settingNewPwd').value = "";
+            });
+        }
+
+        function saveMaxOrderLimitSettings() {
+            var newLimit = parseInt(document.getElementById('settingMaxOrderLimit').value, 10);
+            if (isNaN(newLimit) || newLimit <= 0) {
+                return showPremiumAlert("Peringatan", "Harap masukkan angka batas maksimal pemesanan yang valid!", "error");
+            }
+
+            apiPost('updateMaxOrderLimit', { maxOrderLimit: newLimit }).then(function(res) {
+                showPremiumAlert("Berhasil", "Batas maksimal pemesanan kue berhasil diperbarui menjadi " + newLimit + " Pcs!", "success");
+            }).catch(function(err) {
+                showPremiumAlert("Gagal", "Terjadi kesalahan: " + err.message, "error");
             });
         }
     </script>
