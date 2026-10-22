@@ -326,11 +326,11 @@
                     <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200 flex items-center justify-between gap-3">
                         <div>
                             <span class="block text-xs font-bold text-amber-900 uppercase tracking-wider">Jumlah Pembelian:</span>
-                            <span id="minQtyNotice" class="text-[11px] font-semibold text-rose-600 block mt-0.5">Minimal pembelian: 1 Pcs</span>
+                            <span id="minQtyNotice" class="text-[11px] font-semibold text-rose-600 block mt-0.5">Minimal pembelian: 1 Pcs (Maks. 300 Pcs)</span>
                         </div>
                         <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-amber-200 shadow-sm">
                             <button type="button" onclick="adjustModalQty(-1)" class="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-bold flex items-center justify-center hover:bg-amber-200 transition">-</button>
-                            <span id="modalQtyInput" class="font-bold text-sm w-8 text-center">1</span>
+                            <input type="number" id="modalQtyInput" min="1" max="300" value="1" onchange="validateModalQtyInput(this.value)" class="font-bold text-sm w-12 text-center bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                             <button type="button" onclick="adjustModalQty(1)" class="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-bold flex items-center justify-center hover:bg-amber-200 transition">+</button>
                         </div>
                     </div>
@@ -1303,13 +1303,41 @@
 
         function adjustModalQty(delta) {
             var minAllowed = currentSelectedVariant ? (currentSelectedVariant.minQty || 1) : 1;
+            var maxAllowed = 300;
             var newQty = currentModalQty + delta;
+        
             if (newQty < minAllowed) {
                 showPremiumAlert("Minimal Pembelian", "Minimal pembelian untuk varian ini adalah " + minAllowed + " Pcs.", "error");
                 return;
             }
+        
+            if (newQty > maxAllowed) {
+                showPremiumAlert("Batas Pemesanan", "Maksimal pemesanan kue dibatasi hingga " + maxAllowed + " Pcs.", "error");
+                return;
+            }
+        
             currentModalQty = newQty;
-            document.getElementById('modalQtyInput').innerText = currentModalQty;
+            var inputEl = document.getElementById('modalQtyInput');
+            if (inputEl) inputEl.value = currentModalQty;
+        }
+        
+        function validateModalQtyInput(val) {
+            var parsed = parseInt(val, 10);
+            var minAllowed = currentSelectedVariant ? (currentSelectedVariant.minQty || 1) : 1;
+            var maxAllowed = 300;
+        
+            if (isNaN(parsed) || parsed < minAllowed) {
+                showPremiumAlert("Minimal Pembelian", "Minimal pembelian untuk varian ini adalah " + minAllowed + " Pcs.", "error");
+                currentModalQty = minAllowed;
+            } else if (parsed > maxAllowed) {
+                showPremiumAlert("Batas Pemesanan", "Maksimal pemesanan kue dibatasi hingga " + maxAllowed + " Pcs.", "error");
+                currentModalQty = maxAllowed;
+            } else {
+                currentModalQty = parsed;
+            }
+        
+            var inputEl = document.getElementById('modalQtyInput');
+            if (inputEl) inputEl.value = currentModalQty;
         }
 
         function shareCurrentProduct() {
@@ -1538,13 +1566,41 @@
             if (!cart[index]) return;
             var parsedQty = parseInt(value, 10);
             var minAllowed = cart[index].minQty || 1;
-
+            var maxAllowed = 300;
+        
             if (isNaN(parsedQty) || parsedQty < minAllowed) {
                 showPremiumAlert("Minimal Pembelian", "Jumlah minimal pembelian untuk item ini adalah " + minAllowed + " Pcs.", "error");
                 cart[index].qty = minAllowed;
+            } else if (parsedQty > maxAllowed) {
+                showPremiumAlert("Batas Pemesanan", "Maksimal pemesanan untuk kue ini adalah " + maxAllowed + " Pcs.", "error");
+                cart[index].qty = maxAllowed;
             } else {
                 cart[index].qty = parsedQty;
             }
+            updateCartUI();
+        }
+        
+        function updateCartQty(index, delta) {
+            if (!cart[index]) return;
+            var minAllowed = cart[index].minQty || 1;
+            var maxAllowed = 300;
+            var newQty = cart[index].qty + delta;
+        
+            if (delta > 0 && newQty > maxAllowed) {
+                showPremiumAlert("Batas Pemesanan", "Maksimal pemesanan untuk kue ini adalah " + maxAllowed + " Pcs.", "error");
+                return;
+            }
+        
+            if (delta < 0 && newQty < minAllowed) {
+                showPremiumAlert("Hapus Item", "Kurangi jumlah hingga di bawah minimal (" + minAllowed + " Pcs) akan menghapus item ini dari keranjang. Lanjutkan?", "confirm", function() {
+                    cart.splice(index, 1);
+                    updateCartUI();
+                });
+                return;
+            }
+        
+            cart[index].qty = newQty;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
             updateCartUI();
         }
 
