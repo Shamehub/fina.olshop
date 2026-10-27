@@ -1225,13 +1225,13 @@
                             <h1 class="brand-title">FINA OLSHOP</h1>
                             <p class="brand-subtitle">Faktur pesanan Bukti transaksi pelanggan</p>
                             <div class="meta-info">Order ID: <span>${order.orderId || '-'}</span></div>
-                            <div class="meta-info">Tanggal faktur: <span>${order.timestamp || '-'}</span></div>
+                            <div class="meta-info">Tanggal Pemesanan: <span>${order.timestamp || '-'}</span></div>
                         </div>
                     </div>
                     <div class="header-right">
                         <h2 class="doc-title">FAKTUR</h2>
                         <div class="status-badge-box">
-                            <span class="badge-label">STATUS PEMBAYARAN</span>
+                            <span class="badge-label">STATUS PESANAN</span>
                             <span class="badge-value">${order.status || 'PENDING'}</span>
                         </div>
                         <div class="status-badge-box">
@@ -1284,14 +1284,14 @@
                 <!-- KARTU INFORMASI BAWAH -->
                 <div class="bottom-cards">
                     <div class="card-box">
-                        <div class="card-box-header">PEMBAYARAN</div>
+                        <div class="card-box-header">METODE PEMBAYARAN</div>
                         <div class="card-box-title">${payMethod}</div>
                         <div class="card-box-desc">Pembayaran dilakukan saat pesanan diambil atau sesuai metode yang telah disepakati.</div>
                     </div>
                     <div class="card-box">
-                        <div class="card-box-header">PENGAMBILAN PESANAN</div>
+                        <div class="card-box-header">PENGAMBILAN/PENGIRIMAN PESANAN</div>
                         <div class="card-box-title">${order.deliveryDateTime || '-'}</div>
-                        <div class="card-box-desc">Silakan datang sesuai jadwal pengambilan yang telah ditentukan.</div>
+                        <div class="card-box-desc">Pesanan akan dikirim/diambil sesuai metode yang telah ditentukan.</div>
                     </div>
                 </div>
         
