@@ -1269,10 +1269,10 @@
                 <!-- RINGKASAN TOTAL -->
                 <div class="summary-box">
                     <div class="summary-details">
-                        <div>Total Item: <span>${totalUnits} unit</span></div>
+                        <div>Total Item: <span>${totalUnits} Pcs</span></div>
                         <div>Subtotal Produk: <span>Rp ${subtotalVal.toLocaleString('id-ID')}</span></div>
                         ${discountVal > 0 ? `<div style="color:#e11d48; font-weight:bold;">Potongan Harga / Promo: <span>-Rp ${discountVal.toLocaleString('id-ID')}</span></div>` : ''}
-                        <div>Waktu Pengambilan: <span>${datePart}</span></div>
+                        <div>Waktu Kirim/Ambil: <span>${datePart}</span></div>
                         ${timePart ? `<div>Jam: <span>${timePart}</span></div>` : ''}
                     </div>
                     <div class="grand-total-container">
@@ -1286,19 +1286,18 @@
                     <div class="card-box">
                         <div class="card-box-header">METODE PEMBAYARAN</div>
                         <div class="card-box-title">${payMethod}</div>
-                        <div class="card-box-desc">Pembayaran dilakukan saat pesanan diambil atau sesuai metode yang telah disepakati.</div>
+                        <div class="card-box-desc">Pembayaran dilakukan saat pesanan diterima atau sesuai metode yang telah disepakati.</div>
                     </div>
                     <div class="card-box">
                         <div class="card-box-header">PENGAMBILAN/PENGIRIMAN PESANAN</div>
                         <div class="card-box-title">${order.deliveryDateTime || '-'}</div>
-                        <div class="card-box-desc">Pesanan akan dikirim/diambil sesuai metode yang telah ditentukan.</div>
+                        <div class="card-box-desc">Pesanan dapat diambil/dikirim sesuai metode yang telah ditentukan.</div>
                     </div>
                 </div>
         
                 <!-- AREA TANDA TANGAN -->
                 <div class="signature-container">
-                    <div class="signature-box">
-                        <div>Tangerang, ${datePart !== '-' ? datePart : (order.timestamp || '-')}</div>
+                    <div class="signature-box">                        
                         <div class="signature-title">Penjual / Pengelola Toko</div>
                         <div class="signature-space"></div>
                         <div class="signature-name">FINA OLSHOP</div>
